@@ -1,4 +1,5 @@
-﻿
+﻿using System;
+
 public class NEATNode {
 
     //constant node types
@@ -22,5 +23,29 @@ public class NEATNode {
         else {
             this.value = 0f;
         }
+    }
+
+    public int GetNodeID() {
+        return ID;
+    }
+
+    public int GetNodeType(){
+        return type;
+    }
+
+    public float GetValue()
+    {
+        return value;
+    }
+
+    public void SetValue(float value)
+    {
+        if(type != INPUT_BIAS_NODE)
+            this.value = value;
+    }
+
+    public void Activation()
+    {
+        value =  (float)Math.Tanh(value);
     }
 }
