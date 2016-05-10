@@ -16,8 +16,8 @@ public class Tester : MonoBehaviour
 
     void Start()
     {
-        isActive = true;
-        net = new NEATNet(0,6,1);
+        //isActive = true;
+        //net = new NEATNet(0,6,1);
     }
 
     void FixedUpdate()
@@ -35,8 +35,8 @@ public class Tester : MonoBehaviour
 
     public void Activate(NEATNet net)
     {
-        /*this.net = neatNet;
-        Invoke(ON_FINISHED, (float)net.GetNetTestTime());*/
+        this.net = net;
+        Invoke(ON_FINISHED, net.GetTestTime());
         isActive = true;
     }
 
@@ -45,7 +45,7 @@ public class Tester : MonoBehaviour
     {
         if (TestFinished != null)
         {
-            //TestFinished(net.GetNetID(), EventArgs.Empty);
+            TestFinished(net.GetNetID(), EventArgs.Empty);
             Destroy(gameObject);
         }
     }

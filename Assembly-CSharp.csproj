@@ -57,6 +57,7 @@
      <Compile Include="Assets\MyNEAT\NEATPopulation.cs" />
      <Compile Include="Assets\MyNEAT\Node.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
+     <Compile Include="Assets\NEAT\NEATGeneticController.cs" />
      <Compile Include="Assets\NEAT\NEATNet.cs" />
      <Compile Include="Assets\NEAT\NEATNode.cs" />
      <Compile Include="Assets\NEAT\Tester.cs" />

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class NEATNet{
 
@@ -8,11 +9,18 @@ public class NEATNet{
     private int numberOfInputs;
     private int numberOfOutputs;
     private int innovationNumber;
+    private int netID;
 
-    public NEATNet(int innovationNumber, int numberOfInputs, int numberOfOutputs) {
+    private float time;
+    private float netFitness;
+
+    public NEATNet(int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
+        this.netID = netID;
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
         this.innovationNumber = innovationNumber;
+        this.time = time;
+        this.netFitness = 0f;
 
         InitilizeNodes();
         InitilizeGenes();
@@ -36,12 +44,6 @@ public class NEATNet{
             node = new NEATNode(i, NEATNode.OUTPUT_NODE);
             nodeList.Add(node);
         }
-
-        /*for (int i = 0; i < nodeList.Count; i++) {
-            UnityEngine.Debug.Log(nodeList[i].GetNodeID()+" "+nodeList[i].GetNodeType());
-        }
-        UnityEngine.Debug.Log("---");*/
-
     }
 
     public void InitilizeGenes() {
@@ -55,11 +57,26 @@ public class NEATNet{
                 innovationNumber++;
             }
         }
-        
-        /*for (int i = 0; i < geneList.Count; i++)
-        {
-            UnityEngine.Debug.Log(geneList[i].GetInnovation()+" "+geneList[i].GetInID() + " " + geneList[i].GetOutID());
-        }*/
+    }
+
+    public float GetNetFitness() {
+        return netFitness;
+    }
+
+    public void SetNetFitness(float netFitness) {
+        this.netFitness = netFitness;
+    }
+
+    public void AddNetFitness(float netFitness) {
+        this.netFitness += netFitness;
+    }
+
+    public int GetNetID() {
+        return netID;
+    }
+
+    public float GetTestTime() {
+        return time;
     }
 
     public void SetInputValues(float[] inputs) {
@@ -146,8 +163,119 @@ public class NEATNet{
     }
 
     public void Mutate() {
+        int randomNumber = Random.Range(1,101);
+        if (randomNumber <= 5) {
+            AddConnection();
+        }
+        else if (randomNumber <= 10) {
+            AddNode();
+        }
+
+        MutateWeight();
+    }
+
+    public void AddConnection(){
+        int randomNodeID1, randomNodeID2;
+        bool found = false;
+        int totalAttemptsAllowed = (int)Mathf.Pow(nodeList.Count,2);
+
+        while (totalAttemptsAllowed > 0 && found == false) {
+           
+            randomNodeID1 = Random.Range(numberOfInputs, nodeList.Count);
+            randomNodeID2 = Random.Range(numberOfInputs, nodeList.Count);
+
+            if (!ConnectionExists(randomNodeID1, randomNodeID2)) {
+                NEATGene gene = new NEATGene(innovationNumber, randomNodeID1, randomNodeID2, 1f, true);
+                geneList.Add(gene);
+                innovationNumber++;
+                found = true;
+            }
+            else if(!ConnectionExists(randomNodeID2, randomNodeID1)) {
+                NEATGene gene = new NEATGene(innovationNumber, randomNodeID2, randomNodeID1, 1f, true);
+                geneList.Add(gene);
+                innovationNumber++;
+                found = true;
+            }
+
+            if(randomNodeID1 == randomNodeID2)
+                totalAttemptsAllowed --;
+            else
+                totalAttemptsAllowed -= 2;
+        }
+
+        if (found == false) {
+            AddNode();
+        }
 
     }
 
+    public void AddNode(){
+        int firstID, secondID, thirdID;
+        float oldWeight;
+        int randomGeneIndex = Random.Range(0, geneList.Count);
 
+        NEATGene oldGene = geneList[randomGeneIndex];
+        oldGene.SetGeneState(false);
+        firstID = oldGene.GetInID();
+        thirdID = oldGene.GetOutID();
+        oldWeight = oldGene.GetWeight(); 
+        
+        NEATNode newNode = new NEATNode(nodeList.Count,NEATNode.HIDDEN_NODE);
+        nodeList.Add(newNode);
+        secondID = newNode.GetNodeID();
+        
+        NEATGene newGene1 = new NEATGene(innovationNumber,firstID,secondID,1f,true);
+        innovationNumber++;
+
+        NEATGene newGene2 = new NEATGene(innovationNumber, secondID, thirdID, oldWeight, true);
+        innovationNumber++;
+
+        geneList.Add(newGene1);
+        geneList.Add(newGene2);
+    }
+
+    public void MutateWeight(){
+        int numberOfGenes = geneList.Count;
+        float weight;
+        for (int i = 0; i < numberOfGenes; i++){
+            NEATGene gene = geneList[i];
+
+            int randomNumber = Random.Range(1, 101);
+
+            if (randomNumber <= 1) {
+                weight = gene.GetWeight();
+                weight *= -1f;
+                gene.SetWeight(weight);
+            }
+            else if (randomNumber <= 2) {
+                weight = Random.Range(-1f,1f);
+                gene.SetWeight(weight);
+            }
+            else if (randomNumber <= 3) {
+                float factor = Random.Range(0f,1f) + 1f;
+                weight = gene.GetWeight() * factor;
+                gene.SetWeight(weight);
+            }
+            else if (randomNumber <= 4) {
+                float factor = Random.Range(0f, 1f);
+                weight = gene.GetWeight() * factor;
+                gene.SetWeight(weight);
+            }
+        }
+
+    }
+
+    public bool ConnectionExists(int inID, int outID) {
+        int numberOfGenes = geneList.Count;
+
+        for (int i = 0; i < numberOfGenes; i++) {
+            int nodeInID = geneList[i].GetInID();
+            int nodeOutID = geneList[i].GetOutID();
+
+            if (nodeInID == inID && nodeOutID == outID)
+                return true;
+        }
+
+        return false;
+    }
 }

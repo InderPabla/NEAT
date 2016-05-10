@@ -36,4 +36,12 @@ public class NEATGene {
     public bool GetGeneState() {
         return on;
     }
+
+    public void SetGeneState(bool on) {
+        this.on = on;
+    }
+
+    public void SetWeight(float weight) {
+        this.weight = weight;
+    }
 }
