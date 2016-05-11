@@ -45,27 +45,22 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Balancer\Agent.cs" />
-     <Compile Include="Assets\Balancer\GeneticController.cs" />
-     <Compile Include="Assets\Balancer\GeneticNetTester.cs" />
-     <Compile Include="Assets\Balancer\Layer.cs" />
-     <Compile Include="Assets\Balancer\Net.cs" />
-     <Compile Include="Assets\Balancer\Perceptron.cs" />
-     <Compile Include="Assets\MyNEAT\Gene.cs" />
-     <Compile Include="Assets\MyNEAT\Genome.cs" />
-     <Compile Include="Assets\MyNEAT\NEAT.cs" />
-     <Compile Include="Assets\MyNEAT\NEATPopulation.cs" />
-     <Compile Include="Assets\MyNEAT\Node.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
      <Compile Include="Assets\NEAT\NEATGeneticController.cs" />
      <Compile Include="Assets\NEAT\NEATNet.cs" />
      <Compile Include="Assets\NEAT\NEATNode.cs" />
      <Compile Include="Assets\NEAT\Tester.cs" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>

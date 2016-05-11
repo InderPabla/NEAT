@@ -9,6 +9,15 @@ public class NEATGene {
 
     private bool on;
 
+    public NEATGene(NEATGene copy)
+    {
+        this.inno = copy.inno;
+        this.inID = copy.inID;
+        this.outID = copy.outID;
+        this.weight = copy.weight;
+        this.on = copy.on;
+    }
+
     public NEATGene(int inno, int inID, int outID, float weight, bool on) {
         this.inno = inno;
         this.inID = inID;

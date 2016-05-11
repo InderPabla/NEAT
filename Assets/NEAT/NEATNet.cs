@@ -14,6 +14,30 @@ public class NEATNet{
     private float time;
     private float netFitness;
 
+    public NEATNet(NEATNet copy) {
+        this.netID = copy.netID;
+        this.numberOfInputs = copy.numberOfInputs;
+        this.numberOfOutputs = copy.numberOfOutputs;
+        this.innovationNumber = copy.innovationNumber;
+        this.time = copy.time;
+        this.netFitness = 0f;
+
+        nodeList = new List<NEATNode>();
+        geneList = new List<NEATGene>();
+
+        int numberOfNodes = copy.nodeList.Count;
+        for (int i = 0; i < numberOfNodes; i++) {
+            NEATNode node = new NEATNode(copy.nodeList[i]);
+            nodeList.Add(node);
+        }
+
+        int numberOfGenes = copy.geneList.Count;
+        for (int i = 0; i < numberOfGenes; i++) {
+            NEATGene gene = new NEATGene(copy.geneList[i]);
+            geneList.Add(gene);
+        }
+    }
+
     public NEATNet(int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
         this.netID = netID;
         this.numberOfInputs = numberOfInputs;
@@ -24,6 +48,8 @@ public class NEATNet{
 
         InitilizeNodes();
         InitilizeGenes();
+
+        Mutate();
     }
 
     public void InitilizeNodes() {
@@ -63,6 +89,10 @@ public class NEATNet{
         return netFitness;
     }
 
+    public void SetNetID(int netID) {
+        this.netID = netID;
+    }
+
     public void SetNetFitness(float netFitness) {
         this.netFitness = netFitness;
     }
@@ -77,6 +107,16 @@ public class NEATNet{
 
     public float GetTestTime() {
         return time;
+    }
+
+    public int GetNodeCount()
+    {
+        return nodeList.Count;
+    }
+
+    public int GetGeneCount()
+    {
+        return geneList.Count;
     }
 
     public void SetInputValues(float[] inputs) {
@@ -170,7 +210,6 @@ public class NEATNet{
         else if (randomNumber <= 10) {
             AddNode();
         }
-
         MutateWeight();
     }
 
@@ -234,6 +273,28 @@ public class NEATNet{
         geneList.Add(newGene2);
     }
 
+    //-----UNUSED
+    public void DeleteConnection() {
+        int randomGeneIndex = Random.Range(0, geneList.Count);
+        geneList.RemoveAt(randomGeneIndex);
+    }
+
+    //-----UNUSED
+    public void DeleteNode() {
+        int randomNodeIndex = Random.Range(numberOfInputs+numberOfOutputs, nodeList.Count);
+        
+        for (int i = 0; i < geneList.Count; i++) {
+            NEATGene gene = geneList[i];
+            int inID = gene.GetInID();
+            int outID = gene.GetOutID();
+
+            if (inID == randomNodeIndex || outID == randomNodeIndex) {
+                geneList.RemoveAt(i);
+            }
+        }
+        nodeList.RemoveAt(randomNodeIndex);
+    }
+
     public void MutateWeight(){
         int numberOfGenes = geneList.Count;
         float weight;
@@ -261,6 +322,10 @@ public class NEATNet{
                 weight = gene.GetWeight() * factor;
                 gene.SetWeight(weight);
             }
+            else if (randomNumber <= 5)
+            {
+                gene.SetGeneState(!gene.GetGeneState());
+            }
         }
 
     }
@@ -278,4 +343,23 @@ public class NEATNet{
 
         return false;
     }
+
+    public void ClearNodeValues() {
+        int numberOfNodes = nodeList.Count;
+        for (int i = 0; i < numberOfNodes; i++)
+        {
+            nodeList[i].SetValue(0f);
+        }
+    }
+
+    internal static NEATNet CreateMutateCopy(NEATNet net)
+    {
+        NEATNet copy = null;
+
+        copy = new NEATNet(net);
+        copy.Mutate();
+
+        return copy;
+    }
+
 }

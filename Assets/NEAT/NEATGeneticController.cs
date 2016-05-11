@@ -15,7 +15,7 @@ public class NEATGeneticController : MonoBehaviour
     public float testTime = 0;
 
     private NEATNet[] nets; //array of neural networks 
-    private float[,] finishedNetID;
+    private float[,] finishedResults;
     private int testCounter; //counter for population testing
     private Semaphore finished; //mutex lock for when test if finished and updating test counter
     private const string ACTIVATE = "Activate";
@@ -25,10 +25,22 @@ public class NEATGeneticController : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < populationSize; i++)
+        /*for (int i = 0; i < populationSize; i++)
         {
             GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
             tester.name = i + "";
+        }*/
+
+        Application.runInBackground = true;
+        if (ErrorCheck() == false)
+        {
+            testCounter = 0;
+            finished = new Semaphore(1, 1);
+            nets = new NEATNet[populationSize];
+            finishedResults = new float[populationSize, 2];
+
+            GenerateInitialNets();
+            GeneratePopulation();
         }
     }
 
@@ -49,18 +61,23 @@ public class NEATGeneticController : MonoBehaviour
     {
         for (int i = 0; i < populationSize; i++)
         {
-            GameObject agent = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
-            agent.name = i + "";
-            agent.SendMessage(ACTIVATE, nets[i]);
-            agent.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
+            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
+            tester.name = i + "";
+            tester.SendMessage(ACTIVATE, nets[i]);
+            tester.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
         }
     }
 
     public void OnFinished(object source, EventArgs e)
     {
         finished.WaitOne();
+        int netID = (int)source;
+
+        finishedResults[testCounter, 0] = netID;
+        finishedResults[testCounter, 1] = nets[netID].GetNetFitness();
 
         testCounter++;
+
         if (testCounter == populationSize)
         {
             TestFinished();
@@ -73,7 +90,37 @@ public class NEATGeneticController : MonoBehaviour
     {
         testCounter = 0;
         generationNumber++;
-        
+
+        NEATNet[] tempNet = new NEATNet[populationSize];
+
+        SortFitness();
+        int bestNetIndex = (int)finishedResults[populationSize - 1, 0];
+        Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
+        Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
+        /*for (int i = 0; i < populationSize; i++) {
+            Debug.Log((int)finishedResults[i, 0]+" "+finishedResults[i,1]);
+        }*/
+
+        int index = 0;
+        for (int i = populationSize/2; i < populationSize; i++)
+        {
+            NEATNet net = nets[(int)finishedResults[i, 0]];
+            NEATNet net1 = NEATNet.CreateMutateCopy(net);
+            NEATNet net2 = NEATNet.CreateMutateCopy(net);
+            tempNet[index] = net1;
+            tempNet[index+1] = net2;
+            index += 2;
+        }
+
+        for (int i = 0; i < populationSize; i++)
+        {
+            nets[i] = tempNet[i];
+            nets[i].SetNetFitness(0);
+            nets[i].SetNetID(i);
+            nets[i].ClearNodeValues();
+        }
+
+        GeneratePopulation();
     }
 
     public List<int> GenerateListNumbers(int min, int max)
@@ -121,16 +168,16 @@ public class NEATGeneticController : MonoBehaviour
             j++;
             for (int i = 0; i < populationSize - j; i++)
             {
-                if (finishedNetID[i, 1] < finishedNetID[i + 1, 1])
+                if (finishedResults[i, 1] > finishedResults[i + 1, 1])
                 {
-                    tempFitness[0] = finishedNetID[i, 0];
-                    tempFitness[1] = finishedNetID[i, 1];
+                    tempFitness[0] = finishedResults[i, 0];
+                    tempFitness[1] = finishedResults[i, 1];
 
-                    finishedNetID[i, 0] = finishedNetID[i + 1, 0];
-                    finishedNetID[i, 1] = finishedNetID[i + 1, 1];
+                    finishedResults[i, 0] = finishedResults[i + 1, 0];
+                    finishedResults[i, 1] = finishedResults[i + 1, 1];
 
-                    finishedNetID[i + 1, 0] = tempFitness[0];
-                    finishedNetID[i + 1, 1] = tempFitness[1];
+                    finishedResults[i + 1, 0] = tempFitness[0];
+                    finishedResults[i + 1, 1] = tempFitness[1];
                     swapped = true;
                 }
             }

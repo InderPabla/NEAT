@@ -13,8 +13,14 @@ public class NEATNode {
 
     private float value;
 
-    public NEATNode(int id, int type) {
-        this.ID = id;
+    public NEATNode(NEATNode copy) {
+        this.ID = copy.ID;
+        this.type = copy.type;
+        this.value = copy.value;
+    }
+
+    public NEATNode(int ID, int type) {
+        this.ID = ID;
         this.type = type;      
 
         if (this.type == INPUT_BIAS_NODE) {
