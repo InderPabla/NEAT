@@ -50,8 +50,8 @@ public class NEATNode {
             this.value = value;
     }
 
-    public void Activation()
-    {
+    public void Activation() {
         value =  (float)Math.Tanh(value);
+        //value= 1.0f / (1.0f + (float)Math.Exp(-value));
     }
 }

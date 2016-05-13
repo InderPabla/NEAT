@@ -203,14 +203,28 @@ public class NEATNet{
     }
 
     public void Mutate() {
-        int randomNumber = Random.Range(1,101);
-        if (randomNumber <= 5) {
-            AddConnection();
+        int randomNumberT;
+        do
+        {
+            randomNumberT = Random.Range(1, 3);
+            int randomNumber = Random.Range(1, 101);
+            if (randomNumber <= 5)
+            {
+                AddConnection();
+            }
+            else if (randomNumber <= 10)
+            {
+                AddNode();
+            }
         }
-        else if (randomNumber <= 10) {
-            AddNode();
+        while (randomNumberT == 1);
+
+        do
+        {
+            randomNumberT = Random.Range(1, 3);
+            MutateWeight();
         }
-        MutateWeight();
+        while (randomNumberT == 1);
     }
 
     public void AddConnection(){

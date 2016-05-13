@@ -23,8 +23,7 @@ public class NEATGeneticController : MonoBehaviour
 
 
 
-    void Start()
-    {
+    void Start() {
         /*for (int i = 0; i < populationSize; i++)
         {
             GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
@@ -32,8 +31,7 @@ public class NEATGeneticController : MonoBehaviour
         }*/
 
         Application.runInBackground = true;
-        if (ErrorCheck() == false)
-        {
+        if (ErrorCheck() == false) {
             testCounter = 0;
             finished = new Semaphore(1, 1);
             nets = new NEATNet[populationSize];
@@ -44,24 +42,29 @@ public class NEATGeneticController : MonoBehaviour
         }
     }
 
-    void Update()
-    {
+    void Update() {
 
     }
 
-    public void GenerateInitialNets()
-    {
-        for (int i = 0; i < populationSize; i++)
-        {
+    public void GenerateInitialNets() {
+        for (int i = 0; i < populationSize; i++) {
             nets[i] = new NEATNet(i, 0, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
         }
     }
 
-    public void GeneratePopulation()
-    {
-        for (int i = 0; i < populationSize; i++)
-        {
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
+    public void GeneratePopulation() {
+        float height = 10f;
+        float width = -12f;
+        for (int i = 0; i < populationSize; i++) {
+            if (i % 6 == 0)
+            {
+                height-=2;
+                width = 0;
+            }
+
+            //Vector3 randomLocation = new Vector3(UnityEngine.Random.Range(-16f,16f), UnityEngine.Random.Range(-7f, 7f));
+            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width, height, 0)/*randomLocation*/, testPrefab.transform.rotation);
+            width+=2;
             tester.name = i + "";
             tester.SendMessage(ACTIVATE, nets[i]);
             tester.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
@@ -102,18 +105,16 @@ public class NEATGeneticController : MonoBehaviour
         }*/
 
         int index = 0;
-        for (int i = populationSize/2; i < populationSize; i++)
-        {
+        for (int i = populationSize/2; i < populationSize; i++) {
             NEATNet net = nets[(int)finishedResults[i, 0]];
             NEATNet net1 = NEATNet.CreateMutateCopy(net);
-            NEATNet net2 = NEATNet.CreateMutateCopy(net);
+            //NEATNet net2 = NEATNet.CreateMutateCopy(net);
             tempNet[index] = net1;
-            tempNet[index+1] = net2;
+            tempNet[index+1] = net;
             index += 2;
         }
 
-        for (int i = 0; i < populationSize; i++)
-        {
+        for (int i = 0; i < populationSize; i++) {
             nets[i] = tempNet[i];
             nets[i].SetNetFitness(0);
             nets[i].SetNetID(i);
@@ -126,20 +127,17 @@ public class NEATGeneticController : MonoBehaviour
     public List<int> GenerateListNumbers(int min, int max)
     {
         List<int> unusedIndicies = new List<int>();
-        for (int i = min; i <= max; i++)
-        {
+        for (int i = min; i <= max; i++) {
             unusedIndicies.Add(i);
         }
         return unusedIndicies;
     }
 
-    public int[,] GenerateRandomUniquePaires(List<int> indicies)
-    {
+    public int[,] GenerateRandomUniquePaires(List<int> indicies) {
         int[,] paires = new int[indicies.Count / 2, 2];
         int count = indicies.Count / 2;
 
-        for (int i = 0; i < count; i++)
-        {
+        for (int i = 0; i < count; i++) {
             int index1, index2, item1, item2;
 
             index1 = UnityEngine.Random.Range(0, indicies.Count);
@@ -157,13 +155,11 @@ public class NEATGeneticController : MonoBehaviour
         return paires;
     }
 
-    public void SortFitness()
-    {
+    public void SortFitness() {
         float[] tempFitness = new float[2];
         bool swapped = true;
         int j = 0;
-        while (swapped)
-        {
+        while (swapped) {
             swapped = false;
             j++;
             for (int i = 0; i < populationSize - j; i++)
