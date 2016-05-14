@@ -24,7 +24,7 @@ public class Tester : MonoBehaviour
 
     void TakePoint() {
         points.Add(bodies[0].transform.position);
-        Invoke("TakePoint",0.5f);
+        Invoke("TakePoint",1f);
     }
 
     void FixedUpdate()
@@ -60,6 +60,8 @@ public class Tester : MonoBehaviour
     }
 
     float h1 = -1f, h2 = -1f, h3 = -1f, h4 = -1f, h5 = -1f, h6 = -1f, h7 = -1f, h8 = -1f, h9 = -1f, h10 = -1f;
+    float doDamage = 5f;
+    float[] output;
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet()
@@ -80,31 +82,39 @@ public class Tester : MonoBehaviour
         float[] output = net.FireNet(inputValues); //caluclate new neural net output with given input values
         bodies[0].velocity += new Vector2(output[0], 0); //update track velocity with neural net output*/
 
+        float angle = -40f;
+        float angleAdd = 10f;
 
-
-        Vector2 dir1 = Quaternion.AngleAxis(22.5f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir2 = Quaternion.AngleAxis(45f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir3 = Quaternion.AngleAxis(67.5f, Vector3.forward ) * bodies[0].transform.up;
-        Vector2 dir4 = Quaternion.AngleAxis(90f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir5 = Quaternion.AngleAxis(-22.5f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir6 = Quaternion.AngleAxis(-45f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir7 = Quaternion.AngleAxis(-67.5f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 dir8 = Quaternion.AngleAxis(-90f, Vector3.forward) * bodies[0].transform.up;
+        Vector2 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir2 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir3 = Quaternion.AngleAxis(angle, Vector3.forward ) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir4 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd*2;
+        Vector2 dir5 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir6 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir7 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector2 dir8 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
         Vector2 dir9 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
 
         Vector2 position = bodies[0].transform.position + 0.5f* bodies[0].transform.up;
-        RaycastHit2D hit1 = Physics2D.Raycast(position, bodies[0].transform.up, 2.5f);
-        RaycastHit2D hit2 = Physics2D.Raycast(position, dir1, 2.5f);
-        RaycastHit2D hit3 = Physics2D.Raycast(position, dir2, 2.5f);
-        RaycastHit2D hit4 = Physics2D.Raycast(position, dir3, 2.5f);
-        RaycastHit2D hit5 = Physics2D.Raycast(position, dir4, 2.5f);
-        RaycastHit2D hit6 = Physics2D.Raycast(position, dir5, 2.5f);
-        RaycastHit2D hit7 = Physics2D.Raycast(position, dir6, 2.5f);
-        RaycastHit2D hit8 = Physics2D.Raycast(position, dir7, 2.5f);
-        RaycastHit2D hit9 = Physics2D.Raycast(position, dir8, 2.5f);
+        RaycastHit2D hit1 = Physics2D.Raycast(position, bodies[0].transform.up, 2f);
+        RaycastHit2D hit2 = Physics2D.Raycast(position, dir1, 2f);
+        RaycastHit2D hit3 = Physics2D.Raycast(position, dir2, 2);
+        RaycastHit2D hit4 = Physics2D.Raycast(position, dir3, 2);
+        RaycastHit2D hit5 = Physics2D.Raycast(position, dir4, 2);
+        RaycastHit2D hit6 = Physics2D.Raycast(position, dir5, 2);
+        RaycastHit2D hit7 = Physics2D.Raycast(position, dir6, 2);
+        RaycastHit2D hit8 = Physics2D.Raycast(position, dir7, 2);
+        RaycastHit2D hit9 = Physics2D.Raycast(position, dir8, 2);
 
         position = bodies[0].transform.position - 0.5f * bodies[0].transform.up;
-        RaycastHit2D hit10 = Physics2D.Raycast(position, dir9, 4f);
+        RaycastHit2D hit10 = Physics2D.Raycast(position, dir9, 2f);
 
         h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
         if (hit1.collider!=null)
@@ -157,95 +167,103 @@ public class Tester : MonoBehaviour
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position);
         }
 
-        float boardLocation = bodies[0].transform.position.x / 4f;
+        float[] inputValues = { h1,h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
 
-        float[] inputValues = { h1,h2,h3,h4,h5,h6,h7,h8,h9,h10, damage/10f}; //gather pole and track data into an array 
-
-        float[] output = net.FireNet(inputValues);
+        output = net.FireNet(inputValues);
 
         Vector2 dir = bodies[0].transform.up;
-        if (output[1] > 0)
-            bodies[0].velocity = 2f * dir  * output[1];
+        /*if (output[1] > 0.9f)
+            bodies[0].velocity = 2f * dir * output[1];*/
 
-
-        if (output[0]<0f)
-            bodies[0].angularVelocity = 500f;
+        if (output[1] > 0.75f)
+            bodies[0].velocity = 2f * dir;
+        else if (output[1] < -0.75f)
+            bodies[0].velocity = -2f * dir;
         else
-            bodies[0].angularVelocity = -500f;
+            bodies[0].velocity = Vector2.zero;
+
+        if (output[0] > 0.75f)
+            bodies[0].angularVelocity = 250f;
+        else if (output[0] < -0.75f)
+            bodies[0].angularVelocity = -250f;
+        else
+            bodies[0].angularVelocity = 0f;
 
         //bodies[0].angularVelocity = output[0] * -750f;
 
-        float doDamage = 2f;
-        if (bodies[0].velocity.magnitude <= 0.25f)
+        doDamage = 5f;
+        if (bodies[0].velocity.magnitude == 0f)
             doDamage = 0f;
+        else if (output[1] < -0.9f)
+            doDamage = 100f;
 
         if (h1 != -1)
         {
             h1 = Mathf.Abs(h1);
-            if (h1 <= 1f)
+            if (h1 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h2 != -1)
         {
             h2 = Mathf.Abs(h2);
-            if (h2 <= 1f)
+            if (h2 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h3 != -1)
         {
             h3 = Mathf.Abs(h3);
-            if (h3 <= 1f)
+            if (h3 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h4 != -1)
         {
             h4 = Mathf.Abs(h4);
-            if (h4 <= 1f)
+            if (h4 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h5 != -1)
         {
             h5 = Mathf.Abs(h5);
-            if (h5 <= 1f)
+            if (h5 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h6 != -1)
         {
             h6 = Mathf.Abs(h6);
-            if (h6 <= 1f)
+            if (h6 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h7 != -1)
         {
             h7 = Mathf.Abs(h7);
-            if (h7 <= 1f)
+            if (h7 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h8 != -1)
         {
             h8 = Mathf.Abs(h8);
-            if (h8 <= 1f)
+            if (h8 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h9 != -1)
         {
             h9 = Mathf.Abs(h9);
-            if (h9 <= 1f)
+            if (h9 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h10 != -1)
         {
             h10 = Mathf.Abs(h10);
-            if (h10 <= 1f)
+            if (h10 <= 0.5f)
                 damage -= doDamage;
         }
 
@@ -335,7 +353,13 @@ public class Tester : MonoBehaviour
         this.net.AddNetFitness(Mathf.Pow((1f / (float)net.GetGeneCount()), 2));
 
         for (int i = 1; i < points.Count; i++) {
-            float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]),4f);
+            float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]),2f);
+            if (bodies[0].angularVelocity == 0)
+                dis = dis * 2f;
+            if (bodies[0].velocity.magnitude < 0.5f)
+                dis = dis / 2f;
+            if (output[1] < -0.75f)
+                dis = dis / 2f;
             this.net.AddNetFitness(dis);
         }
     }

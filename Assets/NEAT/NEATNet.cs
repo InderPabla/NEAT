@@ -119,6 +119,17 @@ public class NEATNet{
         return geneList.Count;
     }
 
+    public int GetNumberOfInputNodes()
+    {
+        return numberOfInputs;
+    }
+
+    public int GetNumberOfOutputNodes()
+    {
+        return numberOfOutputs;
+    }
+
+
     public void SetInputValues(float[] inputs) {
         for (int i = 0; i < numberOfInputs; i++) {
             if (nodeList[i].GetNodeType() == NEATNode.INPUT_NODE) {
@@ -374,6 +385,24 @@ public class NEATNet{
         copy.Mutate();
 
         return copy;
+    }
+
+    public void PrintDetails() {
+        Debug.Log("-----------------");
+        int numberOfNodes = nodeList.Count;
+        for (int i = 0; i < numberOfNodes; i++)
+        {
+            NEATNode node = nodeList[i];
+            Debug.Log("ID:"+ node.GetNodeID()+", Type:"+node.GetNodeType());
+        }
+        Debug.Log("-----------------");
+        int numberOfGenes = geneList.Count;
+        for (int i = 0; i < numberOfGenes; i++)
+        {
+            NEATGene gene = geneList[i];
+            Debug.Log("In:"+gene.GetInID() + ", Out:" + gene.GetOutID() + ", On:" + gene.GetGeneState()+", Wi:"+gene.GetWeight());
+        }
+        Debug.Log("-----------------");
     }
 
 }

@@ -21,7 +21,7 @@ public class NEATGeneticController : MonoBehaviour
     private const string ACTIVATE = "Activate";
     private int generationNumber = 0;
 
-
+    public GameObject netDrawer;
 
     void Start() {
         /*for (int i = 0; i < populationSize; i++)
@@ -54,12 +54,12 @@ public class NEATGeneticController : MonoBehaviour
 
     public void GeneratePopulation() {
         float height = 10f;
-        float width = -12f;
+        float width = -16f;
         for (int i = 0; i < populationSize; i++) {
-            if (i % 6 == 0)
+            if (width % 16 == 0 && width!=0)
             {
-                height-=2;
-                width = 0;
+                height-=4;
+                width = -12;
             }
 
             //Vector3 randomLocation = new Vector3(UnityEngine.Random.Range(-16f,16f), UnityEngine.Random.Range(-7f, 7f));
@@ -100,6 +100,10 @@ public class NEATGeneticController : MonoBehaviour
         int bestNetIndex = (int)finishedResults[populationSize - 1, 0];
         Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
         Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
+        //if (generationNumber%10==0)
+        // nets[bestNetIndex].PrintDetails();
+        netDrawer.SendMessage("DrawNet",nets[bestNetIndex]);
+
         /*for (int i = 0; i < populationSize; i++) {
             Debug.Log((int)finishedResults[i, 0]+" "+finishedResults[i,1]);
         }*/
