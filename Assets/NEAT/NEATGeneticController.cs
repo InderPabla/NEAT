@@ -23,13 +23,10 @@ public class NEATGeneticController : MonoBehaviour
 
     public GameObject netDrawer;
 
-    void Start() {
-        /*for (int i = 0; i < populationSize; i++)
-        {
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0, 0, 0), testPrefab.transform.rotation);
-            tester.name = i + "";
-        }*/
+    public List<Transform> bodies;
+    public bool worldActivation = false;
 
+    void Start() {
         Application.runInBackground = true;
         if (ErrorCheck() == false) {
             testCounter = 0;
@@ -42,9 +39,22 @@ public class NEATGeneticController : MonoBehaviour
         }
     }
 
-    void Update() {
-
+    void FixedUpdate() {
+        if (worldActivation) {
+            bodies[0].transform.position += new Vector3(Time.deltaTime/2f, 0, 0);
+            bodies[1].transform.position += new Vector3(-Time.deltaTime/2f, 0, 0);
+            bodies[2].transform.position += new Vector3(0, Time.deltaTime / 8f, 0);
+            bodies[3].transform.position += new Vector3(0, -Time.deltaTime / 8f, 0);
+        }
     }
+
+    public void ResetWorld() {
+        bodies[0].transform.position = new Vector3(-17.5f, 0, 0);
+        bodies[1].transform.position = new Vector3(17.5f, 0, 0);
+        bodies[2].transform.position = new Vector3(0, -9.5f, 0);
+        bodies[3].transform.position = new Vector3(0, 9.5f, 0);
+    }
+
 
     public void GenerateInitialNets() {
         for (int i = 0; i < populationSize; i++) {
@@ -62,8 +72,7 @@ public class NEATGeneticController : MonoBehaviour
                 width = -12;
             }
 
-            //Vector3 randomLocation = new Vector3(UnityEngine.Random.Range(-16f,16f), UnityEngine.Random.Range(-7f, 7f));
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width, height, 0)/*randomLocation*/, testPrefab.transform.rotation);
+            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width, height, 0), testPrefab.transform.rotation);
             width+=2;
             tester.name = i + "";
             tester.SendMessage(ACTIVATE, nets[i]);
@@ -125,6 +134,7 @@ public class NEATGeneticController : MonoBehaviour
             nets[i].ClearNodeValues();
         }
 
+        ResetWorld();
         GeneratePopulation();
     }
 
