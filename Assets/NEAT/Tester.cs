@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 public class Tester : MonoBehaviour
 {
@@ -10,14 +11,16 @@ public class Tester : MonoBehaviour
     private NEATNet net;
     private bool isActive = false;
     private const string ON_FINISHED = "OnFinished";
-
+    private Semaphore mutex; 
     public delegate void TestFinishedEventHandler(object source, EventArgs args);
     public event TestFinishedEventHandler TestFinished;
 
     List<Vector2> points = new List<Vector2>();
     float damage = 10f;
+    
     void Start()
     {
+        mutex = new Semaphore(1, 1);
 
         TakePoint();
         bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
@@ -63,6 +66,7 @@ public class Tester : MonoBehaviour
     float h1 = -1f, h2 = -1f, h3 = -1f, h4 = -1f, h5 = -1f, h6 = -1f, h7 = -1f, h8 = -1f, h9 = -1f, h10 = -1f;
     float doDamage = 5f;
     float[] output;
+    float state = 0f;
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet()
@@ -121,161 +125,201 @@ public class Tester : MonoBehaviour
         RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, 2f);
 
         h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
+        float hitCreatureAdd = 0f;
+        string otherCreatureName = "B";
+        //h1 = 0f; h2 = 0f; h3 = 0f; h4 = 0f; h5 = 0f; h6 = 0f; h7 = 0f; h8 = 0f; h9 = 0f; h10 = 0f;
         if (hit1.collider!=null)
         {
             h1 = Vector2.Distance(hit1.point, bodies[0].transform.position);
+            if (hit1.collider.name.Contains(otherCreatureName))
+            {
+                h1 += hitCreatureAdd;
+            }
             Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
         }
 
         if (hit2.collider != null)
         {
             h2 = Vector2.Distance(hit2.point, bodies[0].transform.position);
+            if (hit2.collider.name.Contains(otherCreatureName))
+                h2 += hitCreatureAdd;
             Debug.DrawLine(position1, hit2.point, Color.red, 0.002f);
         }
 
         if (hit3.collider != null)
         {
             h3 = Vector2.Distance(hit3.point, bodies[0].transform.position);
+            if (hit3.collider.name.Contains(otherCreatureName))
+                h3 += hitCreatureAdd;
             Debug.DrawLine(position1, hit3.point, Color.red, 0.002f);
         }
 
         if (hit4.collider != null)
         {
             h4 = Vector2.Distance(hit4.point, bodies[0].transform.position);
+            if (hit4.collider.name.Contains(otherCreatureName))
+                h4 += hitCreatureAdd;
             Debug.DrawLine(position1, hit4.point, Color.red, 0.002f);
         }
 
         if (hit5.collider != null)
         {
             h5 = Vector2.Distance(hit5.point, bodies[0].transform.position);
+            if (hit5.collider.name.Contains(otherCreatureName))
+                h5 += hitCreatureAdd;
             Debug.DrawLine(position1, hit5.point, Color.red, 0.002f);
         }
 
         if (hit6.collider != null)
         {
             h6 = Vector2.Distance(hit6.point, bodies[0].transform.position);
+            if (hit6.collider.name.Contains(otherCreatureName))
+                h6 += hitCreatureAdd;
             Debug.DrawLine(position1, hit6.point, Color.red, 0.002f);
         }
 
         if (hit7.collider != null)
         {
             h7 = Vector2.Distance(hit7.point, bodies[0].transform.position);
+            if (hit7.collider.name.Contains(otherCreatureName))
+                h7 += hitCreatureAdd;
             Debug.DrawLine(position1, hit7.point, Color.red, 0.002f);
         }
         if (hit8.collider != null)
         {
             h8 = Vector2.Distance(hit8.point, bodies[0].transform.position);
+            if (hit8.collider.name.Contains(otherCreatureName))
+                h8 += hitCreatureAdd;
             Debug.DrawLine(position1, hit8.point, Color.red, 0.002f);
         }
         if (hit9.collider != null)
         {
             h9 = Vector2.Distance(hit9.point, bodies[0].transform.position);
+            if (hit9.collider.name.Contains(otherCreatureName))
+                h9 += hitCreatureAdd;
             Debug.DrawLine(position1, hit9.point, Color.red, 0.002f);
         }
         if (hit10.collider != null)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position);
+            if (hit10.collider.name.Contains(otherCreatureName))
+                h10 += hitCreatureAdd;
             Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
         }
 
-        float[] inputValues = { h1,h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
+        float[] inputValues = {h1, h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
 
         output = net.FireNet(inputValues);
 
         Vector2 dir = bodies[0].transform.up;
 
-        bodies[0].velocity =+ 2f * dir * output[1];
         /*if (output[1] > 0.75f)
             bodies[0].velocity = 2f * dir;
         else if (output[1] < -0.75f)
             bodies[0].velocity = -2f * dir;
         else
-            bodies[0].velocity = Vector2.zero;*/
+        {
+            bodies[0].velocity = Vector2.zero;
+        }
 
-        /*if (output[0] > 0.75f)
+        if (output[0] > 0.75f)
             bodies[0].angularVelocity = 250f;
         else if (output[0] < -0.75f)
             bodies[0].angularVelocity = -250f;
         else
             bodies[0].angularVelocity = 0f;*/
 
-        bodies[0].angularVelocity = output[0] * 100f;
+
+        if (output[0] > 0)
+            bodies[0].angularVelocity = -250f;
+        else
+            bodies[0].angularVelocity = 250f;
+
+        if (output[1] > 0)
+            bodies[0].velocity = -2f * dir;
+        else
+            bodies[0].velocity = 2f * dir;
+        
 
         doDamage = 5f;
+
         if (bodies[0].velocity.magnitude == 0f)
             doDamage = 0f;
-        else if (output[1] < 0f)
+        /*else if (output[1] < -0.75f)
+        {
             doDamage = 100f;
+            
+        }
 
         if (h1 != -1)
         {
             h1 = Mathf.Abs(h1);
-            if (h1 <= 0.7f)
+            if (h1 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h2 != -1)
         {
             h2 = Mathf.Abs(h2);
-            if (h2 <= 0.7f)
+            if (h2 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h3 != -1)
         {
             h3 = Mathf.Abs(h3);
-            if (h3 <= 0.7f)
+            if (h3 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h4 != -1)
         {
             h4 = Mathf.Abs(h4);
-            if (h4 <= 0.7f)
+            if (h4 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h5 != -1)
         {
             h5 = Mathf.Abs(h5);
-            if (h5 <= 0.7f)
+            if (h5 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h6 != -1)
         {
             h6 = Mathf.Abs(h6);
-            if (h6 <= 0.7f)
+            if (h6 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h7 != -1)
         {
             h7 = Mathf.Abs(h7);
-            if (h7 <= 0.7f)
+            if (h7 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h8 != -1)
         {
             h8 = Mathf.Abs(h8);
-            if (h8 <= 0.7f)
+            if (h8 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h9 != -1)
         {
             h9 = Mathf.Abs(h9);
-            if (h9 <= 0.7f)
+            if (h9 <= 0.5f)
                 damage -= doDamage;
         }
 
         if (h10 != -1)
         {
             h10 = Mathf.Abs(h10);
-            if (h10 <= 0.7f)
+            if (h10 <= 0.5f)
                 damage -= doDamage;
-        }
+        }*/
 
     }
 
@@ -300,7 +344,7 @@ public class Tester : MonoBehaviour
         {
             return true;
         }*/
-
+        
         if (damage<=0)
             return true;
 
@@ -357,28 +401,46 @@ public class Tester : MonoBehaviour
         /*if (bodies[0].velocity.magnitude < 0.5f)
             fit = fit / 2f;*/
 
-        if (output[1] < 0f )
+        /*if (Mathf.Abs(output[0]) > 0.05f)
             this.net.AddNetFitness(-1f);
+        if (output[1] < 0f )
+            this.net.AddNetFitness(-1f);*/
 
+        this.net.AddNetFitness(Time.deltaTime);
     }
 
+    
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
-        this.net.AddNetFitness(Mathf.Pow((1f / (float)net.GetGeneCount()), 2f));
-
-        for (int i = 1; i < points.Count; i++) {
+        //this.net.AddNetFitness(Mathf.Pow((1f / (float)net.GetGeneCount()), 4f));
+        float totalDistanceFit = 0;
+       for (int i = 1; i < points.Count; i++) {
             float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]),2f);
-           
-            this.net.AddNetFitness(dis);
+
+            /*this.net.AddNetFitness(dis);*/
+            totalDistanceFit += dis;
         }
+        float life = this.net.GetNetFitness();
+        float ratio = totalDistanceFit/life;
+        float newFit = ratio * totalDistanceFit;
+        this.net.SetNetFitness(newFit);
+
     }
 
     public void OtherActivity(int type) {
+        mutex.WaitOne();
         if (type == 0)
             OnFinished();
-        else
-            damage--;
+        else if (type == 1)
+            OnFinished();//state++;
+        else if (type == 2)
+            state--;
+        mutex.Release();
+    }
+
+    public NEATNet GetNet() {
+        return net;
     }
 
 }

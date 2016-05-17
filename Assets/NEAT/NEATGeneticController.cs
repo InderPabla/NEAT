@@ -26,9 +26,12 @@ public class NEATGeneticController : MonoBehaviour
     public List<Transform> bodies;
     public bool worldActivation = false;
 
+    float timeScale = 0;
+
     void Start() {
         Application.runInBackground = true;
         if (ErrorCheck() == false) {
+            timeScale = Time.timeScale;
             testCounter = 0;
             finished = new Semaphore(1, 1);
             nets = new NEATNet[populationSize];
@@ -41,10 +44,25 @@ public class NEATGeneticController : MonoBehaviour
 
     void FixedUpdate() {
         if (worldActivation) {
-            bodies[0].transform.position += new Vector3(Time.deltaTime/2f, 0, 0);
-            bodies[1].transform.position += new Vector3(-Time.deltaTime/2f, 0, 0);
-            bodies[2].transform.position += new Vector3(0, Time.deltaTime / 8f, 0);
-            bodies[3].transform.position += new Vector3(0, -Time.deltaTime / 8f, 0);
+            /*bodies[0].transform.position += new Vector3(Time.deltaTime/2.5f, 0, 0);
+            bodies[1].transform.position += new Vector3(-Time.deltaTime/2.5f, 0, 0);
+            bodies[2].transform.position += new Vector3(0, Time.deltaTime/8f, 0);
+            bodies[3].transform.position += new Vector3(0, -Time.deltaTime/8f, 0);*/
+        }
+
+       if (timeScale <= 1f) {
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity);
+
+               if (hit.collider != null && hit.collider.name.Contains("B"))
+               {
+                    int id = hit.collider.transform.parent.GetComponent<Tester>().GetNet().GetNetID();
+                    netDrawer.SendMessage("DrawNet", nets[id]);
+                }
+
+            }
         }
     }
 
@@ -53,6 +71,7 @@ public class NEATGeneticController : MonoBehaviour
         bodies[1].transform.position = new Vector3(17.5f, 0, 0);
         bodies[2].transform.position = new Vector3(0, -9.5f, 0);
         bodies[3].transform.position = new Vector3(0, 9.5f, 0);
+        timeScale = Time.timeScale;
     }
 
 
@@ -63,20 +82,24 @@ public class NEATGeneticController : MonoBehaviour
     }
 
     public void GeneratePopulation() {
-        float height = 10f;
-        float width = -16f;
+        List<int> numbers = GenerateListNumbers(0, populationSize-1);
+        float height = 8f;
+        float width = -15f;
         for (int i = 0; i < populationSize; i++) {
-            if (width % 16 == 0 && width!=0)
-            {
-                height-=4;
-                width = -12;
-            }
-
             GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width, height, 0), testPrefab.transform.rotation);
-            width+=2;
-            tester.name = i + "";
-            tester.SendMessage(ACTIVATE, nets[i]);
+            tester.name = i+"";
+
+            int randomIndex = UnityEngine.Random.Range(0,numbers.Count);
+            tester.SendMessage(ACTIVATE, nets[numbers[randomIndex]]);
+            numbers.RemoveAt(randomIndex);
             tester.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
+
+            if (width % 15 == 0 && width >0) {
+                height -= 2;
+                width = -15f;
+            }
+            else
+                width += 3;
         }
     }
 

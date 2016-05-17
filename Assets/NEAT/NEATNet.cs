@@ -140,9 +140,15 @@ public class NEATNet{
                 float[] details = new float[3];
                 details[0] = gene.GetInID();
                 details[1] = gene.GetOutID();
-                details[2] = gene.GetWeight();
+
+                //if (gene.GetGeneState() == true)
+                    details[2] = gene.GetWeight();
+                //else
+                    //details[2] = 0f;
+
                 connectionList.Add(details);
             }
+
         }
         connections = connectionList.ToArray();
         return connections;
