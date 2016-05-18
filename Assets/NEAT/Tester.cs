@@ -16,7 +16,7 @@ public class Tester : MonoBehaviour
     public event TestFinishedEventHandler TestFinished;
 
     List<Vector2> points = new List<Vector2>();
-    float damage = 10f;
+    float damage = 100f;
     
     void Start()
     {
@@ -67,6 +67,7 @@ public class Tester : MonoBehaviour
     float doDamage = 5f;
     float[] output;
     float state = 0f;
+    float hurt = 0f;
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet()
@@ -206,8 +207,8 @@ public class Tester : MonoBehaviour
                 h10 += hitCreatureAdd;
             Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
         }
-
-        float[] inputValues = {h1, h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
+ 
+        float[] inputValues = { hurt, h1, h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
 
         output = net.FireNet(inputValues);
 
@@ -430,12 +431,15 @@ public class Tester : MonoBehaviour
 
     public void OtherActivity(int type) {
         mutex.WaitOne();
-        if (type == 0)
-            OnFinished();
+        /*if (type == 0)
+            state++;
         else if (type == 1)
-            OnFinished();//state++;
+            state++;
         else if (type == 2)
-            state--;
+            state--;*/
+
+   
+        damage -= 10;
         mutex.Release();
     }
 

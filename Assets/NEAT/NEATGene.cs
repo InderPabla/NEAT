@@ -17,7 +17,6 @@ public class NEATGene {
         this.weight = copy.weight;
         this.on = copy.on;
     }
-
     public NEATGene(int inno, int inID, int outID, float weight, bool on) {
         this.inno = inno;
         this.inID = inID;
