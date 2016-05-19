@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CollsionCheck : MonoBehaviour {
     
-    void OnCollisionEnter2D(Collision2D coll)
+    /*void OnCollisionEnter2D(Collision2D coll)
     {
         if (coll.collider.name.Contains("G"))
             transform.parent.SendMessage("OtherActivity", (object)0);
@@ -16,12 +16,12 @@ public class CollsionCheck : MonoBehaviour {
     {
         //if (coll.collider.name.Contains("B"))
         transform.parent.SendMessage("OtherActivity", (object)2);
-    }
-
-    /*void OnCollisionStay2D(Collision2D coll)
-    {
-        if (coll.collider.name.Contains("B"))
-            transform.parent.SendMessage("OtherActivity", (object)3);
     }*/
+
+    void OnCollisionStay2D(Collision2D coll)
+    {
+        //if (coll.collider.name.Contains("B"))
+        transform.parent.SendMessage("OtherActivity", (object)3);
+    }
 
 }

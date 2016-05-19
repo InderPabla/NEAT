@@ -207,12 +207,44 @@ public class Tester : MonoBehaviour
                 h10 += hitCreatureAdd;
             Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
         }
- 
+
+        /*if (state > 0)
+        {
+            hurt = 1;
+            damage -= 2f;
+        }
+        else
+            hurt = -1;*/
+        
+
         float[] inputValues = { hurt, h1, h2,h3,h4,h5,h6,h7,h8,h9,h10}; //gather pole and track data into an array 
 
         output = net.FireNet(inputValues);
 
         Vector2 dir = bodies[0].transform.up;
+
+        float factor = 1f;
+        if (output[2] > 0.9f && hurt > 0)
+            factor = 2f;
+
+        if (output[0] > 0)
+            bodies[0].angularVelocity = -250f * factor;
+        else
+            bodies[0].angularVelocity = 250f * factor;
+
+        if (output[1] > 0)
+            bodies[0].velocity = -2f * dir * factor;
+        else
+            bodies[0].velocity = 2f * dir * factor;
+
+
+        if (hurt > 0f) {
+            hurt -= 0.05f;
+            damage -= 2f;
+        }
+
+        if (hurt <= 0)
+            hurt = -1f;   
 
         /*if (output[1] > 0.75f)
             bodies[0].velocity = 2f * dir;
@@ -230,17 +262,6 @@ public class Tester : MonoBehaviour
         else
             bodies[0].angularVelocity = 0f;*/
 
-
-        if (output[0] > 0)
-            bodies[0].angularVelocity = -250f;
-        else
-            bodies[0].angularVelocity = 250f;
-
-        if (output[1] > 0)
-            bodies[0].velocity = -2f * dir;
-        else
-            bodies[0].velocity = 2f * dir;
-        
 
         doDamage = 5f;
 
@@ -438,8 +459,9 @@ public class Tester : MonoBehaviour
         else if (type == 2)
             state--;*/
 
-   
-        damage -= 10;
+        hurt = 1f;
+
+        //damage -= 10;
         mutex.Release();
     }
 

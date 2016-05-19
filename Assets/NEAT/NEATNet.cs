@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class NEATNet{
 
@@ -19,8 +20,6 @@ public class NEATNet{
         this.numberOfInputs = copy.numberOfInputs;
         this.numberOfOutputs = copy.numberOfOutputs;
         this.innovationNumber = copy.innovationNumber;
-        this.time = copy.time;
-        this.netFitness = 0f;
 
         nodeList = new List<NEATNode>();
         geneList = new List<NEATGene>();
@@ -36,6 +35,41 @@ public class NEATNet{
             NEATGene gene = new NEATGene(copy.geneList[i]);
             geneList.Add(gene);
         }
+
+        this.netID = 0;
+        this.time = 0f;
+        this.netFitness = 0f;
+    }
+
+    public NEATNet(NEATPacket packet) {
+        this.numberOfInputs = packet.node_inputs;
+        this.numberOfOutputs = packet.node_outputs;
+        
+        InitilizeNodes();
+
+        int numberOfNodes = packet.node_total;
+        int numberOfgenes = packet.gene_total;
+        int informationSize = NEATGene.GENE_INFORMATION_SIZE;
+
+        NEATNode node = null;
+        NEATGene gene = null;
+
+        for (int i = numberOfInputs + numberOfOutputs; i < numberOfNodes; i++) {
+            node = new NEATNode(i, NEATNode.HIDDEN_NODE);
+            nodeList.Add(node);
+        }
+
+        float[] geneInformation = packet.genome.Split('_').Select(x => float.Parse(x)).ToArray();
+        geneList = new List<NEATGene>();
+
+        for (int i = 0; i < geneInformation.Length; i+=informationSize) {
+            gene = new NEATGene(0, (int)geneInformation[i], (int)geneInformation[i + 1], geneInformation[i + 2], geneInformation[i + 3] == 1.0? true:false);
+            geneList.Add(gene);
+        }
+
+        this.netID = 0;
+        this.time = 0f;
+        this.netFitness = 0f;
     }
 
     public NEATNet(int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
@@ -129,7 +163,11 @@ public class NEATNet{
         return numberOfOutputs;
     }
 
-    public float[][] GetGeneConnections() {
+    public void SetTestTime(float time) {
+        this.time = time;
+    }
+
+    public float[][] GetGeneDrawConnections() {
         float[][] connections = null;
         List<float[]> connectionList = new List<float[]>();
         int numberOfGenes = geneList.Count;
@@ -152,6 +190,21 @@ public class NEATNet{
         }
         connections = connectionList.ToArray();
         return connections;
+    }
+
+    public string GetGenomeString() {
+        string genome = "";
+        int numberOfGenes = geneList.Count;
+
+        for (int i = 0; i < numberOfGenes; i++) {
+            NEATGene gene = geneList[i];
+            genome += gene.GetGeneString();
+
+            if (i < numberOfGenes - 1)  {
+                genome += "_";
+            }
+        }
+        return genome;
     }
 
 

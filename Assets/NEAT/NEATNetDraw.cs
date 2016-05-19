@@ -72,7 +72,7 @@ public class NEATNetDraw : MonoBehaviour {
             locationIndex++;
         }
 
-        float[][] geneConnections = net.GetGeneConnections();
+        float[][] geneConnections = net.GetGeneDrawConnections();
         int colSize = geneConnections.GetLength(0);
         
         for (int i = 0; i < colSize; i++) {

@@ -1,5 +1,8 @@
 ﻿
 public class NEATGene {
+
+    public const int GENE_INFORMATION_SIZE = 4;
+
     private int inno;
 
     private int inID;
@@ -51,5 +54,18 @@ public class NEATGene {
 
     public void SetWeight(float weight) {
         this.weight = weight;
+    }
+
+    public string GetGeneString() {
+        string gene = inID + "_" + outID + "_" + weight + "_";
+
+        if (on == true) {
+            gene += 1;
+        }
+        else {
+            gene += 0;
+        }
+
+        return gene;
     }
 }
