@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\NEAT\CollsionCheck.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
+     <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
      <Compile Include="Assets\NEAT\NEATGeneticController.cs" />
      <Compile Include="Assets\NEAT\NEATNet.cs" />
@@ -54,6 +55,7 @@
      <Compile Include="Assets\NEAT\NEATNode.cs" />
      <Compile Include="Assets\NEAT\NEATPacket.cs" />
      <Compile Include="Assets\NEAT\Tester.cs" />
+     <Compile Include="Assets\NEAT\Testingstuff.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

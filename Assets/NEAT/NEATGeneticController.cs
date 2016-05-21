@@ -28,9 +28,12 @@ public class NEATGeneticController : MonoBehaviour
     public GameObject netDrawer;
 
     public List<Transform> bodies;
+    
     public bool worldActivation = false;
 
-   
+    public bool loadFromDatabase = false;
+
+    private NEATConsultor consultor;
 
     void Start() {
         Application.runInBackground = true;
@@ -39,15 +42,19 @@ public class NEATGeneticController : MonoBehaviour
             testCounter = 0;
             finished = new Semaphore(1, 1);
             nets = new NEATNet[populationSize];
+            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons);
             finishedResults = new float[populationSize, 2];
             operations = new DatabaseOperation();
 
-            //GenerateInitialNets();
-            //GeneratePopulation();
 
-
-            StartCoroutine(operations.GetNet(creatureName));
-            StartCoroutine(CheckRetrival());
+            if (loadFromDatabase == true) {
+                StartCoroutine(operations.GetNet(creatureName));
+                StartCoroutine(CheckRetrival());
+            }
+            else {
+                GenerateInitialNets();
+                GeneratePopulation();
+            }
         }
     }
 
@@ -65,6 +72,8 @@ public class NEATGeneticController : MonoBehaviour
             bodies[1].transform.position += new Vector3(-Time.deltaTime/2.5f, 0, 0);
             bodies[2].transform.position += new Vector3(0, Time.deltaTime/8f, 0);
             bodies[3].transform.position += new Vector3(0, -Time.deltaTime/8f, 0);
+            //bodies[4].transform.position += new Vector3(Time.deltaTime*1.1f, 0, 0);
+            //bodies[5].transform.position += new Vector3(-Time.deltaTime*1.1f, 0, 0);
         }
 
        if (timeScale <= 1f) {
@@ -84,17 +93,21 @@ public class NEATGeneticController : MonoBehaviour
     }
 
     public void ResetWorld() {
-        bodies[0].transform.position = new Vector3(-17.5f, 0, 0);
-        bodies[1].transform.position = new Vector3(17.5f, 0, 0);
-        bodies[2].transform.position = new Vector3(0, -9.5f, 0);
-        bodies[3].transform.position = new Vector3(0, 9.5f, 0);
+        if (worldActivation) {
+            bodies[0].transform.position = new Vector3(-17.5f, 0, 0);
+            bodies[1].transform.position = new Vector3(17.5f, 0, 0);
+            bodies[2].transform.position = new Vector3(0, -9.5f, 0);
+            bodies[3].transform.position = new Vector3(0, 9.5f, 0);
+            bodies[4].transform.position = new Vector3(-22, -3f, 0);
+            bodies[5].transform.position = new Vector3(22, 3f, 0);
+        }
         timeScale = Time.timeScale;
     }
 
 
     public void GenerateInitialNets() {
         for (int i = 0; i < populationSize; i++) {
-            nets[i] = new NEATNet(i, 0, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
+            nets[i] = new NEATNet(consultor,i, 0, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
         }
     }
 
@@ -110,12 +123,12 @@ public class NEATGeneticController : MonoBehaviour
 
     public void GeneratePopulation() {
         List<int> numbers = GenerateListNumbers(0, populationSize-1);
-        float height = 8f;
-        float width = -16f;
+        float height = 12f;
+        float width = -25f;
         int counter = 1;
         for (int i = 0; i < populationSize; i++) {
 
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width, height, 0), testPrefab.transform.rotation);
+            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width,height, 0), testPrefab.transform.rotation);
             tester.name = i+"";
 
             int randomIndex = UnityEngine.Random.Range(0,numbers.Count);

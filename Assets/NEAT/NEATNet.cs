@@ -4,6 +4,8 @@ using System.Linq;
 
 public class NEATNet{
 
+    private NEATConsultor consultor;
+
     private List<NEATGene> geneList;
     private List<NEATNode> nodeList;
 
@@ -72,7 +74,8 @@ public class NEATNet{
         this.netFitness = 0f;
     }
 
-    public NEATNet(int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
+    public NEATNet(NEATConsultor consultor, int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
+        this.consultor = consultor;
         this.netID = netID;
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
