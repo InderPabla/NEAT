@@ -144,12 +144,12 @@ public class NEATGeneticController : MonoBehaviour
             else
                 width += 2.85f;*/
 
-            if (width % 16 == 0 && width>0) {
-                width = -16f;
+            if (width % 25 == 0 && width>0) {
+                width = -25f;
                 height +=- 2f;
             }
             else
-                width += 4f;
+                width += 5f;
             
         }
     }

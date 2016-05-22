@@ -17,6 +17,10 @@ public class NEATConsultor  {
         InitilizeGenome();
     }
 
+    private void InitilizeGenome() {
+
+    }
+
 
 	
 }
