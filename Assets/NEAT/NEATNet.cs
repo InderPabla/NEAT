@@ -11,17 +11,16 @@ public class NEATNet{
 
     private int numberOfInputs;
     private int numberOfOutputs;
-    private int innovationNumber;
     private int netID;
 
     private float time;
     private float netFitness;
 
     public NEATNet(NEATNet copy) {
+        this.consultor = copy.consultor;
         this.netID = copy.netID;
         this.numberOfInputs = copy.numberOfInputs;
         this.numberOfOutputs = copy.numberOfOutputs;
-        this.innovationNumber = copy.innovationNumber;
 
         nodeList = new List<NEATNode>();
         geneList = new List<NEATGene>();
@@ -43,7 +42,8 @@ public class NEATNet{
         this.netFitness = 0f;
     }
 
-    public NEATNet(NEATPacket packet) {
+    public NEATNet(NEATPacket packet, NEATConsultor consultor) {
+        this.consultor = consultor;
         this.numberOfInputs = packet.node_inputs;
         this.numberOfOutputs = packet.node_outputs;
         
@@ -74,19 +74,18 @@ public class NEATNet{
         this.netFitness = 0f;
     }
 
-    public NEATNet(NEATConsultor consultor, int netID, int innovationNumber, int numberOfInputs, int numberOfOutputs, float time) {
+    public NEATNet(NEATConsultor consultor, int netID, int numberOfInputs, int numberOfOutputs, float time) {
         this.consultor = consultor;
         this.netID = netID;
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
-        this.innovationNumber = innovationNumber;
         this.time = time;
         this.netFitness = 0f;
 
         InitilizeNodes();
         InitilizeGenes();
 
-        Mutate();
+        //Mutate();
     }
 
     public void InitilizeNodes() {
@@ -115,9 +114,9 @@ public class NEATNet{
 
         for (int i = 0; i < numberOfInputs; i++){
             for (int j = numberOfInputs; j < numberOfInputs+numberOfOutputs; j++){
-                gene = new NEATGene(innovationNumber, i, j, 1f, true);
+                int inno = consultor.CheckGeneExistance(i,j);
+                gene = new NEATGene(inno, i, j, 1f, true);
                 geneList.Add(gene);
-                innovationNumber++;
             }
         }
     }
@@ -320,7 +319,7 @@ public class NEATNet{
     }
 
     public void AddConnection(){
-        int randomNodeID1, randomNodeID2;
+        int randomNodeID1, randomNodeID2, inno;
         bool found = false;
         int totalAttemptsAllowed = (int)Mathf.Pow(nodeList.Count,2);
 
@@ -330,15 +329,17 @@ public class NEATNet{
             randomNodeID2 = Random.Range(numberOfInputs, nodeList.Count);
 
             if (!ConnectionExists(randomNodeID1, randomNodeID2)) {
-                NEATGene gene = new NEATGene(innovationNumber, randomNodeID1, randomNodeID2, 1f, true);
+                inno = consultor.CheckGeneExistance(randomNodeID1, randomNodeID2);
+                NEATGene gene = new NEATGene(inno, randomNodeID1, randomNodeID2, 1f, true);
                 geneList.Add(gene);
-                innovationNumber++;
+
                 found = true;
             }
             else if(nodeList[randomNodeID1].GetNodeType() > 1 && !ConnectionExists(randomNodeID2, randomNodeID1)) {
-                NEATGene gene = new NEATGene(innovationNumber, randomNodeID2, randomNodeID1, 1f, true);
+                inno = consultor.CheckGeneExistance(randomNodeID2, randomNodeID1);
+                NEATGene gene = new NEATGene(inno, randomNodeID2, randomNodeID1, 1f, true);
                 geneList.Add(gene);
-                innovationNumber++;
+               
                 found = true;
             }
 
@@ -366,7 +367,7 @@ public class NEATNet{
     }
 
     public void AddNode(){
-        int firstID, secondID, thirdID;
+        int firstID, secondID, thirdID, inno;
         float oldWeight;
         int randomGeneIndex = Random.Range(0, geneList.Count);
         NEATGene oldGene = geneList[randomGeneIndex];
@@ -379,11 +380,11 @@ public class NEATNet{
         nodeList.Add(newNode);
         secondID = newNode.GetNodeID();
 
-        NEATGene newGene1 = new NEATGene(innovationNumber, firstID, secondID, 1f, true);
-        innovationNumber++;
+        inno = consultor.CheckGeneExistance(firstID, secondID);
+        NEATGene newGene1 = new NEATGene(inno, firstID, secondID, 1f, true);
 
-        NEATGene newGene2 = new NEATGene(innovationNumber, secondID, thirdID, oldWeight, true);
-        innovationNumber++;
+        inno = consultor.CheckGeneExistance(secondID, thirdID);
+        NEATGene newGene2 = new NEATGene(inno, secondID, thirdID, oldWeight, true);
 
         geneList.Add(newGene1);
         geneList.Add(newGene2);

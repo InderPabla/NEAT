@@ -62,7 +62,7 @@ public class NEATGeneticController : MonoBehaviour
         while(operations.done == false)
             yield return null;
 
-        GenerateCopyNets(new NEATNet(operations.retrieveNet[operations.retrieveNet.Length-1]));
+        GenerateCopyNets(new NEATNet(operations.retrieveNet[operations.retrieveNet.Length-1],consultor));
         GeneratePopulation();
     } 
 
@@ -107,7 +107,7 @@ public class NEATGeneticController : MonoBehaviour
 
     public void GenerateInitialNets() {
         for (int i = 0; i < populationSize; i++) {
-            nets[i] = new NEATNet(consultor,i, 0, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
+            nets[i] = new NEATNet(consultor, i, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
         }
     }
 
