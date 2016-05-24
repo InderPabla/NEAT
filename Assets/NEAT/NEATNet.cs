@@ -116,7 +116,7 @@ public class NEATNet{
             for (int j = numberOfInputs; j < numberOfInputs+numberOfOutputs; j++){
                 int inno = consultor.CheckGeneExistance(i,j);
                 gene = new NEATGene(inno, i, j, 1f, true);
-                geneList.Add(gene);
+                InsertNewGene(gene);
             }
         }
     }
@@ -331,15 +331,15 @@ public class NEATNet{
             if (!ConnectionExists(randomNodeID1, randomNodeID2)) {
                 inno = consultor.CheckGeneExistance(randomNodeID1, randomNodeID2);
                 NEATGene gene = new NEATGene(inno, randomNodeID1, randomNodeID2, 1f, true);
-                geneList.Add(gene);
+                InsertNewGene(gene);
 
                 found = true;
             }
             else if(nodeList[randomNodeID1].GetNodeType() > 1 && !ConnectionExists(randomNodeID2, randomNodeID1)) {
                 inno = consultor.CheckGeneExistance(randomNodeID2, randomNodeID1);
                 NEATGene gene = new NEATGene(inno, randomNodeID2, randomNodeID1, 1f, true);
-                geneList.Add(gene);
-               
+                InsertNewGene(gene);
+
                 found = true;
             }
 
@@ -386,8 +386,8 @@ public class NEATNet{
         inno = consultor.CheckGeneExistance(secondID, thirdID);
         NEATGene newGene2 = new NEATGene(inno, secondID, thirdID, oldWeight, true);
 
-        geneList.Add(newGene1);
-        geneList.Add(newGene2);
+        InsertNewGene(newGene1);
+        InsertNewGene(newGene2);
     }
 
     //-----UNUSED
@@ -467,6 +467,27 @@ public class NEATNet{
         {
             nodeList[i].SetValue(0f);
         }
+    }
+
+    public void InsertNewGene(NEATGene gene) {
+        //geneList.Add(gene);
+        int inno = gene.GetInnovation();
+        int insertIndex = FindInnovationInsertIndex(inno);
+        geneList.Insert(insertIndex,gene);
+    }
+
+    public int FindInnovationInsertIndex(int inno) {
+        int index = 0;
+        bool found = false;
+        int numberOfGenes = geneList.Count;
+        int startIndex = 0;
+        int endIndex = numberOfGenes - 1;
+
+        while (!found) {
+            int middle = (endIndex - startIndex);
+        }
+
+        return index;
     }
 
     internal static NEATNet CreateMutateCopy(NEATNet net)
