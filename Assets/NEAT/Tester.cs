@@ -34,22 +34,18 @@ public class Tester : MonoBehaviour
         Invoke("TakePoint",1f);
     }
 
-    void FixedUpdate()
-    {
-        if (isActive == true)
-        {
+    void FixedUpdate() {
+        if (isActive == true) {
             UpdateNet(); //update neural net
             CalculateFitness(); //calculate fitness
 
-            if (FailCheck() == true)
-            {
+            if (FailCheck() == true) {
                 OnFinished();
             }
         }
     }
 
-    public void Activate(NEATNet net)
-    {
+    public void Activate(NEATNet net) {
         this.net = net;
         Invoke(ON_FINISHED, net.GetTestTime());
         isActive = true;

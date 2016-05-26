@@ -1,16 +1,24 @@
 ﻿using System.Collections.Generic;
 
 public class NEATConsultor  {
-    public int innovationNumber = 0;
+    private float disjointCoefficient;
+    private float excessCoefficient;
+    private float averageWeightDifferenceCoefficient;
+
+    private int innovationNumber = 0;
 
     private int numberOfInputs;
     private int numberOfOutputs;
 
     private List<NEATGene> geneList;
 
-    public NEATConsultor(int numberOfInputs, int numberOfOutputs) {
+    public NEATConsultor(int numberOfInputs, int numberOfOutputs, float disjointCoefficient, float excessCoefficient, float averageWeightDifferenceCoefficient) {
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
+
+        this.disjointCoefficient = disjointCoefficient;
+        this.excessCoefficient = excessCoefficient;
+        this.averageWeightDifferenceCoefficient = averageWeightDifferenceCoefficient;
 
         geneList = new List<NEATGene>();
 
@@ -53,6 +61,38 @@ public class NEATConsultor  {
         geneList.Add(gene);
     }
 
+    public float GetDisjointCoefficient() {
+        return disjointCoefficient;
+    }
 
-	
+    public float GetExcessCoefficient() {
+        return excessCoefficient;
+    }
+
+    public float GetAverageWeightDifferenceCoefficient() {
+        return averageWeightDifferenceCoefficient;
+    }
+
+    public int GetGeneCount() {
+        return geneList.Count;
+    }
+
+    public string GetGenomeString()
+    {
+        string genome = "";
+        int numberOfGenes = geneList.Count;
+
+        for (int i = 0; i < numberOfGenes; i++)
+        {
+            NEATGene gene = geneList[i];
+            genome += gene.GetGeneString();
+
+            if (i < numberOfGenes - 1)
+            {
+                genome += "_";
+            }
+        }
+        return genome;
+    }
+
 }

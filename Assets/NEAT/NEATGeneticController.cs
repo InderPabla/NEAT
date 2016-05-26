@@ -17,6 +17,8 @@ public class NEATGeneticController : MonoBehaviour
     public float testTime = 0;
 
     private NEATNet[] nets; //array of neural networks 
+    private List<List<NEATNet>> species = new List<List<NEATNet>>();
+
     private float[,] finishedResults;
     private int testCounter; //counter for population testing
     private Semaphore finished; //mutex lock for when test if finished and updating test counter
@@ -42,7 +44,7 @@ public class NEATGeneticController : MonoBehaviour
             testCounter = 0;
             finished = new Semaphore(1, 1);
             nets = new NEATNet[populationSize];
-            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons);
+            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 1f, 1f, 1f);
             finishedResults = new float[populationSize, 2];
             operations = new DatabaseOperation();
 
@@ -125,7 +127,6 @@ public class NEATGeneticController : MonoBehaviour
         List<int> numbers = GenerateListNumbers(0, populationSize-1);
         float height = 12f;
         float width = -25f;
-        int counter = 1;
         for (int i = 0; i < populationSize; i++) {
 
             GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width,height, 0), testPrefab.transform.rotation);
@@ -184,8 +185,7 @@ public class NEATGeneticController : MonoBehaviour
         Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
         Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
 
-        if (generationNumber == 100)
-        {
+        if (generationNumber == 100) {
             StartCoroutine(operations.SaveNet(nets[bestNetIndex], creatureName));
         }
         

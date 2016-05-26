@@ -1,5 +1,6 @@
-﻿
-public class NEATGene {
+﻿using System;
+
+public class NEATGene : IEquatable<NEATGene>{
 
     public const int GENE_INFORMATION_SIZE = 4;
 
@@ -67,5 +68,17 @@ public class NEATGene {
         }
 
         return gene;
+    }
+
+    public bool Equals(NEATGene other) {
+        if (other == null) {
+            return false;
+        }
+
+        if (inID == other.inID && outID == other.outID) {
+            return true;
+        }
+
+        return false;
     }
 }

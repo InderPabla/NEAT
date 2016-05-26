@@ -21,11 +21,16 @@ public class DatabaseOperation  {
     public IEnumerator SaveNet(NEATNet net,string name) {
         string page = insertPage;
 
+        NEATConsultor consultor = net.GetConsultor();
+
         string genome = net.GetGenomeString();
+        string consultorGenome = consultor.GetGenomeString();
+
         int nodeTotal = net.GetNodeCount();
         int nodeInputs = net.GetNumberOfInputNodes();
         int nodeOutputs = net.GetNumberOfOutputNodes();
         int geneTotal = net.GetGeneCount();
+        int genomeTotal = consultor.GetGeneCount();
 
         page +=
             "&creature_name=" + name +
@@ -33,7 +38,9 @@ public class DatabaseOperation  {
             "&node_inputs=" + nodeInputs +
             "&node_outputs=" + nodeOutputs +
             "&gene_total=" + geneTotal +
-            "&genome=" + genome;
+            "&genome_total=" + genomeTotal +
+            "&genome=" + genome +
+            "&consultor_genome=" + consultorGenome;
 
         web = new WWW(page);
         yield return web;
