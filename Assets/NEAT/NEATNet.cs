@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using System.Linq;
 
@@ -18,24 +19,11 @@ public class NEATNet {
 
     public NEATNet(NEATNet copy) {
         this.consultor = copy.consultor;
-        this.netID = copy.netID;
         this.numberOfInputs = copy.numberOfInputs;
         this.numberOfOutputs = copy.numberOfOutputs;
 
-        nodeList = new List<NEATNode>();
-        geneList = new List<NEATGene>();
-
-        int numberOfNodes = copy.nodeList.Count;
-        for (int i = 0; i < numberOfNodes; i++) {
-            NEATNode node = new NEATNode(copy.nodeList[i]);
-            nodeList.Add(node);
-        }
-
-        int numberOfGenes = copy.geneList.Count;
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = new NEATGene(copy.geneList[i]);
-            geneList.Add(gene);
-        }
+        CopyNodes(copy.nodeList);
+        CopyGenes(copy.geneList);
 
         this.netID = 0;
         this.time = 0f;
@@ -84,8 +72,19 @@ public class NEATNet {
 
         InitilizeNodes();
         InitilizeGenes();
+    }
 
-        //Mutate();
+    public NEATNet(NEATConsultor consultor, int numberOfInputs, int numberOfOutputs, List<NEATNode> copyNodes, List<NEATGene> copyGenes) {
+        this.consultor = consultor;
+        this.numberOfInputs = numberOfInputs;
+        this.numberOfOutputs = numberOfOutputs;
+
+        CopyNodes(copyNodes);
+        CopyGenes(copyGenes);
+        
+        this.netID = 0;
+        this.time = 0f;
+        this.netFitness = 0f;
     }
 
     public void InitilizeNodes() {
@@ -252,6 +251,25 @@ public class NEATNet {
             values[i] = nodeList[i + numberOfInputs + numberOfOutputs].GetValue();
         }
         return values;
+    }
+
+    public void CopyNodes(List<NEATNode> copyNodes) {
+        nodeList = new List<NEATNode>();
+        int numberOfNodes = copyNodes.Count;
+        for (int i = 0; i < numberOfNodes; i++) {
+            NEATNode node = new NEATNode(copyNodes[i]);
+            nodeList.Add(node);
+        }
+    }
+
+
+    public void CopyGenes(List<NEATGene> copyGenes) {
+        geneList = new List<NEATGene>();
+        int numberOfGenes = copyGenes.Count;
+        for (int i = 0; i < numberOfGenes; i++) {
+            NEATGene gene = new NEATGene(copyGenes[i]);
+            geneList.Add(gene);
+        }
     }
 
     public float[] FireNet(float[] inputs){
@@ -535,9 +553,84 @@ public class NEATNet {
     internal static NEATNet Corssover (NEATNet parent1, NEATNet parent2)
     {
         NEATNet child = null;
+        List<NEATGene> childGeneList = new List<NEATGene>();
 
+        Hashtable geneHash = new Hashtable();
+
+        List<NEATGene> geneList1 = parent1.geneList;
+        List<NEATGene> geneList2 = parent2.geneList;
+
+        NEATConsultor consultor = parent1.GetConsultor();
+
+        int numberOfGenes1 = geneList1.Count;
+        int numberOfGenes2 = geneList2.Count;
+
+       for (int i = 0; i < numberOfGenes1; i++) {
+
+            geneHash.Add(geneList1[i].GetInnovation(),new NEATGene[] { geneList1[i], null});
+        }
+
+        for (int i = 0; i < numberOfGenes2; i++) {
+            int innovationNumber = geneList2[i].GetInnovation();
+            if (geneHash.ContainsKey(innovationNumber) == true) {
+                NEATGene[] geneValue = (NEATGene[])geneHash[innovationNumber];
+                geneValue[1] = geneList2[i];
+                geneHash.Remove(innovationNumber);
+                geneHash.Add(innovationNumber, geneValue);
+            }
+            else {
+                geneHash.Add(innovationNumber, new NEATGene[] { null , geneList2[i] });
+            }
+        }
+
+        NEATGene gene;
+        int randomIndex;
+        ICollection keysCol = geneHash.Keys;
+        int[] keys = new int[keysCol.Count];
+        keysCol.CopyTo(keys,0);
+        keys = keys.OrderBy(i => i).ToArray();
+        
+        for (int i = 0; i < keys.Length; i++) {
+            NEATGene[] geneValue = (NEATGene[])geneHash[keys[i]];
+
+            if (geneValue[0] != null && geneValue[1] != null)  {
+                randomIndex = Random.Range(0, 2);
+
+                gene = CrossoverCopyGene(geneValue[randomIndex]);
+                childGeneList.Add(gene);
+            }
+            else if (parent1.GetNetFitness() > parent2.GetNetFitness()) {
+                if (geneValue[0] != null) {
+                    gene = CrossoverCopyGene(geneValue[0]);
+                    childGeneList.Add(gene);
+                }
+            }
+            else if (parent1.GetNetFitness() < parent2.GetNetFitness()) {
+                if (geneValue[1] != null) {
+                    gene = CrossoverCopyGene(geneValue[1]);
+                    childGeneList.Add(gene);
+                }
+            }
+            else if (geneValue[0] != null) {
+                gene = CrossoverCopyGene(geneValue[0]);
+                childGeneList.Add(gene);
+            }
+            else if (geneValue[1] != null) {
+                gene = CrossoverCopyGene(geneValue[1]);
+                childGeneList.Add(gene);
+            }
+        }
 
         return child;
+    }
+
+    public static NEATGene CrossoverCopyGene(NEATGene copyGene) {
+        NEATGene gene = new NEATGene(copyGene);
+        int randomNumber = Random.Range(0, 4);
+        if (gene.GetGeneState() == false && randomNumber == 0) {
+            gene.SetGeneState(true);
+        }
+        return gene;
     }
 
     internal static float CalculateGenomeSimilarity(NEATNet net1, NEATNet net2) {
@@ -564,8 +657,6 @@ public class NEATNet {
         float similarity = 0;
         float averageWeightDifference = 0;
 
-
-        
         for (smallerIndex = 0; smallerIndex < smallerGenomeSize; smallerIndex++) {
             done = false;
             while (!done) {

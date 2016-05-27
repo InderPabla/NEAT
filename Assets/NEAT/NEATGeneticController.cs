@@ -184,7 +184,7 @@ public class NEATGeneticController : MonoBehaviour
         int bestNetIndex = (int)finishedResults[populationSize - 1, 0];
         Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
         Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
-
+        NEATNet.Corssover(nets[bestNetIndex], nets[50]);
         if (generationNumber == 100) {
             StartCoroutine(operations.SaveNet(nets[bestNetIndex], creatureName));
         }
