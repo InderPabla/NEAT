@@ -13,11 +13,6 @@ public class DatabaseOperation  {
     public WWW web;
     public bool done = false;
 
-    public DatabaseOperation()
-    {
-
-    }
-
     public IEnumerator SaveNet(NEATNet net,string name) {
         string page = insertPage;
 

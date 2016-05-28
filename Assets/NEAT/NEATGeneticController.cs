@@ -16,7 +16,7 @@ public class NEATGeneticController : MonoBehaviour
     public int populationSize = 0;
     public float testTime = 0;
 
-    private NEATNet[] nets; //array of neural networks 
+    //private NEATNet[] nets; //array of neural networks 
     private List<List<NEATNet>> species = new List<List<NEATNet>>();
 
     private float[,] finishedResults;
@@ -43,8 +43,8 @@ public class NEATGeneticController : MonoBehaviour
             timeScale = Time.timeScale;
             testCounter = 0;
             finished = new Semaphore(1, 1);
-            nets = new NEATNet[populationSize];
-            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 1f, 1f, 1f);
+            //nets = new NEATNet[populationSize];
+            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 0.1f, 0.4f, 1f, 1f);
             finishedResults = new float[populationSize, 2];
             operations = new DatabaseOperation();
 
@@ -74,8 +74,6 @@ public class NEATGeneticController : MonoBehaviour
             bodies[1].transform.position += new Vector3(-Time.deltaTime/2.5f, 0, 0);
             bodies[2].transform.position += new Vector3(0, Time.deltaTime/8f, 0);
             bodies[3].transform.position += new Vector3(0, -Time.deltaTime/8f, 0);
-            //bodies[4].transform.position += new Vector3(Time.deltaTime*1.1f, 0, 0);
-            //bodies[5].transform.position += new Vector3(-Time.deltaTime*1.1f, 0, 0);
         }
 
        if (timeScale <= 1f) {
@@ -86,8 +84,10 @@ public class NEATGeneticController : MonoBehaviour
 
                if (hit.collider != null && hit.collider.name.Contains("B"))
                {
-                    int id = hit.collider.transform.parent.GetComponent<Tester>().GetNet().GetNetID();
-                    netDrawer.SendMessage("DrawNet", nets[id]);
+                    //int id = hit.collider.transform.parent.GetComponent<Tester>().GetNet().GetNetID();
+                    //netDrawer.SendMessage("DrawNet", nets[id]);
+                    int[] id = hit.collider.transform.parent.GetComponent<Tester>().GetNet().GetNetID();
+                    netDrawer.SendMessage("DrawNet", species[id[0]][id[1]]);
                 }
 
             }
@@ -100,50 +100,48 @@ public class NEATGeneticController : MonoBehaviour
             bodies[1].transform.position = new Vector3(17.5f, 0, 0);
             bodies[2].transform.position = new Vector3(0, -9.5f, 0);
             bodies[3].transform.position = new Vector3(0, 9.5f, 0);
-            bodies[4].transform.position = new Vector3(-22, -3f, 0);
-            bodies[5].transform.position = new Vector3(22, 3f, 0);
         }
         timeScale = Time.timeScale;
     }
 
 
     public void GenerateInitialNets() {
-        for (int i = 0; i < populationSize; i++) {
+        /*for (int i = 0; i < populationSize; i++) {
             nets[i] = new NEATNet(consultor, i, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
+        }*/
+
+        List<NEATNet> initialSpecies = new List<NEATNet>();
+        for (int i = 0; i < populationSize; i++) {
+            NEATNet net = new NEATNet(consultor, new int[] {0,i}, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
+            initialSpecies.Add(net);
+            
         }
+        species.Add(initialSpecies);
     }
 
     public void GenerateCopyNets(NEATNet net) {
-        for (int i = 0; i < populationSize; i++) {
+        /*for (int i = 0; i < populationSize; i++) {
             nets[i] = new NEATNet(net);
             nets[i].SetTestTime(testTime);
             nets[i].SetNetFitness(0);
             nets[i].SetNetID(i);
             nets[i].ClearNodeValues();
-        }
+        }*/
     }
 
     public void GeneratePopulation() {
-        List<int> numbers = GenerateListNumbers(0, populationSize-1);
+        /*List<int> numbers = GenerateListNumbers(0, populationSize-1);
         float height = 12f;
         float width = -25f;
         for (int i = 0; i < populationSize; i++) {
 
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(width,height, 0), testPrefab.transform.rotation);
+            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0,0, 0), testPrefab.transform.rotation);
             tester.name = i+"";
 
             int randomIndex = UnityEngine.Random.Range(0,numbers.Count);
             tester.SendMessage(ACTIVATE, nets[numbers[randomIndex]]);
             numbers.RemoveAt(randomIndex);
             tester.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
-
-
-            /*if (width+2.85f > 16 && width > 0) {
-                height -= 2;
-                width = -16f;
-            }
-            else
-                width += 2.85f;*/
 
             if (width % 25 == 0 && width>0) {
                 width = -25f;
@@ -152,30 +150,43 @@ public class NEATGeneticController : MonoBehaviour
             else
                 width += 5f;
             
+        }*/
+
+        int numberOfSpecies = species.Count;
+        for (int i = 0; i < numberOfSpecies; i++) {
+            int numberOfNets = species[i].Count;
+            for (int j = 0; j < numberOfNets; j++) {
+                CreateIndividual(Vector3.zero, species[i][j]);
+            }
         }
+
+
     }
 
-    public void OnFinished(object source, EventArgs e)
-    {
-        finished.WaitOne();
-        int netID = (int)source;
+    public void CreateIndividual(Vector3 position, NEATNet net) {
+        GameObject tester = (GameObject)Instantiate(testPrefab, position, testPrefab.transform.rotation);
+        tester.SendMessage(ACTIVATE, net);
+        tester.GetComponent<Tester>().TestFinished += OnFinished;
+    }
 
+    public void OnFinished(object source, EventArgs e) {
+        finished.WaitOne();
+
+        /*int netID = (int)source;
         finishedResults[testCounter, 0] = netID;
-        finishedResults[testCounter, 1] = nets[netID].GetNetFitness();
+        finishedResults[testCounter, 1] = nets[netID].GetNetFitness();*/
 
         testCounter++;
 
-        if (testCounter == populationSize)
-        {
+        if (testCounter == populationSize) {
             TestFinished();
         }
 
         finished.Release();
     }
 
-    public void TestFinished()
-    {
-        testCounter = 0;
+    public void TestFinished() {
+        /*testCounter = 0;
         generationNumber++;
 
         NEATNet[] tempNet = new NEATNet[populationSize];
@@ -184,21 +195,33 @@ public class NEATGeneticController : MonoBehaviour
         int bestNetIndex = (int)finishedResults[populationSize - 1, 0];
         Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
         Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
-        NEATNet.Corssover(nets[bestNetIndex], nets[50]);
+
         if (generationNumber == 100) {
             StartCoroutine(operations.SaveNet(nets[bestNetIndex], creatureName));
         }
         
-        netDrawer.SendMessage("DrawNet",nets[bestNetIndex]);
+        netDrawer.SendMessage("DrawNet",nets[bestNetIndex]);wwwwwwwwwwwwwwwwww
 
         int index = 0;
-        for (int i = populationSize/2; i < populationSize; i++) {
-            NEATNet net = nets[(int)finishedResults[i, 0]];
-            NEATNet net1 = NEATNet.CreateMutateCopy(net);
-            //NEATNet net2 = NEATNet.CreateMutateCopy(net);
+
+        for (int i = populationSize / 2; i < populationSize; i+=2) {
+            NEATNet net1 = nets[(int)finishedResults[i, 0]];
+            NEATNet net2 = nets[(int)finishedResults[i+1, 0]];
+
+            NEATNet net3 = NEATNet.Corssover(net1, net2);
+            NEATNet net4 = new NEATNet(net3);
+
+            net1.Mutate();
+            net2.Mutate();
+            net3.Mutate();
+            net4.Mutate();
+
             tempNet[index] = net1;
-            tempNet[index+1] = net;
-            index += 2;
+            tempNet[index + 1] = net2;
+            tempNet[index + 2] = net3;
+            tempNet[index + 3] = net4;
+
+            index += 4;
         }
 
         for (int i = 0; i < populationSize; i++) {
@@ -210,11 +233,44 @@ public class NEATGeneticController : MonoBehaviour
         }
 
         ResetWorld();
-        GeneratePopulation();
+        GeneratePopulation();*/
+
+
+
+        testCounter = 0;
+        generationNumber++;
+
+        List<List<float>> adjustedFitnessSpecies = new List<List<float>>();
+        int numberOfSpecies = species.Count;
+        for (int i = 0; i < numberOfSpecies; i++) {
+
+            float sharedTotal = 0;
+            int numberOfNets = species[i].Count;
+            List<float> adjustedFitnessNets = new List<float>();
+
+            for (int j = 0; j < numberOfNets; j++) {
+                for (int k = 0; k < numberOfNets; k++) {
+                    if (j != k) {
+                        sharedTotal += NEATNet.SameSpecies(species[i][j], species[i][k]) == true ? 1 : 0;
+                    }
+                }
+            }
+
+            for (int j = 0; j < numberOfNets; j++) {
+                float fitness = species[i][j].GetNetFitness();
+                fitness /= sharedTotal;
+                adjustedFitnessNets.Add(fitness); ;
+                species[i][j].SetNetFitness(fitness);
+            }
+
+            if (adjustedFitnessNets.Count > 0) {
+                adjustedFitnessSpecies.Add(adjustedFitnessNets);
+            }
+        }
+
     }
 
-    public List<int> GenerateListNumbers(int min, int max)
-    {
+    public List<int> GenerateListNumbers(int min, int max) {
         List<int> unusedIndicies = new List<int>();
         for (int i = min; i <= max; i++) {
             unusedIndicies.Add(i);

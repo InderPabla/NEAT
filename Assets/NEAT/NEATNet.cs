@@ -12,7 +12,7 @@ public class NEATNet {
 
     private int numberOfInputs;
     private int numberOfOutputs;
-    private int netID;
+    private int[] netID = new int[2];
 
     private float time;
     private float netFitness;
@@ -25,7 +25,7 @@ public class NEATNet {
         CopyNodes(copy.nodeList);
         CopyGenes(copy.geneList);
 
-        this.netID = 0;
+        this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
     }
@@ -57,14 +57,14 @@ public class NEATNet {
             geneList.Add(gene);
         }
 
-        this.netID = 0;
+        this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
     }
 
-    public NEATNet(NEATConsultor consultor, int netID, int numberOfInputs, int numberOfOutputs, float time) {
+    public NEATNet(NEATConsultor consultor, int[] netID, int numberOfInputs, int numberOfOutputs, float time) {
         this.consultor = consultor;
-        this.netID = netID;
+        this.netID = new int[] {netID[0], netID[1]};
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
         this.time = time;
@@ -82,7 +82,7 @@ public class NEATNet {
         CopyNodes(copyNodes);
         CopyGenes(copyGenes);
         
-        this.netID = 0;
+        this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
     }
@@ -124,8 +124,8 @@ public class NEATNet {
         return netFitness;
     }
 
-    public void SetNetID(int netID) {
-        this.netID = netID;
+    public void SetNetID(int[] netID) {
+        this.netID = new int[] {netID[0], netID[1]};
     }
 
     public void SetNetFitness(float netFitness) {
@@ -136,7 +136,7 @@ public class NEATNet {
         this.netFitness += netFitness;
     }
 
-    public int GetNetID() {
+    public int[] GetNetID() {
         return netID;
     }
 
@@ -312,28 +312,28 @@ public class NEATNet {
     }
 
     public void Mutate() {
-        int randomNumberT;
-        do
-        {
-            randomNumberT = Random.Range(1, 3);
+        //int randomNumberT;
+        //do
+        //{
+            //randomNumberT = Random.Range(1, 3);
             int randomNumber = Random.Range(1, 101);
-            if (randomNumber <= 5)
+            if (randomNumber <= 1)
             {
                 AddConnection();
             }
-            else if (randomNumber <= 10)
+            else if (randomNumber <= 2)
             {
                 AddNode();
             }
-        }
-        while (randomNumberT == 1);
+        //}
+        //while (randomNumberT == 1);
 
-        do
-        {
-            randomNumberT = Random.Range(1, 3);
+        //do
+        //{
+            //randomNumberT = Random.Range(1, 3);
             MutateWeight();
-        }
-        while (randomNumberT == 1);
+        //}
+        //while (randomNumberT == 1);
     }
 
     public void AddConnection(){
@@ -525,22 +525,6 @@ public class NEATNet {
         }
     }
 
-    public void PrintDetails() {
-        Debug.Log("-----------------");
-        int numberOfNodes = nodeList.Count;
-        for (int i = 0; i < numberOfNodes; i++) {
-            NEATNode node = nodeList[i];
-            Debug.Log("ID:"+ node.GetNodeID()+", Type:"+node.GetNodeType());
-        }
-        Debug.Log("-----------------");
-        int numberOfGenes = geneList.Count;
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = geneList[i];
-            Debug.Log("Inno "+gene.GetInnovation()+", In:" +gene.GetInID() + ", Out:" + gene.GetOutID() + ", On:" + gene.GetGeneState()+", Wi:"+gene.GetWeight());
-        }
-        Debug.Log("-----------------");
-    }
-
     internal static NEATNet CreateMutateCopy(NEATNet net) {
         NEATNet copy = null;
 
@@ -553,9 +537,11 @@ public class NEATNet {
     internal static NEATNet Corssover (NEATNet parent1, NEATNet parent2)
     {
         NEATNet child = null;
-        List<NEATGene> childGeneList = new List<NEATGene>();
 
         Hashtable geneHash = new Hashtable();
+
+        List<NEATGene> childGeneList = new List<NEATGene>();
+        List<NEATNode> childNodeList = null;
 
         List<NEATGene> geneList1 = parent1.geneList;
         List<NEATGene> geneList2 = parent2.geneList;
@@ -564,8 +550,18 @@ public class NEATNet {
 
         int numberOfGenes1 = geneList1.Count;
         int numberOfGenes2 = geneList2.Count;
+        int numberOfInputs = parent1.GetNumberOfInputNodes();
+        int numberOfOutputs = parent1.GetNumberOfOutputNodes();
 
-       for (int i = 0; i < numberOfGenes1; i++) {
+        if (parent1.GetNodeCount() > parent2.GetNodeCount()) {
+            childNodeList = parent1.nodeList;
+        }
+        else
+        {
+            childNodeList = parent2.nodeList;
+        }
+
+        for (int i = 0; i < numberOfGenes1; i++) {
 
             geneHash.Add(geneList1[i].GetInnovation(),new NEATGene[] { geneList1[i], null});
         }
@@ -621,6 +617,7 @@ public class NEATNet {
             }
         }
 
+        child = new NEATNet(consultor, numberOfInputs, numberOfOutputs, childNodeList, childGeneList);
         return child;
     }
 
@@ -633,7 +630,7 @@ public class NEATNet {
         return gene;
     }
 
-    internal static float CalculateGenomeSimilarity(NEATNet net1, NEATNet net2) {
+    internal static bool SameSpecies(NEATNet net1, NEATNet net2) {
         NEATConsultor consultor = net1.consultor;
         List<NEATGene> geneList1 = net1.geneList;
         List<NEATGene> geneList2 = net2.geneList;
@@ -654,6 +651,7 @@ public class NEATNet {
         float disjointCoefficient = consultor.GetDisjointCoefficient();
         float excessCoefficient = consultor.GetExcessCoefficient();
         float averageWeightDifferenceCoefficient = consultor.GetAverageWeightDifferenceCoefficient();
+        float deltaThreshold = consultor.GetDeltaThreshold();
         float similarity = 0;
         float averageWeightDifference = 0;
 
@@ -729,28 +727,52 @@ public class NEATNet {
         }
 
         averageWeightDifference = averageWeightDifference / (float)equalGenes;
+        similarity = (averageWeightDifference * averageWeightDifferenceCoefficient) + (((float)disjointGenes / (float)largeGenomeSize) * disjointCoefficient) + (((float)excessGenes / (float)largeGenomeSize) * excessCoefficient);
 
-        /*Debug.Log("Details: "+averageWeightDifference +" "+ disjointGenes+" "+ excessGenes+" "+ largeGenomeSize);
-        if (numberOfGenes1 > 33) {
+        /*Debug.Log("()()()()()()()()()()()()()()()()()()()()");
+        Debug.Log("()()()()()()()()()()()()()()()()()()()()");
+        Debug.Log("Details: " + equalGenes + " " + averageWeightDifference + " " + disjointGenes + " " + excessGenes + " " + largeGenomeSize+" "+similarity);
+        int totalNormalNodes = net1.numberOfOutputs * net1.numberOfInputs;
+        if (numberOfGenes1 > totalNormalNodes)
+        {
             Debug.Log("--gene 1--");
-            for (int i = 33; i < numberOfGenes1; i++) {
+            for (int i = totalNormalNodes; i < numberOfGenes1; i++)
+            {
                 NEATGene gene = geneList1[i];
-                Debug.Log(i+" "+gene.GetInnovation() +" "+gene.GetInID()+" "+gene.GetOutID());
+                Debug.Log(i + " " + gene.GetInnovation() + " " + gene.GetInID() + " " + gene.GetOutID());
             }
         }
 
-        if (numberOfGenes2 > 33)
+        if (numberOfGenes2 > totalNormalNodes)
         {
             Debug.Log("--gene 2--");
-            for (int i = 33; i < numberOfGenes2; i++) {
+            for (int i = totalNormalNodes; i < numberOfGenes2; i++)
+            {
                 NEATGene gene = geneList2[i];
                 Debug.Log(i + " " + gene.GetInnovation() + " " + gene.GetInID() + " " + gene.GetOutID());
             }
         }
-        Debug.Log("~~~~~~~~");*/
-        similarity = (averageWeightDifference * averageWeightDifferenceCoefficient) + (((float)disjointGenes / (float)largeGenomeSize) * disjointCoefficient) + (((float)excessGenes / (float)largeGenomeSize) * excessCoefficient);
-        
-        return similarity;
+        Debug.Log("~~~~~~~~");
+        Debug.Log("()()()()()()()()()()()()()()()()()()()()");
+        Debug.Log("()()()()()()()()()()()()()()()()()()()()");*/
+
+        return similarity < deltaThreshold;
+    }
+
+    public void PrintDetails() {
+        Debug.Log("-----------------");
+        int numberOfNodes = nodeList.Count;
+        for (int i = 0; i < numberOfNodes; i++) {
+            NEATNode node = nodeList[i];
+            Debug.Log("ID:" + node.GetNodeID() + ", Type:" + node.GetNodeType());
+        }
+        Debug.Log("-----------------");
+        int numberOfGenes = geneList.Count;
+        for (int i = 0; i < numberOfGenes; i++) {
+            NEATGene gene = geneList[i];
+            Debug.LogWarning("Inno " + gene.GetInnovation() + ", In:" + gene.GetInID() + ", Out:" + gene.GetOutID() + ", On:" + gene.GetGeneState() + ", Wi:" + gene.GetWeight());
+        }
+        Debug.Log("-----------------");
     }
 
 }

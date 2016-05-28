@@ -23,10 +23,10 @@ public class Tester : MonoBehaviour
 
     void Start()
     {
-        mutex = new Semaphore(1, 1);
-        pos = GameObject.Find("Pos").transform;
-        TakePoint();
-        bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
+        mutex = new Semaphore(1, 1); 
+        //pos = GameObject.Find("Pos").transform;
+        //TakePoint();
+        //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
     }
 
     void TakePoint() {
@@ -71,7 +71,7 @@ public class Tester : MonoBehaviour
     private void UpdateNet()
     {
 
-        /*float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
+        float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
         //both poles angles in radians
         float pole1AngleRadian = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
         float pole2AngleRadian = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
@@ -84,9 +84,15 @@ public class Tester : MonoBehaviour
 
         float[] inputValues = { boardVelocity, boardLocation, pole1AngleRadian, pole2AngleRadian, pole1AngularVelocity, pole2AngularVelocity }; //gather pole and track data into an array 
         float[] output = net.FireNet(inputValues); //caluclate new neural net output with given input values
-        bodies[0].velocity += new Vector2(output[0], 0); //update track velocity with neural net output*/
+        Vector2 velo = bodies[0].velocity;
+        velo += new Vector2(output[0], 0);
 
-        float angle = -100f;
+        if (velo.magnitude < 3.5f)
+            bodies[0].velocity = velo;
+
+        //bodies[0].velocity += new Vector2(output[0], 0); //update track velocity with neural net output
+
+        /*float angle = -100f;
         float angleAdd = 22.22f;
 
         Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
@@ -146,8 +152,6 @@ public class Tester : MonoBehaviour
         string otherCreatureName = "B";
         if (hit1.collider!=null) {
             h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / 2f;
-            /*if (hit1.collider.name.Contains(otherCreatureName))  
-                h1 = -1;*/
             if(h1!=-1)
                 Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
         }
@@ -155,8 +159,6 @@ public class Tester : MonoBehaviour
         if (hit2.collider != null)
         {
             h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / 2f;
-            /*if (hit2.collider.name.Contains(otherCreatureName))
-                h2 = -1;*/
             if (h2 != -1)
                 Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
         }
@@ -164,8 +166,6 @@ public class Tester : MonoBehaviour
         if (hit3.collider != null)
         {
             h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / 2f;
-            /*if (hit3.collider.name.Contains(otherCreatureName))
-                h3 = -1;*/
             if (h3 != -1)
                 Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
         }
@@ -173,8 +173,6 @@ public class Tester : MonoBehaviour
         if (hit4.collider != null)
         {
             h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / 2f;
-            /*if (hit4.collider.name.Contains(otherCreatureName))
-                h4 = -1;*/
             if (h4 != -1)
                 Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
         }
@@ -182,8 +180,6 @@ public class Tester : MonoBehaviour
         if (hit5.collider != null)
         {
             h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / 2f;
-            /*if (hit5.collider.name.Contains(otherCreatureName))
-                h5 = -1;*/
             if (h5 != -1)
                 Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
         }
@@ -191,8 +187,6 @@ public class Tester : MonoBehaviour
         if (hit6.collider != null)
         {
             h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / 2f;
-            /*if (hit6.collider.name.Contains(otherCreatureName))
-                h6 = -1;*/
             if (h6 != -1)
                 Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
         }
@@ -200,32 +194,24 @@ public class Tester : MonoBehaviour
         if (hit7.collider != null)
         {
             h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / 2f;
-            /*if (hit7.collider.name.Contains(otherCreatureName))
-                h7 = -1;*/
             if (h7 != -1)
                 Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
         }
         if (hit8.collider != null)
         {
             h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / 2f;
-            /*if (hit8.collider.name.Contains(otherCreatureName))
-                h8 = -1;*/
             if (h8 != -1)
                 Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
         }
         if (hit9.collider != null)
         {
             h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / 2f;
-            /*if (hit9.collider.name.Contains(otherCreatureName))
-                h9 = -1;*/
             if (h9 != -1)
                 Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
         }
         if (hit10.collider != null)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / 2f;
-            /*if (hit10.collider.name.Contains(otherCreatureName))
-                h10 = -1;*/
             if (h10 != -1)
                 Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
         }
@@ -261,7 +247,7 @@ public class Tester : MonoBehaviour
         if (output[2] < 0.5f && output[2] > -0.5f)
         {
             bodies[0].velocity /= 2f;
-        }
+        }*/
 
 
         /*Vector2 dir = bodies[0].transform.up;
@@ -315,34 +301,34 @@ public class Tester : MonoBehaviour
     //restrictions on the test to fail bad neural networks faster
     private bool FailCheck()
     {
-        /*float failDegree = 45f;
+        float failDegree = 45f;
         float pole1AngleDegree = bodies[1].transform.eulerAngles.z;
         float pole2AngleDegree = bodies[2].transform.eulerAngles.z;
         //if both poles are within 45 degrees on eaither side then fail check is false
         if (!(((pole1AngleDegree <= failDegree && pole1AngleDegree >= 0) || (pole1AngleDegree <= 360 && pole1AngleDegree >= (360 - failDegree))) &&
             ((pole2AngleDegree <= failDegree && pole2AngleDegree >= 0) || (pole2AngleDegree <= 360 && pole2AngleDegree >= (360 - failDegree))))) {
-            return true;
+            return true; 
         }
         //if both poles are above 0 y then fail check is false
         if (!(bodies[1].transform.localPosition.y > 0 && bodies[2].transform.localPosition.y > 0)) {
             return true;
+            
         }
 
-        if (Mathf.Abs(bodies[1].transform.localPosition.x) >5f)
-        {
+        if (Mathf.Abs(bodies[0].transform.localPosition.x) > 1000f) {
             return true;
-        }*/
+        }
         
         if (damage<=0)
             return true;
-
+        
         return false;
     }
 
     //--Add your own neural net fail code here--//
     //Fitness calculation
     private void CalculateFitness() {
-        /*float factor = 1f;
+        float factor = 1f;
 
         float pole1Factor = bodies[1].transform.eulerAngles.z;
         float pole2Factor = bodies[2].transform.eulerAngles.z;
@@ -374,14 +360,13 @@ public class Tester : MonoBehaviour
         float boardFactor = Mathf.Abs(bodies[0].transform.localPosition.x);
         if (boardFactor < 0.1f)
             boardFactor = 0.1f;
-        boardFactor = 1f / boardFactor;
+        boardFactor =  /*(5f-boardFactor)/5f*/1f/speedFactor;
 
-        //factor = factor * pole1Factor * pole2Factor * boardFactor * speedFactor;
-        factor = factor * pole1Factor * pole2Factor * boardFactor;
-        //factor = factor * factor;
-        float fit = Time.deltaTime + factor*Time.deltaTime;
+        factor = factor * pole1Factor * pole2Factor * boardFactor * speedFactor;
+        //factor = factor * pole1Factor * pole2Factor * boardFactor;
+        float fit = /*Time.deltaTime + */factor*Time.deltaTime;
 
-        net.AddNetFitness(fit);*/
+        net.AddNetFitness(Time.deltaTime);
 
 
         /*if (bodies[0].angularVelocity == 0)
@@ -394,7 +379,7 @@ public class Tester : MonoBehaviour
         if (output[1] < 0f )
             this.net.AddNetFitness(-1f);*/
 
-        this.net.AddNetFitness(Time.deltaTime);
+        //this.net.AddNetFitness(Time.deltaTime);
         //this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2));
 
     }
@@ -404,7 +389,7 @@ public class Tester : MonoBehaviour
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
         //this.net.AddNetFitness(Mathf.Pow((1f / (float)net.GetGeneCount()),1));
-        float totalDistanceFit = 0;
+        /*float totalDistanceFit = 0;
         for (int i = 1; i < points.Count; i++) {
             float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]),2f);
             totalDistanceFit += dis;
@@ -413,7 +398,7 @@ public class Tester : MonoBehaviour
         float ratio = totalDistanceFit/life;
         float newFit = ratio * totalDistanceFit;
 
-        this.net.SetNetFitness(newFit);
+        this.net.SetNetFitness(newFit);*/
 
     }
 
@@ -421,7 +406,7 @@ public class Tester : MonoBehaviour
         mutex.WaitOne();
 
 
-        hurt = 1f;
+        //hurt = 1f;
 
         mutex.Release();
     }
