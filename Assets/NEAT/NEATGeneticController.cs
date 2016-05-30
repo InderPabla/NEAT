@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 
 public class NEATGeneticController : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class NEATGeneticController : MonoBehaviour
     //private NEATNet[] nets; //array of neural networks 
     private List<List<NEATNet>> species = new List<List<NEATNet>>();
 
-    private float[,] finishedResults;
+    //private float[,] finishedResults;
     private int testCounter; //counter for population testing
     private Semaphore finished; //mutex lock for when test if finished and updating test counter
     private const string ACTIVATE = "Activate";
@@ -44,8 +45,8 @@ public class NEATGeneticController : MonoBehaviour
             testCounter = 0;
             finished = new Semaphore(1, 1);
             //nets = new NEATNet[populationSize];
-            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 0.1f, 0.4f, 1f, 1f);
-            finishedResults = new float[populationSize, 2];
+            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 0.1f, 1f, 1f, 2f);
+            //finishedResults = new float[populationSize, 2];
             operations = new DatabaseOperation();
 
 
@@ -110,13 +111,47 @@ public class NEATGeneticController : MonoBehaviour
             nets[i] = new NEATNet(consultor, i, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
         }*/
 
-        List<NEATNet> initialSpecies = new List<NEATNet>();
+        //List<NEATNet> initialSpecies = new List<NEATNet>();
         for (int i = 0; i < populationSize; i++) {
             NEATNet net = new NEATNet(consultor, new int[] {0,i}, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
-            initialSpecies.Add(net);
-            
+            for (int j = 0; j <1; j++) {
+                net.Mutate();
+            }
+
+            if (species.Count == 0) {
+                List<NEATNet> newSpecies = new List<NEATNet>();
+                newSpecies.Add(net);
+                species.Add(newSpecies);
+            }
+            else {
+                int numberOfSpecies = species.Count;
+                int location = -1;
+                for (int j = 0; j < numberOfSpecies; j++)  {
+                    int numberOfNets = species[j].Count;
+                    int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
+                    if (NEATNet.SameSpecies(species[j][randomIndex], net)) {
+                        location = j;
+                        break;
+                    }
+                }
+
+                if (location == -1) {
+                    List<NEATNet> newSpecies = new List<NEATNet>();
+                    newSpecies.Add(net);
+                    species.Add(newSpecies);
+                }
+                else {
+                    species[location].Add(net);
+                }
+            } 
         }
-        species.Add(initialSpecies);
+
+        /*int numberOfSpecies1 = species.Count;
+        Debug.Log(numberOfSpecies1);
+        for (int i = 0; i < numberOfSpecies1; i++) {
+            int numberOfNets = species[i].Count;
+            Debug.Log(i+" "+numberOfNets);
+        }*/
     }
 
     public void GenerateCopyNets(NEATNet net) {
@@ -240,15 +275,32 @@ public class NEATGeneticController : MonoBehaviour
         testCounter = 0;
         generationNumber++;
 
+
         List<List<float>> adjustedFitnessSpecies = new List<List<float>>();
+        List<int> newPopulationDistribution = new List<int>();
+        List<float> populationFitness = new List<float>();
+
         int numberOfSpecies = species.Count;
+        float totalFitness = 0;
+        float highestFitness = -1000000;
+
         for (int i = 0; i < numberOfSpecies; i++) {
 
-            float sharedTotal = 0;
+            float sharedTotal = 1;
             int numberOfNets = species[i].Count;
             List<float> adjustedFitnessNets = new List<float>();
 
-            for (int j = 0; j < numberOfNets; j++) {
+            /*for (int j = 0; j < numberOfNets1; j++) {
+                for (int k = 0; k < numberOfSpecies; k++) {
+                    int numberOfNets2 = species[k].Count;
+                    for (int l = 0; l < numberOfNets2; l++) {
+                       if (i != k && j != l) {
+                            sharedTotal += NEATNet.SameSpecies(species[i][j], species[k][l]) == true ? 1 : 0;
+                       }
+                   }
+                }  
+            }*/
+            for(int j = 0; j < numberOfNets; j++) {
                 for (int k = 0; k < numberOfNets; k++) {
                     if (j != k) {
                         sharedTotal += NEATNet.SameSpecies(species[i][j], species[i][k]) == true ? 1 : 0;
@@ -256,11 +308,17 @@ public class NEATGeneticController : MonoBehaviour
                 }
             }
 
+            populationFitness.Add(0);
             for (int j = 0; j < numberOfNets; j++) {
                 float fitness = species[i][j].GetNetFitness();
+
+                if (fitness > highestFitness)
+                    highestFitness = fitness;
                 fitness /= sharedTotal;
-                adjustedFitnessNets.Add(fitness); ;
-                species[i][j].SetNetFitness(fitness);
+                adjustedFitnessNets.Add(fitness);
+
+                totalFitness += fitness;
+                populationFitness[i] += fitness;
             }
 
             if (adjustedFitnessNets.Count > 0) {
@@ -268,6 +326,175 @@ public class NEATGeneticController : MonoBehaviour
             }
         }
 
+        Debug.Log("Generation Number: "+generationNumber+", Highest Fitness: "+highestFitness);
+
+        int populationLeft = 0;
+        for (int i = 0; i < numberOfSpecies; i++) {
+            newPopulationDistribution.Add(0);
+            newPopulationDistribution[i] = Mathf.RoundToInt((populationFitness[i] / totalFitness) * populationSize);
+            populationLeft += newPopulationDistribution[i];
+        }
+
+        for (int i = 0; i < newPopulationDistribution.Count; i++) {
+            if (newPopulationDistribution[i] == 0) {
+                newPopulationDistribution.RemoveAt(i);
+                species.RemoveAt(i);
+            }
+        }
+
+        populationLeft = populationSize - populationLeft;
+        //Debug.Log("Popleft: "+populationLeft);
+
+        if (populationLeft < 0) {
+            populationLeft = Mathf.Abs(populationLeft);
+
+            for (int i = 0; i < populationLeft; i++) {
+                int randomSpeciesIndex = UnityEngine.Random.Range(0, newPopulationDistribution.Count);
+                newPopulationDistribution[randomSpeciesIndex]--;
+
+                if (newPopulationDistribution[randomSpeciesIndex] == 0) {
+                    newPopulationDistribution.RemoveAt(randomSpeciesIndex);
+                    species.RemoveAt(randomSpeciesIndex);
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < populationLeft; i++) {
+                int randomSpeciesIndex = UnityEngine.Random.Range(0, newPopulationDistribution.Count);
+                newPopulationDistribution[randomSpeciesIndex]++;
+            }
+        }
+
+        List<List<NEATNet>> tempSpecies = species;
+        species = new List<List<NEATNet>>();
+
+        
+        for (int i =0;i<tempSpecies.Count;i++) {
+            if (tempSpecies[i].Count > 3) {
+                float[,] fitness = SortedFitnessIndicies(tempSpecies[i]);
+                
+                for (int j = 0; j < (fitness.GetLength(0)/2 ); j++) {
+                    tempSpecies[i][(int)fitness[j, 0]] = null;
+
+                    //Debug.Log(i + " " + (int)fitness[j, 0] + " " + tempSpecies[i].Count+" "+ fitness.GetLength(0)+" "+((fitness.GetLength(0) / 2)));
+                    //Debug.Log(i+" "+ (int)fitness[j, 0]+ " "+tempSpecies[i][(int)fitness[j, 0]].GetNetFitness()+" "+tempSpecies[i].Count);
+                    //Debug.Log(i + " " + (int)fitness[j, 0]);
+                }
+            }
+        }
+
+        for (int i = 0; i < tempSpecies.Count; i++) {
+            for (int j = 0; j < tempSpecies[i].Count; j++) {
+                if (tempSpecies[i][j] == null) {
+                    tempSpecies[i].RemoveAt(j);
+                    j = 0;
+                }
+            }
+        }
+        for (int i = 0; i < tempSpecies.Count; i++)
+        {
+            for (int j = 0; j < tempSpecies[i].Count; j++)
+            {
+                if (tempSpecies[i][j] == null)
+                {
+                    tempSpecies[i].RemoveAt(j);
+                    j = 0;
+                }
+            }
+        }
+
+
+        /*for (int i = 0; i < tempSpecies.Count; i++)
+        {
+            for (int j = 0; j < tempSpecies[i].Count; j++)
+            {
+                if (tempSpecies[i][j] == null) {
+                    Debug.Log(i+" "+j); 
+                    Debug.Log("yes");
+                }
+            }
+        }*/
+
+        for (int i = 0; i < newPopulationDistribution.Count; i++) {
+            int distribution = newPopulationDistribution[i];
+
+            for (int j = 0; j < distribution; j++) {
+                int numberOfTempNets = tempSpecies[i].Count;
+                NEATNet parent1 = tempSpecies[i][UnityEngine.Random.Range(0, numberOfTempNets)];
+                NEATNet parent2 = tempSpecies[i][UnityEngine.Random.Range(0, numberOfTempNets)];
+
+                NEATNet net = NEATNet.Corssover(parent1, parent2);
+                net.Mutate();
+                net.SetNetFitness(0f);
+                net.SetTestTime(testTime);
+
+                if (species.Count == 0)
+                {
+                    List<NEATNet> newSpecies = new List<NEATNet>();
+                    newSpecies.Add(net);
+                    species.Add(newSpecies);
+                }
+                else
+                {
+                    int numberOfNewSpecies = species.Count;
+                    int location = -1;
+                    for (int k = 0; k < numberOfNewSpecies; k++)
+                    {
+                        int numberOfNets = species[k].Count;
+                        int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
+                        if (NEATNet.SameSpecies(species[k][randomIndex], net))
+                        {
+                            location = k;
+                            break;
+                        }
+                    }
+
+                    if (location == -1)
+                    {
+                        List<NEATNet> newSpecies = new List<NEATNet>();
+                        newSpecies.Add(net);
+                        species.Add(newSpecies);
+                    }
+                    else
+                    {
+                        species[location].Add(net);
+                    }
+                }
+            }
+        }
+
+        GeneratePopulation();
+
+        /*int counter = 0;
+        for (int i = 0; i < species.Count; i++) {
+            Debug.Log(i+" "+species[i].Count);
+            counter += species[i].Count;
+        }
+        Debug.Log(counter);*/
+
+        /*int countDistribution = 0;
+        int countSpecies = 0;
+        for (int i = 0; i < newPopulationDistribution.Count; i++) {
+            Debug.Log(species[i].Count+" => "+newPopulationDistribution[i]);
+            countDistribution += newPopulationDistribution[i];
+            countSpecies += species[i].Count;
+        }
+        Debug.Log("Total: "+countDistribution+" "+countSpecies+" "+newPopulationDistribution.Count+" "+species.Count);*/
+
+
+
+
+    }
+
+    public float[,] SortedFitnessIndicies(List<NEATNet> organisums) {
+        float[,] sorted = new float [organisums.Count,2];
+
+        for (int i = 0; i < sorted.GetLength(0); i++) {
+            sorted[i,0] = i;
+            sorted[i,1] = organisums[i].GetNetFitness();
+        }
+
+        return SortFitness(sorted);
     }
 
     public List<int> GenerateListNumbers(int min, int max) {
@@ -300,29 +527,31 @@ public class NEATGeneticController : MonoBehaviour
         return paires;
     }
 
-    public void SortFitness() {
+    public float[,] SortFitness(float[,] sort) {
         float[] tempFitness = new float[2];
         bool swapped = true;
         int j = 0;
         while (swapped) {
             swapped = false;
             j++;
-            for (int i = 0; i < populationSize - j; i++)
+            for (int i = 0; i < sort.GetLength(0) - j; i++)
             {
-                if (finishedResults[i, 1] > finishedResults[i + 1, 1])
+                if (sort[i, 1] > sort[i + 1, 1])
                 {
-                    tempFitness[0] = finishedResults[i, 0];
-                    tempFitness[1] = finishedResults[i, 1];
+                    tempFitness[0] = sort[i, 0];
+                    tempFitness[1] = sort[i, 1];
 
-                    finishedResults[i, 0] = finishedResults[i + 1, 0];
-                    finishedResults[i, 1] = finishedResults[i + 1, 1];
+                    sort[i, 0] = sort[i + 1, 0];
+                    sort[i, 1] = sort[i + 1, 1];
 
-                    finishedResults[i + 1, 0] = tempFitness[0];
-                    finishedResults[i + 1, 1] = tempFitness[1];
+                    sort[i + 1, 0] = tempFitness[0];
+                    sort[i + 1, 1] = tempFitness[1];
                     swapped = true;
                 }
             }
         }
+
+        return sort;
     }
 
     public bool ErrorCheck()
