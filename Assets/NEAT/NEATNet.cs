@@ -447,10 +447,10 @@ public class NEATNet {
                 weight = gene.GetWeight() * factor;
                 gene.SetWeight(weight);
             }
-            else if (randomNumber <= 5)
+            /*else if (randomNumber <= 5)
             {
                 gene.SetGeneState(!gene.GetGeneState());
-            }
+            }*/
         }
 
     }
@@ -562,7 +562,6 @@ public class NEATNet {
         }
 
         for (int i = 0; i < numberOfGenes1; i++) {
-
             geneHash.Add(geneList1[i].GetInnovation(),new NEATGene[] { geneList1[i], null});
         }
 

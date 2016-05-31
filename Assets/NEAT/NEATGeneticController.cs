@@ -45,7 +45,7 @@ public class NEATGeneticController : MonoBehaviour
             testCounter = 0;
             finished = new Semaphore(1, 1);
             //nets = new NEATNet[populationSize];
-            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 0.1f, 1f, 1f, 2f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons,numberOfOutputPerceptrons, 0.05f, 0.1f, 0.1f, 0.1f);
             //finishedResults = new float[populationSize, 2];
             operations = new DatabaseOperation();
 
@@ -71,10 +71,10 @@ public class NEATGeneticController : MonoBehaviour
 
     void FixedUpdate() {
         if (worldActivation) {
-            bodies[0].transform.position += new Vector3(Time.deltaTime/2.5f, 0, 0);
-            bodies[1].transform.position += new Vector3(-Time.deltaTime/2.5f, 0, 0);
-            bodies[2].transform.position += new Vector3(0, Time.deltaTime/8f, 0);
-            bodies[3].transform.position += new Vector3(0, -Time.deltaTime/8f, 0);
+            bodies[0].transform.position += new Vector3(Time.deltaTime/2f, 0, 0);
+            bodies[1].transform.position += new Vector3(-Time.deltaTime/2f, 0, 0);
+            bodies[2].transform.position += new Vector3(0, Time.deltaTime/4f, 0);
+            bodies[3].transform.position += new Vector3(0, -Time.deltaTime/4f, 0);
         }
 
        if (timeScale <= 1f) {
@@ -97,10 +97,10 @@ public class NEATGeneticController : MonoBehaviour
 
     public void ResetWorld() {
         if (worldActivation) {
-            bodies[0].transform.position = new Vector3(-17.5f, 0, 0);
-            bodies[1].transform.position = new Vector3(17.5f, 0, 0);
-            bodies[2].transform.position = new Vector3(0, -9.5f, 0);
-            bodies[3].transform.position = new Vector3(0, 9.5f, 0);
+            bodies[0].transform.position = new Vector3(-26f, 0, 0);
+            bodies[1].transform.position = new Vector3(26f, 0, 0);
+            bodies[2].transform.position = new Vector3(0, -14.5f, 0);
+            bodies[3].transform.position = new Vector3(0, 14.5f, 0);
         }
         timeScale = Time.timeScale;
     }
@@ -115,7 +115,7 @@ public class NEATGeneticController : MonoBehaviour
         for (int i = 0; i < populationSize; i++) {
             NEATNet net = new NEATNet(consultor, new int[] {0,i}, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
             for (int j = 0; j <1; j++) {
-                net.Mutate();
+               // net.Mutate();
             }
 
             if (species.Count == 0) {
@@ -187,11 +187,22 @@ public class NEATGeneticController : MonoBehaviour
             
         }*/
 
+        float height = 10f;
+        float width = -20f;
         int numberOfSpecies = species.Count;
         for (int i = 0; i < numberOfSpecies; i++) {
             int numberOfNets = species[i].Count;
             for (int j = 0; j < numberOfNets; j++) {
-                CreateIndividual(Vector3.zero, species[i][j]);
+                CreateIndividual(new Vector3(width, height, 0), species[i][j]);
+
+
+                if (width % 20 == 0 && width > 0)
+                {
+                    width = -20f;
+                    height += -2f;
+                }
+                else
+                    width += 4f;
             }
         }
 
@@ -303,7 +314,7 @@ public class NEATGeneticController : MonoBehaviour
             for(int j = 0; j < numberOfNets; j++) {
                 for (int k = 0; k < numberOfNets; k++) {
                     if (j != k) {
-                        sharedTotal += NEATNet.SameSpecies(species[i][j], species[i][k]) == true ? 1 : 0;
+                        //sharedTotal += NEATNet.SameSpecies(species[i][j], species[i][k]) == true ? 1 : 0;
                     }
                 }
             }
@@ -370,7 +381,7 @@ public class NEATGeneticController : MonoBehaviour
 
         
         for (int i =0;i<tempSpecies.Count;i++) {
-            if (tempSpecies[i].Count > 3) {
+            if (tempSpecies[i].Count > 1) {
                 float[,] fitness = SortedFitnessIndicies(tempSpecies[i]);
                 
                 for (int j = 0; j < (fitness.GetLength(0)/2 ); j++) {
@@ -403,30 +414,53 @@ public class NEATGeneticController : MonoBehaviour
             }
         }
 
-
-        /*for (int i = 0; i < tempSpecies.Count; i++)
-        {
-            for (int j = 0; j < tempSpecies[i].Count; j++)
-            {
-                if (tempSpecies[i][j] == null) {
-                    Debug.Log(i+" "+j); 
-                    Debug.Log("yes");
-                }
-            }
-        }*/
-
         for (int i = 0; i < newPopulationDistribution.Count; i++) {
             int distribution = newPopulationDistribution[i];
 
             for (int j = 0; j < distribution; j++) {
                 int numberOfTempNets = tempSpecies[i].Count;
-                NEATNet parent1 = tempSpecies[i][UnityEngine.Random.Range(0, numberOfTempNets)];
-                NEATNet parent2 = tempSpecies[i][UnityEngine.Random.Range(0, numberOfTempNets)];
+                NEATNet parent1, parent2, net = null;
 
-                NEATNet net = NEATNet.Corssover(parent1, parent2);
-                net.Mutate();
+                 if (tempSpecies[i].Count == 1) {
+                     parent1 = tempSpecies[i][0];
+                     net = new NEATNet(parent1);
+
+                 }
+                 else if (tempSpecies[i].Count > 1) {
+
+                    float[,] fitness = SortedFitnessIndicies(tempSpecies[i]);
+                    /*int index1 = UnityEngine.Random.Range(0, numberOfTempNets);
+                    int index2 = index1;
+                    while (index1 == index2) {
+
+                        index2=  UnityEngine.Random.Range(0, numberOfTempNets);
+                    }
+
+                    parent1 = tempSpecies[i][index1];
+                    parent2 = tempSpecies[i][index2];*/
+
+                    /*parent1 = tempSpecies[i][(int)fitness[fitness.GetLength(0)-1,0]];
+                    parent2 = tempSpecies[i][(int)fitness[fitness.GetLength(0)-2, 0]];
+
+                    net = NEATNet.Corssover(parent1, parent2);*/
+                    if (j < 2)
+                    {
+                        net = tempSpecies[i][(int)fitness[fitness.GetLength(0) - 1, 0]];
+                    }
+                    else {
+                        parent1 = tempSpecies[i][(int)fitness[fitness.GetLength(0) - 1, 0]];
+                        parent2 = tempSpecies[i][(int)fitness[fitness.GetLength(0) - 2, 0]];
+
+                        net = NEATNet.Corssover(parent1, parent2);
+                        net.Mutate();
+                    }
+                 }
+
+
+                //
                 net.SetNetFitness(0f);
                 net.SetTestTime(testTime);
+                net.ClearNodeValues();
 
                 if (species.Count == 0)
                 {
@@ -463,6 +497,15 @@ public class NEATGeneticController : MonoBehaviour
             }
         }
 
+        /*int numberOfSpecies1 = species.Count;
+        Debug.Log(numberOfSpecies1);
+        for (int i = 0; i < numberOfSpecies1; i++)
+        {
+            int numberOfNets = species[i].Count;
+            Debug.Log(i + " " + numberOfNets);
+        }
+        */
+        ResetWorld();
         GeneratePopulation();
 
         /*int counter = 0;
