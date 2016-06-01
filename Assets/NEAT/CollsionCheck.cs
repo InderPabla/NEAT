@@ -3,7 +3,8 @@ using System.Collections;
 
 public class CollsionCheck : MonoBehaviour {
     
-    void OnCollisionEnter2D(Collision2D coll) {
+    void OnCollisionEnter2D(Collision2D coll)
+    {
         //if (coll.collider.name.Contains("G"))
         //transform.parent.SendMessage("OtherActivity", (object)0);
         //else

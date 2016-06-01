@@ -50,7 +50,6 @@
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
      <Compile Include="Assets\NEAT\NEATGeneticController.cs" />
-     <Compile Include="Assets\NEAT\NEATGeneticControllerV2.cs" />
      <Compile Include="Assets\NEAT\NEATNet.cs" />
      <Compile Include="Assets\NEAT\NEATNetDraw.cs" />
      <Compile Include="Assets\NEAT\NEATNode.cs" />
