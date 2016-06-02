@@ -45,9 +45,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             timeScale = Time.timeScale;
             testCounter = 0;
             finished = new Semaphore(1, 1);
-            //nets = new NEATNet[populationSize];
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.05f, 0.1f, 0.1f, 0.1f);
-            //finishedResults = new float[populationSize, 2];
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 1f, 3f, 2f, 3f);
             operations = new DatabaseOperation();
 
 
@@ -115,98 +113,50 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     }
 
 
-    public void GenerateInitialNets()
-    {
-        /*for (int i = 0; i < populationSize; i++) {
-            nets[i] = new NEATNet(consultor, i, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
-        }*/
-
-        //List<NEATNet> initialSpecies = new List<NEATNet>();
-        for (int i = 0; i < populationSize; i++)
-        {
+    public void GenerateInitialNets() {
+        for (int i = 0; i < populationSize; i++) {
             NEATNet net = new NEATNet(consultor, new int[] { 0, i }, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime);
-            for (int j = 0; j < 1; j++)
-            {
-                // net.Mutate();
+            for (int j = 0; j < 1; j++) {
+                //net.Mutate(); net.Mutate(); net.Mutate(); net.Mutate();
+                net.Mutate(); 
             }
 
-            if (species.Count == 0)
-            {
+            if (species.Count == 0) {
                 List<NEATNet> newSpecies = new List<NEATNet>();
                 newSpecies.Add(net);
                 species.Add(newSpecies);
             }
-            else
-            {
+            else {
                 int numberOfSpecies = species.Count;
                 int location = -1;
-                for (int j = 0; j < numberOfSpecies; j++)
-                {
+                for (int j = 0; j < numberOfSpecies; j++) {
                     int numberOfNets = species[j].Count;
                     int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
-                    if (NEATNet.SameSpecies(species[j][randomIndex], net))
-                    {
+                    if (NEATNet.SameSpeciesV2(species[j][randomIndex], net)) {
                         location = j;
                         break;
                     }
                 }
 
-                if (location == -1)
-                {
+                if (location == -1) {
                     List<NEATNet> newSpecies = new List<NEATNet>();
                     newSpecies.Add(net);
                     species.Add(newSpecies);
                 }
-                else
-                {
+                else {
                     species[location].Add(net);
                 }
             }
         }
 
-        /*int numberOfSpecies1 = species.Count;
-        Debug.Log(numberOfSpecies1);
-        for (int i = 0; i < numberOfSpecies1; i++) {
-            int numberOfNets = species[i].Count;
-            Debug.Log(i+" "+numberOfNets);
-        }*/
+
     }
 
-    public void GenerateCopyNets(NEATNet net)
-    {
-        /*for (int i = 0; i < populationSize; i++) {
-            nets[i] = new NEATNet(net);
-            nets[i].SetTestTime(testTime);
-            nets[i].SetNetFitness(0);
-            nets[i].SetNetID(i);
-            nets[i].ClearNodeValues();
-        }*/
+    public void GenerateCopyNets(NEATNet net) {
+
     }
 
-    public void GeneratePopulation()
-    {
-        /*List<int> numbers = GenerateListNumbers(0, populationSize-1);
-        float height = 12f;
-        float width = -25f;
-        for (int i = 0; i < populationSize; i++) {
-
-            GameObject tester = (GameObject)Instantiate(testPrefab, new Vector3(0,0, 0), testPrefab.transform.rotation);
-            tester.name = i+"";
-
-            int randomIndex = UnityEngine.Random.Range(0,numbers.Count);
-            tester.SendMessage(ACTIVATE, nets[numbers[randomIndex]]);
-            numbers.RemoveAt(randomIndex);
-            tester.GetComponent<Tester>().TestFinished += OnFinished; //suscribe OnFinished to event in Balancer
-
-            if (width % 25 == 0 && width>0) {
-                width = -25f;
-                height +=- 2f;
-            }
-            else
-                width += 5f;
-            
-        }*/
-
+    public void GeneratePopulation() {
         float height = 10f;
         float width = -20f;
         int numberOfSpecies = species.Count;
@@ -217,18 +167,15 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             {
                 CreateIndividual(new Vector3(width, height, 0), species[i][j]);
 
-
                 if (width % 20 == 0 && width > 0)
                 {
                     width = -20f;
-                    height += -2f;
+                    height += -1f;
                 }
                 else
                     width += 4f;
             }
         }
-
-
     }
 
     public void CreateIndividual(Vector3 position, NEATNet net)
@@ -242,10 +189,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     {
         finished.WaitOne();
 
-        /*int netID = (int)source;
-        finishedResults[testCounter, 0] = netID;
-        finishedResults[testCounter, 1] = nets[netID].GetNetFitness();*/
-
         testCounter++;
 
         if (testCounter == populationSize)
@@ -256,78 +199,116 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         finished.Release();
     }
 
-    public void TestFinished()
-    {
-        /*testCounter = 0;
-        generationNumber++;
-
-        NEATNet[] tempNet = new NEATNet[populationSize];
-
-        SortFitness();
-        int bestNetIndex = (int)finishedResults[populationSize - 1, 0];
-        Debug.Log("Generation Number: " + generationNumber + ", Best Fitness: " + finishedResults[populationSize - 1, 1]);
-        Debug.Log("-----"+nets[bestNetIndex].GetNodeCount() +" "+ nets[bestNetIndex].GetGeneCount());
-
-        if (generationNumber == 100) {
-            StartCoroutine(operations.SaveNet(nets[bestNetIndex], creatureName));
-        }
-        
-        netDrawer.SendMessage("DrawNet",nets[bestNetIndex]);wwwwwwwwwwwwwwwwww
-
-        int index = 0;
-
-        for (int i = populationSize / 2; i < populationSize; i+=2) {
-            NEATNet net1 = nets[(int)finishedResults[i, 0]];
-            NEATNet net2 = nets[(int)finishedResults[i+1, 0]];
-
-            NEATNet net3 = NEATNet.Corssover(net1, net2);
-            NEATNet net4 = new NEATNet(net3);
-
-            net1.Mutate();
-            net2.Mutate();
-            net3.Mutate();
-            net4.Mutate();
-
-            tempNet[index] = net1;
-            tempNet[index + 1] = net2;
-            tempNet[index + 2] = net3;
-            tempNet[index + 3] = net4;
-
-            index += 4;
-        }
-
-        for (int i = 0; i < populationSize; i++) {
-            nets[i] = tempNet[i];
-            nets[i].SetTestTime(testTime);
-            nets[i].SetNetFitness(0);
-            nets[i].SetNetID(i);
-            nets[i].ClearNodeValues();
-        }
-
-        ResetWorld();
-        GeneratePopulation();*/
-
-
-
+    public void TestFinished() {
         testCounter = 0;
         generationNumber++;
 
+        float highestFitness = 0f;
+        List<List<NEATNet>> bestSpecies = new List<List<NEATNet>>();
 
+        float[,] distribution = new float[species.Count,2];
+        float totalSharedFitness = 0f;
+        float totalOrganisums = 0f;
+
+        int[] id = new int[2];
+        for (int i = 0; i < species.Count; i++) {
+            float sharedAmount = 0f;
+            distribution[i, 0] = i;
+            for (int j = 0; j < species[i].Count; j++) {
+                distribution[i,1] += species[i][j].GetNetFitness();
+                if (species[i][j].GetNetFitness() > highestFitness) {
+                    highestFitness = species[i][j].GetNetFitness();
+                    id[0] = i; id[1] = j;
+                }
+                for (int k = j+1; k < species[i].Count; k++) {
+                    sharedAmount += NEATNet.SameSpeciesV2(species[i][j],species[i][k]) == true?1:0;
+                }
+            }
+            if (sharedAmount == 0)
+                sharedAmount = 1f;
+            distribution[i,1] = distribution[i, 1] / sharedAmount;
+            totalSharedFitness += distribution[i,1];
+
+            float[,] sortedFitness = SortedFitnessIndicies(species[i]);
+            List<NEATNet> bestOrganisums = new List<NEATNet>();
+
+            for (int j = sortedFitness.GetLength(0) / 2; j < sortedFitness.GetLength(0); j++) {
+                bestOrganisums.Add(species[i][(int)sortedFitness[j, 0]]);
+            }
+            bestSpecies.Add(bestOrganisums);
+        }
+
+        Debug.Log("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness);
+        netDrawer.SendMessage("DrawNet",species[id[0]][id[1]]);
+
+        distribution = SortFitness(distribution);
+        for (int i = 0; i < distribution.GetLength(0); i++) {
+            distribution[i, 1] = (int)((distribution[i, 1] / totalSharedFitness) * populationSize);
+            totalOrganisums += distribution[i, 1];
+            //Debug.Log(distribution[i, 0] + " " + i + " " + species[i].Count + " " + distribution[i, 1]);
+        }
+
+        for (int i = 0; i < (populationSize - totalOrganisums); i++) {
+            int highIndex = distribution.GetLength(0)/2;
+            int randomInsertIndex = UnityEngine.Random.Range(highIndex, distribution.GetLength(0));
+            distribution[randomInsertIndex, 1]++;
+        }
+
+        species = new List<List<NEATNet>>();
+
+        for (int i = 0; i < distribution.GetLength(0); i++) {
+            if (distribution[i, 1] > 0) {
+                for (int j = 0; j < distribution[i, 1]; j++) {
+                    List<NEATNet> bestOrganisums = bestSpecies[(int)distribution[i, 0]];
+                    NEATNet net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                    if(j< (float)distribution[i, 1]*0.9f)
+                        net.Mutate();
+                    net.SetNetFitness(0f);
+                    net.SetTestTime(testTime);
+                    net.ClearNodeValues();
+
+                            if (species.Count == 0) {
+                                List<NEATNet> newSpecies = new List<NEATNet>();
+                                newSpecies.Add(net);
+                                species.Add(newSpecies);
+                            }
+                            else {
+                                int numberOfSpecies = species.Count;
+                                int location = -1;
+                                for (int k = 0; k < numberOfSpecies; k++) {
+                                    int numberOfNets = species[k].Count;
+                                    int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
+                                    if (NEATNet.SameSpeciesV2(species[k][randomIndex], net)) {
+                                        location = k;
+                                        break;
+                                    }
+                                }
+
+                                if (location == -1) {
+                                    List<NEATNet> newSpecies = new List<NEATNet>();
+                                    newSpecies.Add(net);
+                                    net.SetNetID(new int[] {species.Count, 0 });
+                                    species.Add(newSpecies);
+                                    
+                                }
+                                else {
+                                    net.SetNetID(new int[] {location, species[location].Count});
+                                    species[location].Add(net);
+                                }      
+                            }
+                }
+            }
+        }
         
-
-
+        GeneratePopulation();
     }
 
-    public float[,] SortedFitnessIndicies(List<NEATNet> organisums)
-    {
+    public float[,] SortedFitnessIndicies(List<NEATNet> organisums) {
         float[,] sorted = new float[organisums.Count, 2];
-
-        for (int i = 0; i < sorted.GetLength(0); i++)
-        {
+        for (int i = 0; i < sorted.GetLength(0); i++) {
             sorted[i, 0] = i;
             sorted[i, 1] = organisums[i].GetNetFitness();
         }
-
         return SortFitness(sorted);
     }
 

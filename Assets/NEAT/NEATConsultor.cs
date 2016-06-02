@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 
 public class NEATConsultor  {
+    private float deltaThreshold;
     private float disjointCoefficient;
     private float excessCoefficient;
     private float averageWeightDifferenceCoefficient;
@@ -12,10 +13,11 @@ public class NEATConsultor  {
 
     private List<NEATGene> geneList;
 
-    public NEATConsultor(int numberOfInputs, int numberOfOutputs, float disjointCoefficient, float excessCoefficient, float averageWeightDifferenceCoefficient) {
+    public NEATConsultor(int numberOfInputs, int numberOfOutputs, float deltaThreshold, float disjointCoefficient, float excessCoefficient, float averageWeightDifferenceCoefficient) {
         this.numberOfInputs = numberOfInputs;
         this.numberOfOutputs = numberOfOutputs;
 
+        this.deltaThreshold = deltaThreshold;
         this.disjointCoefficient = disjointCoefficient;
         this.excessCoefficient = excessCoefficient;
         this.averageWeightDifferenceCoefficient = averageWeightDifferenceCoefficient;
@@ -71,6 +73,10 @@ public class NEATConsultor  {
 
     public float GetAverageWeightDifferenceCoefficient() {
         return averageWeightDifferenceCoefficient;
+    }
+
+    public float GetDeltaThreshold() {
+        return deltaThreshold;
     }
 
     public int GetGeneCount() {
