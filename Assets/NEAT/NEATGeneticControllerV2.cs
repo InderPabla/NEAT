@@ -45,7 +45,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             timeScale = Time.timeScale;
             testCounter = 0;
             finished = new Semaphore(1, 1);
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 1f, 3f, 2f, 3f);
+            //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 4f);
             operations = new DatabaseOperation();
 
 
@@ -165,7 +166,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             int numberOfNets = species[i].Count;
             for (int j = 0; j < numberOfNets; j++)
             {
-                CreateIndividual(new Vector3(width, height, 0), species[i][j]);
+                CreateIndividual(new Vector3(0, 0, 0), species[i][j]);
 
                 if (width % 20 == 0 && width > 0)
                 {
@@ -260,9 +261,21 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             if (distribution[i, 1] > 0) {
                 for (int j = 0; j < distribution[i, 1]; j++) {
                     List<NEATNet> bestOrganisums = bestSpecies[(int)distribution[i, 0]];
-                    NEATNet net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                    if(j< (float)distribution[i, 1]*0.9f)
+                    NEATNet net = null;
+
+                    if (j < (float)distribution[i, 1] * 0.9f) {
+                        net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
                         net.Mutate();
+                    }
+                    else {
+                        net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                    }
+
+                    /*NEATNet net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+
+                    if(j< (float)distribution[i, 1]*0.9f)
+                        net.Mutate();*/
+
                     net.SetNetFitness(0f);
                     net.SetTestTime(testTime);
                     net.ClearNodeValues();

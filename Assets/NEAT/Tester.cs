@@ -24,7 +24,7 @@ public class Tester : MonoBehaviour
     void Start()
     {
         mutex = new Semaphore(1, 1); 
-        pos = GameObject.Find("Pos").transform;
+        //pos = GameObject.Find("Pos").transform;
         //TakePoint();
         //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
     }
@@ -52,8 +52,7 @@ public class Tester : MonoBehaviour
     }
 
     //action based on neural net faling the test
-    protected virtual void OnFinished()
-    {
+    protected virtual void OnFinished() {
         if (TestFinished != null)
         {
             CalculateFitnessOnFinish();
@@ -68,10 +67,8 @@ public class Tester : MonoBehaviour
     float hurt = 0f;
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
-    private void UpdateNet()
-    {
-
-       /* float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
+    private void UpdateNet() {
+        /*float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
         //both poles angles in radians
         float pole1AngleRadian = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
         float pole2AngleRadian = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
@@ -82,7 +79,7 @@ public class Tester : MonoBehaviour
 
         float boardLocation = bodies[0].transform.localPosition.x;
 
-        float[] inputValues = { boardVelocity, boardLocation, pole1AngleRadian, pole2AngleRadian, pole1AngularVelocity, pole2AngularVelocity }; //gather pole and track data into an array 
+        float[] inputValues = { boardVelocity, pole1AngleRadian, pole2AngleRadian, pole1AngularVelocity, pole2AngularVelocity }; //gather pole and track data into an array 
         float[] output = net.FireNet(inputValues); //caluclate new neural net output with given input values
         Vector2 velo = bodies[0].velocity;
         velo += new Vector2(output[0], 0);
@@ -90,9 +87,27 @@ public class Tester : MonoBehaviour
         //if (velo.magnitude < 3.5f)
             bodies[0].velocity = velo;*/
 
+        float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
+        //both poles angles in radians
+        float pole1AngleRadian = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
+
+        //both poles angular velocities 
+        float pole1AngularVelocity = bodies[1].angularVelocity;
+
+
+        float boardLocation = bodies[0].transform.localPosition.x;
+
+        float[] inputValues = { boardVelocity, pole1AngleRadian, pole1AngularVelocity}; //gather pole and track data into an array 
+        float[] output = net.FireNet(inputValues); //caluclate new neural net output with given input values
+        Vector2 velo = bodies[0].velocity;
+        velo += new Vector2(output[0], 0);
+
+        //if (velo.magnitude < 3.5f)
+        bodies[0].velocity = velo;
+
         //bodies[0].velocity += new Vector2(output[0], 0); //update track velocity with neural net output
 
-        float angle = -100f;
+        /*float angle = -100f;
         float angleAdd = 22.22f;
 
         Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
@@ -250,7 +265,7 @@ public class Tester : MonoBehaviour
         rad2 *= Mathf.Deg2Rad;
 
 
-        float[] inputValues = {/*h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, */rad2}; 
+        float[] inputValues = {h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, rad2}; 
 
         output = net.FireNet(inputValues);
 
@@ -263,8 +278,8 @@ public class Tester : MonoBehaviour
             bodies[0].angularVelocity = 50f;
 
         rad2 = Mathf.Abs(rad2);
-        this.net.AddNetFitness(Mathf.Pow(Time.deltaTime*(Mathf.PI- rad2),2));
-        
+        this.net.AddNetFitness(Mathf.Pow(Time.deltaTime*(Mathf.PI- rad2),2));*/
+
         /*int[] id = net.GetNetID();
         if(id[0] == 0 && id[1]==0)
         Debug.Log(rad2);*/
@@ -339,34 +354,41 @@ public class Tester : MonoBehaviour
     //restrictions on the test to fail bad neural networks faster
     private bool FailCheck()
     {
-        /*float failDegree = 45f;
+        /*float failDegree = 10f;
         float pole1AngleDegree = bodies[1].transform.eulerAngles.z;
         float pole2AngleDegree = bodies[2].transform.eulerAngles.z;
         //if both poles are within 45 degrees on eaither side then fail check is false
         if (!(((pole1AngleDegree <= failDegree && pole1AngleDegree >= 0) || (pole1AngleDegree <= 360 && pole1AngleDegree >= (360 - failDegree))) &&
             ((pole2AngleDegree <= failDegree && pole2AngleDegree >= 0) || (pole2AngleDegree <= 360 && pole2AngleDegree >= (360 - failDegree))))) {
-            return true; 
+                return true; 
         }
         //if both poles are above 0 y then fail check is false
         if (!(bodies[1].transform.localPosition.y > 0 && bodies[2].transform.localPosition.y > 0)) {
-            return true;
-            
+                return true;
         }
 
-        if (Mathf.Abs(bodies[0].transform.localPosition.x) > 1000f) {
+        if (Mathf.Abs(bodies[0].transform.localPosition.x) > 5f) {
             return true;
+        }*/
+
+        float failDegree = 10f;
+        float pole1AngleDegree = bodies[1].transform.eulerAngles.z;
+        if (!(((pole1AngleDegree <= failDegree && pole1AngleDegree >= 0) || (pole1AngleDegree <= 360 && pole1AngleDegree >= (360 - failDegree))))) {
+            if(isUp == true)
+                return true;
         }
-        
+
         if (damage<=0)
-            return true;*/
+            return true;
         
         return false;
     }
 
+    bool isUp = false;
+
     //--Add your own neural net fail code here--//
     //Fitness calculation
     private void CalculateFitness() {
-        
         /*float factor = 1f;
 
         float pole1Factor = bodies[1].transform.eulerAngles.z;
@@ -402,11 +424,31 @@ public class Tester : MonoBehaviour
         boardFactor =  1f/speedFactor;
 
         factor = factor * pole1Factor * pole2Factor * boardFactor * speedFactor;
-        //factor = factor * pole1Factor * pole2Factor * boardFactor;
         float fit = factor*Time.deltaTime;
 
-        net.AddNetFitness(fit);*/
-        
+        net.AddNetFitness(Time.deltaTime);*/
+
+        float pole1Factor = bodies[1].transform.eulerAngles.z;
+
+        if (pole1Factor < 90f) {
+            if (pole1Factor<70f)
+                isUp = true;
+            pole1Factor = ((90f - pole1Factor) / 90f);
+            
+        }
+        else if (pole1Factor > 270f) {
+            if (pole1Factor >290f)
+                isUp = true;
+            pole1Factor = ((pole1Factor - 270f) / 90f); 
+        }
+        else {
+            pole1Factor = 0f;
+        }
+
+        net.AddNetFitness(Mathf.Pow((Time.deltaTime*pole1Factor),1.1f));
+
+        //if (net.GetNetID()[0] == 0 && net.GetNetID()[1] == 0)
+        //Debug.Log(Time.deltaTime);
 
         /*if (bodies[0].angularVelocity == 0)
             fit = fit * 2f;*/
@@ -420,10 +462,9 @@ public class Tester : MonoBehaviour
 
         //this.net.AddNetFitness(Time.deltaTime);
         //this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2));
-
     }
 
-    
+
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
