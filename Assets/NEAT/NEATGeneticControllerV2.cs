@@ -46,7 +46,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             testCounter = 0;
             finished = new Semaphore(1, 1);
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 4f);
+            //
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 2f, 2f, 2f, 1f);
             operations = new DatabaseOperation();
 
 
@@ -166,12 +167,12 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             int numberOfNets = species[i].Count;
             for (int j = 0; j < numberOfNets; j++)
             {
-                CreateIndividual(new Vector3(0, 0, 0), species[i][j]);
+                CreateIndividual(new Vector3(width, height, 0), species[i][j]);
 
                 if (width % 20 == 0 && width > 0)
                 {
                     width = -20f;
-                    height += -1f;
+                    height += -2f;
                 }
                 else
                     width += 4f;
@@ -264,7 +265,16 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                     NEATNet net = null;
 
                     if (j < (float)distribution[i, 1] * 0.9f) {
-                        net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                        NEATNet organisum1 = bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)];
+
+                        float random = UnityEngine.Random.Range(1f,100f);
+                        float powerNeeded = Mathf.Log(bestOrganisums.Count-1,100);
+                        float logIndex = Mathf.Abs(((bestOrganisums.Count - 1) -Mathf.Pow(random, powerNeeded)));
+                        //Debug.Log(logIndex+" "+bestOrganisums.Count);
+                        NEATNet organisum2 = bestOrganisums[(int)logIndex];
+                        
+                        //net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                        net = NEATNet.Corssover(organisum1, organisum2);
                         net.Mutate();
                     }
                     else {
@@ -312,8 +322,10 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 }
             }
         }
-        
+
+        ResetWorld();
         GeneratePopulation();
+
     }
 
     public float[,] SortedFitnessIndicies(List<NEATNet> organisums) {
