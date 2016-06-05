@@ -36,6 +36,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     public bool loadFromDatabase = false;
 
     private NEATConsultor consultor;
+    float[,] colors = new float[15,3];
 
     void Start()
     {
@@ -47,8 +48,33 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             finished = new Semaphore(1, 1);
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 2f, 2f, 2f, 1f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 1f, 2f, 2f, 2f);
             operations = new DatabaseOperation();
+
+
+            colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
+            colors[0, 1] = UnityEngine.Random.Range(0f, 1f);
+            colors[0, 2] = UnityEngine.Random.Range(0f, 1f);
+
+            for (int i = 1; i < colors.GetLength(0); i++)
+            {
+                bool found = false;
+
+                while (!found)
+                {
+                    found = true;
+                    colors[i, 0] = UnityEngine.Random.Range(0f, 1f);
+                    colors[i, 1] = UnityEngine.Random.Range(0f, 1f);
+                    colors[i, 2] = UnityEngine.Random.Range(0f, 1f);
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (!(Mathf.Abs(((colors[i, 0] + colors[i, 1] + colors[i, 2]) - (colors[j, 0] + colors[j, 1] + colors[j, 2]))) >= 0.1f))
+                        {
+                            found = false;
+                        }
+                    }
+                }
+            }
 
 
             if (loadFromDatabase == true)
@@ -62,6 +88,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 GeneratePopulation();
             }
         }
+
+        
     }
 
     public IEnumerator CheckRetrival()
@@ -79,8 +107,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         {
             bodies[0].transform.position += new Vector3(Time.deltaTime / 2f, 0, 0);
             bodies[1].transform.position += new Vector3(-Time.deltaTime / 2f, 0, 0);
-            bodies[2].transform.position += new Vector3(0, Time.deltaTime / 4f, 0);
-            bodies[3].transform.position += new Vector3(0, -Time.deltaTime / 4f, 0);
+            bodies[2].transform.position += new Vector3(0, Time.deltaTime / 8f, 0);
+            bodies[3].transform.position += new Vector3(0, -Time.deltaTime / 8f, 0);
         }
 
         if (timeScale <= 1f)
@@ -106,10 +134,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     {
         if (worldActivation)
         {
-            bodies[0].transform.position = new Vector3(-26f, 0, 0);
+            /*bodies[0].transform.position = new Vector3(-26f, 0, 0);
             bodies[1].transform.position = new Vector3(26f, 0, 0);
             bodies[2].transform.position = new Vector3(0, -14.5f, 0);
-            bodies[3].transform.position = new Vector3(0, 14.5f, 0);
+            bodies[3].transform.position = new Vector3(0, 14.5f, 0);*/
+            bodies[0].transform.position = new Vector3(-22f, 0, 0);
+            bodies[1].transform.position = new Vector3(22f, 0, 0);
+            bodies[2].transform.position = new Vector3(0, -8f, 0);
+            bodies[3].transform.position = new Vector3(0, 12f, 0);
         }
         timeScale = Time.timeScale;
     }
@@ -159,42 +191,62 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     }
 
     public void GeneratePopulation() {
+
+        List<int[]> allID = new List<int[]>();
         float height = 10f;
         float width = -20f;
         int numberOfSpecies = species.Count;
+
         for (int i = 0; i < numberOfSpecies; i++)
         {
             int numberOfNets = species[i].Count;
             for (int j = 0; j < numberOfNets; j++)
             {
-                CreateIndividual(new Vector3(width, height, 0), species[i][j]);
+                allID.Add(new int[] {i,j});
+            }
+        }
+
+        for (int i = 0; i < numberOfSpecies; i++)
+        {
+            int numberOfNets = species[i].Count;
+
+            //Color color = new Color(UnityEngine.Random.Range(0f,1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+            Color color = new Color(colors[i,0], colors[i, 1], colors[i, 2]);
+            for (int j = 0; j < numberOfNets; j++)
+            {
+
+                int randomIndex = UnityEngine.Random.Range(0, allID.Count);
+                int[] randomId = allID[randomIndex];
+                allID.RemoveAt(randomIndex);
+                CreateIndividual(new Vector3(width, height, 0), species[randomId[0]][randomId[1]], color);
+
+                //CreateIndividual(new Vector3(width, height, 0), species[i][j],color);
 
                 if (width % 20 == 0 && width > 0)
                 {
                     width = -20f;
-                    height += -2f;
+                    height += -4f;
                 }
                 else
-                    width += 4f;
+                    width += 2f;
             }
         }
     }
 
-    public void CreateIndividual(Vector3 position, NEATNet net)
+    public void CreateIndividual(Vector3 position, NEATNet net, Color color)
     {
         GameObject tester = (GameObject)Instantiate(testPrefab, position, testPrefab.transform.rotation);
         tester.SendMessage(ACTIVATE, net);
+        tester.transform.GetChild(0).GetComponent<Renderer>().material.color = color;
         tester.GetComponent<Tester>().TestFinished += OnFinished;
     }
 
-    public void OnFinished(object source, EventArgs e)
-    {
+    public void OnFinished(object source, EventArgs e) {
         finished.WaitOne();
 
         testCounter++;
 
-        if (testCounter == populationSize)
-        {
+        if (testCounter == populationSize) {
             TestFinished();
         }
 
@@ -257,20 +309,20 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         }
 
         species = new List<List<NEATNet>>();
-
+        
         for (int i = 0; i < distribution.GetLength(0); i++) {
             if (distribution[i, 1] > 0) {
                 for (int j = 0; j < distribution[i, 1]; j++) {
                     List<NEATNet> bestOrganisums = bestSpecies[(int)distribution[i, 0]];
                     NEATNet net = null;
 
-                    if (j < (float)distribution[i, 1] * 0.9f) {
+                    /*if (j > (float)distribution[i, 1] * 0.1f) {
                         NEATNet organisum1 = bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)];
 
                         float random = UnityEngine.Random.Range(1f,100f);
                         float powerNeeded = Mathf.Log(bestOrganisums.Count-1,100);
                         float logIndex = Mathf.Abs(((bestOrganisums.Count - 1) -Mathf.Pow(random, powerNeeded)));
-                        //Debug.Log(logIndex+" "+bestOrganisums.Count);
+                       
                         NEATNet organisum2 = bestOrganisums[(int)logIndex];
                         
                         //net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
@@ -279,12 +331,12 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                     }
                     else {
                         net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                    }
+                    }*/
+                    
+                    net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
 
-                    /*NEATNet net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-
-                    if(j< (float)distribution[i, 1]*0.9f)
-                        net.Mutate();*/
+                    if(j> (float)distribution[i, 1]*0.1f)
+                        net.Mutate();
 
                     net.SetNetFitness(0f);
                     net.SetTestTime(testTime);

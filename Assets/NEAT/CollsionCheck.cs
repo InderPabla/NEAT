@@ -10,7 +10,8 @@ public class CollsionCheck : MonoBehaviour {
         //transform.parent.SendMessage("OtherActivity", (object)1);
 
         //if (coll.collider.name.Contains("G"))
-            transform.parent.SendMessage("OnFinished");
+        //transform.parent.SendMessage("OnFinished");
+       
     }
 
     void OnCollisionExit2D(Collision2D coll)
@@ -23,6 +24,7 @@ public class CollsionCheck : MonoBehaviour {
     {
         //if (coll.collider.name.Contains("B"))
         //transform.parent.SendMessage("OtherActivity", (object)3);
+        transform.parent.SendMessage("OtherActivity", (object)0);
     }
 
 }

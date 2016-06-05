@@ -31,7 +31,7 @@ public class Tester : MonoBehaviour
 
     void TakePoint() {
         points.Add(bodies[0].transform.position);
-        Invoke("TakePoint",0.5f);
+        Invoke("TakePoint",1f);
     }
 
     void FixedUpdate() {
@@ -259,9 +259,10 @@ public class Tester : MonoBehaviour
         }
 
         rad2 *= Mathf.Deg2Rad;*/
-
-
-        float[] inputValues = {h1, h2, h3, h4, h5, h6, h7, h8, h9, h10}; 
+        int act = -1;
+        if (hurt > 0)
+            act = 1;
+        float[] inputValues = {act, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10}; 
 
         output = net.FireNet(inputValues);
 
@@ -272,8 +273,8 @@ public class Tester : MonoBehaviour
             bodies[0].angularVelocity = 250f;
         else if (output[0] < 0f)
             bodies[0].angularVelocity = -250f;
-        else
-            bodies[0].angularVelocity = 0f;
+        //else
+            //bodies[0].angularVelocity = 0f;
         //rad2 = Mathf.Abs(rad2);
         //this.net.AddNetFitness(Mathf.Pow(Time.deltaTime*(Mathf.PI- rad2),2));
 
@@ -286,19 +287,13 @@ public class Tester : MonoBehaviour
             bodies[0].velocity = 2f * dir * factor;
 
 
-        /*if (hurt > 0f) {
+        if (hurt > 0f) {
             hurt -= 0.1f;
-            damage -= 2f;
+            damage -= 5f;
         }
 
         if (hurt < 0)
             hurt = 0f;
-
-        if (output[2] < 0.5f && output[2] > -0.5f)
-        {
-            bodies[0].velocity /= 2f;
-        }*/
-
 
         /*Vector2 dir = bodies[0].transform.up;
         Vector2 posi = bodies[0].transform.position;
@@ -373,10 +368,10 @@ public class Tester : MonoBehaviour
         if (!(((pole1AngleDegree <= failDegree && pole1AngleDegree >= 0) || (pole1AngleDegree <= 360 && pole1AngleDegree >= (360 - failDegree))))) {
             if(isUp == true)
                 return true;
-        }
+        }*/
 
         if (damage<=0)
-            return true;*/
+            return true;
         
         return false;
     }
@@ -465,15 +460,17 @@ public class Tester : MonoBehaviour
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
-        //this.net.AddNetFitness(Mathf.Pow((1f / (float)net.GetGeneCount()),1));
+        float life = this.net.GetNetFitness();
+        float factor = (life / net.GetTestTime())*2f;
+
         float totalDistanceFit = 0;
         for (int i = 1; i < points.Count; i++) {
-            float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]),4f);
+            float dis = Mathf.Pow(Vector2.Distance(points[i],points[i-1]), factor);
             totalDistanceFit += dis;
         }
-        float life = this.net.GetNetFitness();
-        float ratio = totalDistanceFit/life;
-        float newFit = ratio * totalDistanceFit;
+        
+        /*float ratio = totalDistanceFit/life;
+        float newFit = ratio * totalDistanceFit;*/
 
         this.net.SetNetFitness(totalDistanceFit);
 
@@ -482,8 +479,8 @@ public class Tester : MonoBehaviour
     public void OtherActivity(int type) {
         mutex.WaitOne();
 
-
-        //hurt = 1f;
+        if(hurt<=0)
+            hurt = 1f;
 
         mutex.Release();
     }
