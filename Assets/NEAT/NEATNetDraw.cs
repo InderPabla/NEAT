@@ -38,6 +38,7 @@ public class NEATNetDraw : MonoBehaviour {
         for (int i = 0; i < numberOfInputs; i++) {
             Vector3 loc = new Vector3(topLeft.x, staryY, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
+            node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.green;
             nodeList.Add(node);
             staryY--;
@@ -50,6 +51,7 @@ public class NEATNetDraw : MonoBehaviour {
         for (int i = numberOfInputs; i < hiddenStartIndex; i++) {
             Vector3 loc = new Vector3(topLeft.x + 7f, staryY, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
+            node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.red;
             nodeList.Add(node);
             staryY--;
@@ -67,6 +69,7 @@ public class NEATNetDraw : MonoBehaviour {
 
             Vector3 loc = new Vector3(xn + 3.5f + topLeft.x, (yn + topLeft.y) - numberOfInputs / 2f, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
+            node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.magenta;
             nodeList.Add(node);
             angle += (360f / numberOfHiddens);
@@ -80,6 +83,7 @@ public class NEATNetDraw : MonoBehaviour {
         
         for (int i = 0; i < colSize; i++) {
             GameObject lineObj = (GameObject)Instantiate(linePrefab);
+            lineObj.transform.parent = transform;
             lineList.Add(lineObj);
             LineRenderer lineRen = lineObj.GetComponent<LineRenderer>();
             lineRen.SetPosition(0, locations[(int)geneConnections[i][0]]);

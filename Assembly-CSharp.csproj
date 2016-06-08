@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\NEAT\CollsionCheck.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
+     <Compile Include="Assets\NEAT\LineGraphDrawer.cs" />
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
      <Compile Include="Assets\NEAT\NEATGeneticController.cs" />
@@ -57,11 +58,20 @@
      <Compile Include="Assets\NEAT\NEATPacket.cs" />
      <Compile Include="Assets\NEAT\Tester.cs" />
      <Compile Include="Assets\NEAT\Testingstuff.cs" />
+     <Compile Include="Assets\ProgressBar\Script\ProgressBarBehaviour.cs" />
+     <Compile Include="Assets\ProgressBar\Script\ProgressRadialBehaviour.cs" />
+     <Compile Include="Assets\ProgressBar\Script\Utils.cs" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="LitJson">
  <HintPath>C:/Users/Pabla/Documents/Unity Projects/NEAT/Assets/NEAT/LitJson.dll</HintPath>
