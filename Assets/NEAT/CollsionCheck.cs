@@ -10,7 +10,7 @@ public class CollsionCheck : MonoBehaviour {
         //transform.parent.SendMessage("OtherActivity", (object)1);
 
         //if (coll.collider.name.Contains("G"))
-        //transform.parent.SendMessage("OnFinished");
+        transform.parent.SendMessage("OnFinished");
        
     }
 
@@ -24,7 +24,7 @@ public class CollsionCheck : MonoBehaviour {
     {
         //if (coll.collider.name.Contains("B"))
         //transform.parent.SendMessage("OtherActivity", (object)3);
-        transform.parent.SendMessage("OtherActivity", (object)0);
+        //transform.parent.SendMessage("OtherActivity", (object)0);
     }
 
 }

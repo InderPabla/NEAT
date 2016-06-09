@@ -41,7 +41,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     private NEATConsultor consultor;
     private DatabaseOperation operations;
 
-    private float[,] colors = new float[15,3];
+    private float[,] colors = new float[100,3];
     private NEATNet bestNet;
 
     private bool viewMode = false;
@@ -64,7 +64,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
 
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 1f, 2f, 2f, 2f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 2f);
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -82,7 +82,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                     colors[i, 2] = UnityEngine.Random.Range(0f, 1f);
                     for (int j = 0; j < i; j++)
                     {
-                        if (!(Mathf.Abs(((colors[i, 0] + colors[i, 1] + colors[i, 2]) - (colors[j, 0] + colors[j, 1] + colors[j, 2]))) >= 0.1f))
+                        if (!(Mathf.Abs(((colors[i, 0] + colors[i, 1] + colors[i, 2]) - (colors[j, 0] + colors[j, 1] + colors[j, 2]))) >= 0.005f))
                         {
                             found = false;
                         }
@@ -269,7 +269,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 int[] randomId = allID[randomIndex];
                 allID.RemoveAt(randomIndex);
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(width, height, 0), species[randomId[0]][randomId[1]], color);
+                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color);
 
                 //CreateIndividual(new Vector3(width, height, 0), species[i][j],color);
 
@@ -328,7 +328,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                         sharedAmount += NEATNet.SameSpeciesV2(species[i][j],species[i][k]) == true?1:0;
                     }
                 }
-                //if (sharedAmount == 0)
+                if (sharedAmount == 0)
                     sharedAmount = 1f;
                 distribution[i,1] = distribution[i, 1] / sharedAmount;
                 totalSharedFitness += distribution[i,1];
@@ -370,7 +370,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                         List<NEATNet> bestOrganisums = bestSpecies[(int)distribution[i, 0]];
                         NEATNet net = null;
 
-                        /*if (j > (float)distribution[i, 1] * 0.1f) {
+                        if (j > (float)distribution[i, 1] * 0.1f) {
                             NEATNet organisum1 = bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)];
 
                             float random = UnityEngine.Random.Range(1f,100f);
@@ -385,13 +385,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                         }
                         else {
                             net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                        }*/
+                        }
                     
-                        net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                        /*net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
                         if(j> (float)distribution[i, 1]*0.1f)
-                            net.Mutate();
+                            net.Mutate();*/
 
                         net.SetNetFitness(0f);
+                        net.SetTimeLived(0f);
                         net.SetTestTime(testTime);
                         net.ClearNodeValues();
 

@@ -24,9 +24,9 @@ public class Tester : MonoBehaviour
     void Start()
     {
         mutex = new Semaphore(1, 1); 
-        //pos = GameObject.Find("Pos").transform;
-        TakePoint();
-        bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
+        pos = GameObject.Find("Pos").transform;
+        //TakePoint();
+        //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
     }
 
     void TakePoint() {
@@ -124,46 +124,46 @@ public class Tester : MonoBehaviour
         angle += angleAdd;
         Vector3 dir9 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
 
-       
 
-        int ignoreLayer =  ~(1 << 8);
+
+        int ignoreLayer = ~(1 << 8);
         Vector2 position1 = bodies[0].transform.position + (0.35f * dir1);
-        RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, 2f);
+        RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, 2f, ignoreLayer);
 
         Vector2 position2 = bodies[0].transform.position + (0.35f * dir2);
-        RaycastHit2D hit2 = Physics2D.Raycast(position2, dir2, 2f);
+        RaycastHit2D hit2 = Physics2D.Raycast(position2, dir2, 2f, ignoreLayer);
 
         Vector2 position3 = bodies[0].transform.position + (0.35f * dir3);
-        RaycastHit2D hit3 = Physics2D.Raycast(position3, dir3, 2f);
+        RaycastHit2D hit3 = Physics2D.Raycast(position3, dir3, 2f, ignoreLayer);
 
         Vector2 position4 = bodies[0].transform.position + (0.35f * dir4);
-        RaycastHit2D hit4 = Physics2D.Raycast(position4, dir4, 2f);
+        RaycastHit2D hit4 = Physics2D.Raycast(position4, dir4, 2f, ignoreLayer);
 
         Vector2 position5 = bodies[0].transform.position + (0.35f * dir5);
-        RaycastHit2D hit5 = Physics2D.Raycast(position5, dir5, 2f);
+        RaycastHit2D hit5 = Physics2D.Raycast(position5, dir5, 2f, ignoreLayer);
 
         Vector2 position6 = bodies[0].transform.position + (0.35f * dir6);
-        RaycastHit2D hit6 = Physics2D.Raycast(position6, dir6, 2f);
+        RaycastHit2D hit6 = Physics2D.Raycast(position6, dir6, 2f, ignoreLayer);
 
         Vector2 position7 = bodies[0].transform.position + (0.35f * dir7);
-        RaycastHit2D hit7 = Physics2D.Raycast(position7, dir7, 2f);
+        RaycastHit2D hit7 = Physics2D.Raycast(position7, dir7, 2f, ignoreLayer);
 
         Vector2 position8 = bodies[0].transform.position + (0.35f * dir8);
-        RaycastHit2D hit8 = Physics2D.Raycast(position8, dir8, 2f);
+        RaycastHit2D hit8 = Physics2D.Raycast(position8, dir8, 2f, ignoreLayer);
 
         Vector2 position9 = bodies[0].transform.position + (0.35f * dir9);
-        RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, 2f);
+        RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, 2f, ignoreLayer);
 
         Vector3 dir10 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
         Vector2 position10 = bodies[0].transform.position + (0.3f * dir10);
-        RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, 2f);
+        RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, 2f, ignoreLayer);
 
         h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
         float hitCreatureAdd = 0f;
         string otherCreatureName = "B";
-        if (hit1.collider!=null) {
+        if (hit1.collider != null) {
             h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / 2f;
-            if(h1!=-1)
+            if (h1 != -1)
                 Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
         }
 
@@ -220,16 +220,16 @@ public class Tester : MonoBehaviour
             if (h9 != -1)
                 Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
         }
-        if (hit10.collider != null)
+        /*if (hit10.collider != null)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / 2f;
             if (h10 != -1)
                 Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
-        }
+        }*/
 
 
         Vector2 dir = bodies[0].transform.up;
-        /*Vector2 dirV = bodies[0].velocity;
+        //Vector2 dirV = bodies[0].velocity;
 
 
         Vector2 deltaVector = pos.position - bodies[0].transform.position;
@@ -258,34 +258,77 @@ public class Tester : MonoBehaviour
             rad2 *= -1f;
         }
 
-        rad2 *= Mathf.Deg2Rad;*/
+        rad2 *= Mathf.Deg2Rad;
+
         int act = -1;
         if (hurt > 0)
             act = 1;
-        float[] inputValues = {act, h1, h2, h3, h4, h5, h6, h7, h8, h9, h10}; 
+
+        float counter = 1;
+
+
+        /*if (h1 >= 0)
+            rad2 = Mathf.PI;
+        if (h2 >= 0)
+            rad2 = Mathf.PI;
+        if (h3 >= 0)
+            rad2 = Mathf.PI;
+        if (h4 >= 0)
+            rad2 = Mathf.PI;
+        if (h5 >= 0)
+            rad2 = Mathf.PI;
+        if (h6 >= 0)
+            rad2 = Mathf.PI;
+        if (h7 >=0)
+            rad2 = Mathf.PI;
+        if (h8 >=0)
+            rad2 = Mathf.PI;
+        if (h9 >= 0)
+            rad2 = Mathf.PI;*/
+
+        
+
+        float dis = Vector2.Distance(bodies[0].transform.position, pos.position);
+       
+        float[] inputValues = {h1, h2, h3, h4, h5, h6, h7, h8, h9, rad2, dis};
 
         output = net.FireNet(inputValues);
 
-        float factor = 1f;
-        
 
         if (output[0] > 0f)
             bodies[0].angularVelocity = 250f;
         else if (output[0] < 0f)
             bodies[0].angularVelocity = -250f;
+
+
+       // if (h5 == -1 ) {
+            this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2) * Time.deltaTime);
+           
+        //}
+
+        this.net.AddTimeLived(Time.deltaTime);
+
+        //if ( h5 == -1 ) { 
+            //this.net.AddNetFitness(Mathf.Pow(Time.deltaTime * (Mathf.PI - Mathf.Abs(rad2)),4 ));
+        //}
+
+
         //else
-            //bodies[0].angularVelocity = 0f;
+        //bodies[0].angularVelocity = 0f;
         //rad2 = Mathf.Abs(rad2);
-        //this.net.AddNetFitness(Mathf.Pow(Time.deltaTime*(Mathf.PI- rad2),2));
+
+        //if(h1 == -1 && h5 == -1 && h6==-1 && h9==-1)
+
 
         /*int[] id = net.GetNetID();
         if(id[0] == 0 && id[1]==0)
         Debug.Log(rad2);*/
         if (output[1] > 0)
-            bodies[0].velocity = -2f * dir * factor;
+            bodies[0].velocity = 2f * dir;
         else
-            bodies[0].velocity = 2f * dir * factor;
+            bodies[0].velocity = -2f * dir;
 
+        //bodies[0].velocity = 2f * dir;
 
         if (hurt > 0f) {
             hurt -= 0.1f;
@@ -294,6 +337,8 @@ public class Tester : MonoBehaviour
 
         if (hurt < 0)
             hurt = 0f;
+        
+        //
 
         /*Vector2 dir = bodies[0].transform.up;
         Vector2 posi = bodies[0].transform.position;
@@ -340,6 +385,8 @@ public class Tester : MonoBehaviour
         else
             bodies[0].velocity = Vector2.zero;*/
 
+
+
     }
 
     //--Add your own neural net fail code here--//
@@ -370,7 +417,7 @@ public class Tester : MonoBehaviour
                 return true;
         }*/
 
-        if (damage<=0)
+        if (damage <= 0) 
             return true;
         
         return false;
@@ -419,7 +466,7 @@ public class Tester : MonoBehaviour
         float fit = factor*Time.deltaTime;
 
         net.AddNetFitness(fit);*/
-        
+
         /*float pole1Factor = bodies[1].transform.eulerAngles.z;
 
         if (pole1Factor < 90f) {
@@ -452,15 +499,26 @@ public class Tester : MonoBehaviour
         if (output[1] < 0f )
             this.net.AddNetFitness(-1f);*/
 
-        this.net.AddNetFitness(Time.deltaTime);
-        //this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2));
+        
+        
     }
 
 
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
-        float life = this.net.GetNetFitness();
+
+
+        float life = this.net.GetTimeLived();
+        life = (life / net.GetTestTime()) * 2f;
+
+        float fit = this.net.GetNetFitness();
+        fit = Mathf.Pow(fit,life);
+
+        this.net.SetNetFitness(fit);
+        //this.net.SetNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), life));
+
+        /*float life = this.net.GetNetFitness();
         float factor = (life / net.GetTestTime())*2f;
 
         float totalDistanceFit = 0;
@@ -469,10 +527,10 @@ public class Tester : MonoBehaviour
             totalDistanceFit += dis;
         }
         
-        /*float ratio = totalDistanceFit/life;
-        float newFit = ratio * totalDistanceFit;*/
+        //float ratio = totalDistanceFit/life;
+       // float newFit = ratio * totalDistanceFit;
 
-        this.net.SetNetFitness(totalDistanceFit);
+        this.net.SetNetFitness(totalDistanceFit);*/
 
     }
 

@@ -15,6 +15,7 @@ public class NEATNet {
     private int[] netID = new int[2];
 
     private float time;
+    private float timeLived;
     private float netFitness;
 
     public NEATNet(NEATNet copy) {
@@ -28,6 +29,7 @@ public class NEATNet {
         this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
+        this.timeLived = 0f;
     }
 
     public NEATNet(NEATPacket packet, NEATConsultor consultor) {
@@ -60,6 +62,7 @@ public class NEATNet {
         this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
+        this.timeLived = 0f;
     }
 
     public NEATNet(NEATConsultor consultor, int[] netID, int numberOfInputs, int numberOfOutputs, float time) {
@@ -69,6 +72,7 @@ public class NEATNet {
         this.numberOfOutputs = numberOfOutputs;
         this.time = time;
         this.netFitness = 0f;
+        this.timeLived = 0f;
 
         InitilizeNodes();
         InitilizeGenes();
@@ -85,6 +89,7 @@ public class NEATNet {
         this.netID = new int[2];
         this.time = 0f;
         this.netFitness = 0f;
+        this.timeLived = 0f;
     }
 
     public void InitilizeNodes() {
@@ -124,6 +129,10 @@ public class NEATNet {
         return netFitness;
     }
 
+    public float GetTimeLived() {
+        return timeLived;
+    }
+
     public void SetNetID(int[] netID) {
         this.netID = new int[] {netID[0], netID[1]};
     }
@@ -134,6 +143,14 @@ public class NEATNet {
 
     public void AddNetFitness(float netFitness) {
         this.netFitness += netFitness;
+    }
+
+    public void SetTimeLived(float timeLived) {
+        this.timeLived = timeLived;
+    }
+
+    public void AddTimeLived(float timeLived) {
+        this.timeLived += timeLived;
     }
 
     public int[] GetNetID() {
