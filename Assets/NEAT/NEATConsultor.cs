@@ -63,6 +63,11 @@ public class NEATConsultor  {
         geneList.Add(gene);
     }
 
+    public void SetDeltaThreshold(float deltaThreshold) {
+        this.deltaThreshold = deltaThreshold;
+    }
+
+
     public float GetDisjointCoefficient() {
         return disjointCoefficient;
     }

@@ -64,7 +64,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
 
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 2f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 3f, 3f, 3f);
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -131,7 +131,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             species = new List<List<NEATNet>>();
             List<NEATNet> newSpecies = new List<NEATNet>();
             for (int i = 0; i < populationSize; i++) {
-                newSpecies.Add(bestNet);
+                newSpecies.Add(new NEATNet(bestNet));
             }
             species.Add(newSpecies);
         }
@@ -153,7 +153,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         else {
             Camera.main.transform.position = new Vector3(0, transform.position.y, -100);
         }
-    }
+    } 
 
 
     private IEnumerator CheckRetrival() {
@@ -198,6 +198,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             bodies[2].transform.position = new Vector3(0, -8f, 0);
             bodies[3].transform.position = new Vector3(0, 12f, 0);
         }
+        
     }
 
 
@@ -269,7 +270,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 int[] randomId = allID[randomIndex];
                 allID.RemoveAt(randomIndex);
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color);
+                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
 
                 //CreateIndividual(new Vector3(width, height, 0), species[i][j],color);
 
@@ -283,8 +284,9 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         }
     }
 
-    private void CreateIndividual(Vector3 position, NEATNet net, Color color) {
+    private void CreateIndividual(Vector3 position, NEATNet net, Color color, int[] id) {
         GameObject tester = (GameObject)Instantiate(testPrefab, position, testPrefab.transform.rotation);
+        tester.name = id[0] + "_" + id[1];
         tester.SendMessage(ACTIVATE, net);
         tester.transform.GetChild(0).GetComponent<Renderer>().material.color = color;
         tester.GetComponent<Tester>().TestFinished += OnFinished;
@@ -344,10 +346,10 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
             distribution = SortFitness(distribution);
 
-            bestNet = species[bestIndex[0]][bestIndex[1]];
+            bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]);
             lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness);
 
-            Debug.Log("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness+", Highest Shared Fitness: "+ distribution[distribution.GetLength(0) - 1, 1]);
+            Debug.Log("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness+", Delta: "+consultor.GetDeltaThreshold());
             netDrawer.SendMessage("DrawNet",bestNet);
             
             for (int i = 0; i < distribution.GetLength(0); i++) {
@@ -363,7 +365,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             }
 
             species = new List<List<NEATNet>>();
-        
+
             for (int i = 0; i < distribution.GetLength(0); i++) {
                 if (distribution[i, 1] > 0) {
                     for (int j = 0; j < distribution[i, 1]; j++) {
@@ -379,16 +381,20 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                        
                             NEATNet organisum2 = bestOrganisums[(int)logIndex];
                        
-                            //net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                            net = NEATNet.Corssover(organisum1, organisum2);
+                            net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                            //net = NEATNet.Corssover(organisum1, organisum2);
                             net.Mutate();
                         }
                         else {
                             net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
                         }
-                    
-                        /*net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                        if(j> (float)distribution[i, 1]*0.1f)
+
+                        /*float random = UnityEngine.Random.Range(1f, 100f);
+                        float powerNeeded = Mathf.Log(bestOrganisums.Count - 1, 100);
+                        float logIndex = Mathf.Abs(((bestOrganisums.Count - 1) - Mathf.Pow(random, powerNeeded)));
+                        net = bestOrganisums[(int)logIndex];
+                        //net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                        if (j> (float)distribution[i, 1]*0.1f)
                             net.Mutate();*/
 
                         net.SetNetFitness(0f);
@@ -429,7 +435,13 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 }
             }
         } //number of generation > 0
-        
+        /*float deltaThresh = consultor.GetDeltaThreshold();
+
+        if (species.Count < 10)
+            consultor.SetDeltaThreshold(deltaThresh-(deltaThresh*0.5f));
+        else
+            consultor.SetDeltaThreshold(deltaThresh + (deltaThresh * 0.5f));*/
+
         if (numberOfGenerationsToRun > 0) {
             numberOfGenerationsToRun--;
             progressBar.GetComponent<ProgressRadialBehaviour>().IncrementValue(currentIncrement);

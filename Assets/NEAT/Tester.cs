@@ -25,15 +25,16 @@ public class Tester : MonoBehaviour
     {
         mutex = new Semaphore(1, 1); 
         pos = GameObject.Find("Pos").transform;
-        //TakePoint();
+        TakePoint();
         //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
     }
-
+    float avgAngle = 0;
     void TakePoint() {
-        points.Add(bodies[0].transform.position);
-        Invoke("TakePoint",1f);
+        //points.Add(bodies[0].transform.position);
+        points.Add(bodies[0].velocity);
+        Invoke("TakePoint",0.5f);
     }
-
+    bool start = false;
     void FixedUpdate() {
         if (isActive == true) {
             UpdateNet(); //update neural net
@@ -55,7 +56,10 @@ public class Tester : MonoBehaviour
     protected virtual void OnFinished() {
         if (TestFinished != null)
         {
-            CalculateFitnessOnFinish();
+            if (FailCheck() == true)
+                net.SetNetFitness(0);
+            else 
+                CalculateFitnessOnFinish();
             TestFinished(net.GetNetID(), EventArgs.Empty);
             Destroy(gameObject);
         }
@@ -65,6 +69,8 @@ public class Tester : MonoBehaviour
     float[] output;
     float state = 0f;
     float hurt = 0f;
+    float bodyRad, leftUpRad1, leftDownRad1, rightUpRad1, rightDownRad1, leftUpRad2, leftDownRad2, rightUpRad2, rightDownRad2,
+        jointAngle1, jointAngle2, jointAngle3, jointAngle4, jointAngle5, jointAngle6, jointAngle7, jointAngle8;
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet() {
@@ -103,7 +109,7 @@ public class Tester : MonoBehaviour
 
         //bodies[0].velocity += new Vector2(output[0], 0); //update track velocity with neural net output
 
-        float angle = -100f;
+        /*float angle = -100f;
         float angleAdd = 22.22f;
 
         Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
@@ -220,12 +226,12 @@ public class Tester : MonoBehaviour
             if (h9 != -1)
                 Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
         }
-        /*if (hit10.collider != null)
+        if (hit10.collider != null)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / 2f;
             if (h10 != -1)
                 Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
-        }*/
+        }
 
 
         Vector2 dir = bodies[0].transform.up;
@@ -266,31 +272,9 @@ public class Tester : MonoBehaviour
 
         float counter = 1;
 
-
-        /*if (h1 >= 0)
-            rad2 = Mathf.PI;
-        if (h2 >= 0)
-            rad2 = Mathf.PI;
-        if (h3 >= 0)
-            rad2 = Mathf.PI;
-        if (h4 >= 0)
-            rad2 = Mathf.PI;
-        if (h5 >= 0)
-            rad2 = Mathf.PI;
-        if (h6 >= 0)
-            rad2 = Mathf.PI;
-        if (h7 >=0)
-            rad2 = Mathf.PI;
-        if (h8 >=0)
-            rad2 = Mathf.PI;
-        if (h9 >= 0)
-            rad2 = Mathf.PI;*/
-
-        
-
         float dis = Vector2.Distance(bodies[0].transform.position, pos.position);
        
-        float[] inputValues = {h1, h2, h3, h4, h5, h6, h7, h8, h9, rad2, dis};
+        float[] inputValues = {h1, h2, h3, h4, h5, h6, h7, h8, h9, rad2};
 
         output = net.FireNet(inputValues);
 
@@ -300,35 +284,16 @@ public class Tester : MonoBehaviour
         else if (output[0] < 0f)
             bodies[0].angularVelocity = -250f;
 
-
-       // if (h5 == -1 ) {
-            this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2) * Time.deltaTime);
+        this.net.AddNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), 2) * Time.deltaTime);
            
-        //}
-
+ 
         this.net.AddTimeLived(Time.deltaTime);
 
-        //if ( h5 == -1 ) { 
-            //this.net.AddNetFitness(Mathf.Pow(Time.deltaTime * (Mathf.PI - Mathf.Abs(rad2)),4 ));
-        //}
 
-
-        //else
-        //bodies[0].angularVelocity = 0f;
-        //rad2 = Mathf.Abs(rad2);
-
-        //if(h1 == -1 && h5 == -1 && h6==-1 && h9==-1)
-
-
-        /*int[] id = net.GetNetID();
-        if(id[0] == 0 && id[1]==0)
-        Debug.Log(rad2);*/
         if (output[1] > 0)
             bodies[0].velocity = 2f * dir;
         else
-            bodies[0].velocity = -2f * dir;
-
-        //bodies[0].velocity = 2f * dir;
+            bodies[0].velocity = 0.1f * dir;
 
         if (hurt > 0f) {
             hurt -= 0.1f;
@@ -336,59 +301,200 @@ public class Tester : MonoBehaviour
         }
 
         if (hurt < 0)
-            hurt = 0f;
-        
-        //
+            hurt = 0f;*/
 
-        /*Vector2 dir = bodies[0].transform.up;
-        Vector2 posi = bodies[0].transform.position;
-        Vector2 deltaVector = pos.position - bodies[0].transform.position;
-        deltaVector = deltaVector.normalized;
-
-        float rad1 = bodies[0].transform.eulerAngles.z * Mathf.Deg2Rad;
-        float dis = Vector2.Distance(posi, pos.position);
-        float rad2 = Mathf.Atan2(deltaVector.y, deltaVector.x);
-        float rad3 = Mathf.Atan2(deltaVector.y - dir.y, deltaVector.x - dir.x);
-
-        rad2 *= Mathf.Rad2Deg;
-        rad2 = 90f - rad2;
-
-        if (rad2 < 0f) {
-            rad2 += 360f;
-        }
-        rad2 = 360 - rad2;
-
-        rad2 -= bodies[0].transform.eulerAngles.z;
-        if (rad2 < 0)
-            rad2 = 360 + rad2;
-
-
-        if (rad2 >= 180f) {
-            rad2 = 360 - rad2;
-        }
-
-        rad2 *= Mathf.Deg2Rad;
-
-
-        float[] inputValues = {rad2,dis};
-        output = net.FireNet(inputValues);
-
-        if (output[0] > 0.66f)
-            bodies[0].angularVelocity = 200f ;
-        else if (output[0] < -0.66f)
-            bodies[0].angularVelocity = -200f ;
-        else 
-             bodies[0].angularVelocity = 0f;
-
-        if (output[1] > 0.5f)
-            bodies[0].velocity = 2f * dir;
-        else
-            bodies[0].velocity = Vector2.zero;*/
-
-
-
+        if (!start)
+            UpdateOverTime();
+        start = true;     
     }
 
+    public void UpdateOverTime() {
+        bodyRad = Mathf.Deg2Rad * bodies[0].transform.eulerAngles.z;
+        leftUpRad1 = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
+        leftDownRad1 = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
+        rightUpRad1 = Mathf.Deg2Rad * bodies[3].transform.eulerAngles.z;
+        rightDownRad1 = Mathf.Deg2Rad * bodies[4].transform.eulerAngles.z;
+
+        leftUpRad2 = Mathf.Deg2Rad * bodies[5].transform.eulerAngles.z;
+        leftDownRad2 = Mathf.Deg2Rad * bodies[6].transform.eulerAngles.z;
+        rightUpRad2 = Mathf.Deg2Rad * bodies[7].transform.eulerAngles.z;
+        rightDownRad2 = Mathf.Deg2Rad * bodies[8].transform.eulerAngles.z;
+
+        jointAngle1 = bodies[1].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle2 = bodies[2].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle3 = bodies[3].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle4 = bodies[4].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle5 = bodies[5].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle6 = bodies[6].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle7 = bodies[7].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        jointAngle8 = bodies[8].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+      
+        float[] inputValues = { bodyRad, jointAngle1, jointAngle2, jointAngle3, jointAngle4, jointAngle5, jointAngle6, jointAngle7, jointAngle8, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
+        //float[] inputValues = { bodyRad, leftUpRad1, leftDownRad1, rightUpRad1, rightDownRad1, leftUpRad2, leftDownRad2, rightUpRad2, rightDownRad2, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
+
+        output = net.FireNet(inputValues);
+
+
+        float motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4, motorSpeed5, motorSpeed6, motorSpeed7, motorSpeed8;
+
+        if (output[0] > 0.5f)
+            motorSpeed1 = 500f;
+        else if (output[0] < -0.5f)
+            motorSpeed1 = -500f;
+        else 
+            motorSpeed1 = 0f;
+
+        if (output[1] > 0.5f)
+            motorSpeed2 = 500f;
+        else if (output[1] < -0.5f)
+            motorSpeed2 = -500f;
+        else
+            motorSpeed2 = 0f;
+
+        if (output[2] > 0.5f)
+            motorSpeed3 = 500f;
+        else if (output[2] < -0.5f)
+            motorSpeed3 = -500f;
+        else
+            motorSpeed3 = 0f;
+
+        if (output[3] > 0.5f)
+            motorSpeed4 = 500f;
+        else if (output[3] < -0.5f)
+            motorSpeed4 = -500f;
+        else
+            motorSpeed4 = 0f;
+
+        if (output[4] > 0.5f)
+            motorSpeed5 = 500f;
+        else if (output[4] < -0.5f)
+            motorSpeed5 = -500f;
+        else
+            motorSpeed5 = 0f;
+
+        if (output[5] > 0.5f)
+            motorSpeed6 = 500f;
+        else if (output[5] < -0.5f)
+            motorSpeed6 = -500f;
+        else
+            motorSpeed6 = 0f;
+
+        if (output[6] > 0.5f)
+            motorSpeed7 = 500f;
+        else if (output[6] < -0.5f)
+            motorSpeed7 = -500f;
+        else
+            motorSpeed7 = 0f;
+        if (output[7] > 0.5f)
+            motorSpeed8 = 500f;
+        else if (output[7] < -0.5f)
+            motorSpeed8 = -500f;
+        else
+            motorSpeed8 = 0f;
+
+        JointMotor2D motor1 = bodies[1].GetComponent<HingeJoint2D>().motor;
+        motor1.motorSpeed = motorSpeed1;
+        bodies[1].GetComponent<HingeJoint2D>().motor = motor1;
+
+        JointMotor2D motor2 = bodies[2].GetComponent<HingeJoint2D>().motor;
+        motor2.motorSpeed = motorSpeed2;
+        bodies[2].GetComponent<HingeJoint2D>().motor = motor2;
+
+        JointMotor2D motor3 = bodies[3].GetComponent<HingeJoint2D>().motor;
+        motor3.motorSpeed = motorSpeed3;
+        bodies[3].GetComponent<HingeJoint2D>().motor = motor3;
+
+        JointMotor2D motor4 = bodies[4].GetComponent<HingeJoint2D>().motor;
+        motor4.motorSpeed = motorSpeed4;
+        bodies[4].GetComponent<HingeJoint2D>().motor = motor4;
+
+        JointMotor2D motor5 = bodies[5].GetComponent<HingeJoint2D>().motor;
+        motor5.motorSpeed = motorSpeed5;
+        bodies[5].GetComponent<HingeJoint2D>().motor = motor5;
+
+        JointMotor2D motor6 = bodies[6].GetComponent<HingeJoint2D>().motor;
+        motor6.motorSpeed = motorSpeed6;
+        bodies[6].GetComponent<HingeJoint2D>().motor = motor6;
+
+        JointMotor2D motor7 = bodies[7].GetComponent<HingeJoint2D>().motor;
+        motor7.motorSpeed = motorSpeed7;
+        bodies[7].GetComponent<HingeJoint2D>().motor = motor7;
+
+        JointMotor2D motor8 = bodies[8].GetComponent<HingeJoint2D>().motor;
+        motor8.motorSpeed = motorSpeed8;
+        bodies[8].GetComponent<HingeJoint2D>().motor = motor8;
+
+        Invoke("UpdateOverTime",0.01f);
+    }
+
+
+
+    float sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2;
+    float fail = 0;
+    public void LegTouch(int type) {
+        if(type == -1)
+            sensorTouchLeft1 = -1f;
+        else if (type == 1)  
+            sensorTouchLeft1 = 1f;
+        else if (type == -2)
+            sensorTouchLeft2 = -1f;
+        else if (type == 2)
+            sensorTouchLeft2 = 1f;
+        else if (type == -3)
+            sensorTouchRight1 = -1f;
+        else if (type == 3)
+            sensorTouchRight1 = 1f;
+        else if (type == -4)
+            sensorTouchRight2 = -1f;
+        else if (type == 4)
+            sensorTouchRight2 = 1f;
+
+        /*if (type == -1)
+            sensorTouchLeft1 = -1f;
+        else if (type == 1)
+        {
+            if (sensorTouchLeft1 == -1)
+                sensorTouchLeft1 = 1f;
+            else
+                sensorTouchLeft1 += 0.1f;
+        }
+
+        else if (type == -2)
+            sensorTouchLeft2 = -1f;
+        else if (type == 2)
+        {
+            if (sensorTouchLeft2 == -1)
+                sensorTouchLeft2 = 1f;
+            else
+                sensorTouchLeft2 += 0.1f;
+        }
+
+        else if (type == -3)
+            sensorTouchRight1 = -1f;
+        else if (type == 3)
+        {
+            if (sensorTouchRight1 == -1)
+                sensorTouchRight1 = 1f;
+            else
+                sensorTouchRight1 += 0.1f;
+        }
+
+        else if (type == -4)
+            sensorTouchRight2 = -1f;
+        else if (type == 4)
+        {
+            if (sensorTouchRight2 == -1)
+                sensorTouchRight2 = 1f;
+            else
+                sensorTouchRight2 += 0.1f;
+        }*/
+
+        if (type == 0)
+            damage = 0;
+    }
+
+
+    
     //--Add your own neural net fail code here--//
     //restrictions on the test to fail bad neural networks faster
     private bool FailCheck()
@@ -416,6 +522,12 @@ public class Tester : MonoBehaviour
             if(isUp == true)
                 return true;
         }*/
+
+        if (bodies[0].transform.localPosition.y > 1f || bodies[0].transform.localPosition.y < -2f) 
+            return true; 
+        
+        if (bodies[0].transform.eulerAngles.z > 35f && bodies[0].transform.eulerAngles.z<215)
+            return true;
 
         if (damage <= 0) 
             return true;
@@ -507,15 +619,36 @@ public class Tester : MonoBehaviour
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
+        //float avg = bodies[0].transform.position.x + bodies[1].transform.position.x + bodies[2].transform.position.x + bodies[3].transform.position.x + bodies[4].transform.position.x;
+        //avg = avg / 5f;
+        float velo = 0;
+        if (points.Count > 0)
+        {
+            
 
+            for (int i = 0; i < points.Count; i++)
+            {
+                velo += points[i].x;
 
-        float life = this.net.GetTimeLived();
+            }
+            velo = velo / points.Count;
+        }
+
+        float avg = bodies[0].transform.localPosition.x * velo/** bodies[0].velocity.x*/;
+        if (bodies[0].transform.localPosition.x < 0 || avg<0)
+            avg = 0;
+        this.net.SetNetFitness(avg);
+
+        
+
+        /*float life = this.net.GetTimeLived();
         life = (life / net.GetTestTime()) * 2f;
 
         float fit = this.net.GetNetFitness();
         fit = Mathf.Pow(fit,life);
 
-        this.net.SetNetFitness(fit);
+        this.net.SetNetFitness(fit);*/
+
         //this.net.SetNetFitness(Mathf.Pow((1f / Vector2.Distance(bodies[0].transform.position, pos.position)), life));
 
         /*float life = this.net.GetNetFitness();

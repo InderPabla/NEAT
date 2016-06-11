@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\NEAT\CollsionCheck.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
+     <Compile Include="Assets\NEAT\Leg1.cs" />
      <Compile Include="Assets\NEAT\LineGraphDrawer.cs" />
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
