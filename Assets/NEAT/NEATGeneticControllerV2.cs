@@ -144,7 +144,11 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     public void ActionSetTimeScale(float timeScale) {
         Time.timeScale = timeScale;
     }
-    
+
+    public void ActionSaveCurrent()
+    {
+        StartCoroutine(operations.SaveNet(bestNet,creatureName));
+    }
 
     private void SetCameraLocation() {
         if (viewMode == true) {

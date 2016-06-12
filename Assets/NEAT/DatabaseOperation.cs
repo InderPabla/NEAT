@@ -37,6 +37,7 @@ public class DatabaseOperation  {
             "&genome=" + genome +
             "&consultor_genome=" + consultorGenome;
 
+        Debug.Log(page);
         web = new WWW(page);
         yield return web;
     }

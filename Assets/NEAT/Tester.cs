@@ -24,7 +24,7 @@ public class Tester : MonoBehaviour
     void Start()
     {
         mutex = new Semaphore(1, 1); 
-        pos = GameObject.Find("Pos").transform;
+        //pos = GameObject.Find("Pos").transform;
         TakePoint();
         //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
     }
@@ -309,16 +309,16 @@ public class Tester : MonoBehaviour
     }
 
     public void UpdateOverTime() {
-        bodyRad = Mathf.Deg2Rad * bodies[0].transform.eulerAngles.z;
-        leftUpRad1 = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
-        leftDownRad1 = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
-        rightUpRad1 = Mathf.Deg2Rad * bodies[3].transform.eulerAngles.z;
-        rightDownRad1 = Mathf.Deg2Rad * bodies[4].transform.eulerAngles.z;
+         bodyRad = Mathf.Deg2Rad * bodies[0].transform.eulerAngles.z;
+         leftUpRad1 = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
+         leftDownRad1 = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
+         rightUpRad1 = Mathf.Deg2Rad * bodies[3].transform.eulerAngles.z;
+         rightDownRad1 = Mathf.Deg2Rad * bodies[4].transform.eulerAngles.z;
 
-        leftUpRad2 = Mathf.Deg2Rad * bodies[5].transform.eulerAngles.z;
-        leftDownRad2 = Mathf.Deg2Rad * bodies[6].transform.eulerAngles.z;
-        rightUpRad2 = Mathf.Deg2Rad * bodies[7].transform.eulerAngles.z;
-        rightDownRad2 = Mathf.Deg2Rad * bodies[8].transform.eulerAngles.z;
+         leftUpRad2 = Mathf.Deg2Rad * bodies[5].transform.eulerAngles.z;
+         leftDownRad2 = Mathf.Deg2Rad * bodies[6].transform.eulerAngles.z;
+         rightUpRad2 = Mathf.Deg2Rad * bodies[7].transform.eulerAngles.z;
+         rightDownRad2 = Mathf.Deg2Rad * bodies[8].transform.eulerAngles.z;
 
         jointAngle1 = bodies[1].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
         jointAngle2 = bodies[2].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
@@ -328,103 +328,136 @@ public class Tester : MonoBehaviour
         jointAngle6 = bodies[6].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
         jointAngle7 = bodies[7].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
         jointAngle8 = bodies[8].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
-      
+
         float[] inputValues = { bodyRad, jointAngle1, jointAngle2, jointAngle3, jointAngle4, jointAngle5, jointAngle6, jointAngle7, jointAngle8, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
         //float[] inputValues = { bodyRad, leftUpRad1, leftDownRad1, rightUpRad1, rightDownRad1, leftUpRad2, leftDownRad2, rightUpRad2, rightDownRad2, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
-
         output = net.FireNet(inputValues);
 
 
         float motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4, motorSpeed5, motorSpeed6, motorSpeed7, motorSpeed8;
+        float threshold = 0.75f;
+        float motorPower = 500f;
 
-        if (output[0] > 0.5f)
-            motorSpeed1 = 500f;
-        else if (output[0] < -0.5f)
-            motorSpeed1 = -500f;
+        if (output[0] > threshold)
+            motorSpeed1 = motorPower;
+        else if (output[0] < -threshold)
+            motorSpeed1 = -motorPower;
         else 
             motorSpeed1 = 0f;
 
-        if (output[1] > 0.5f)
-            motorSpeed2 = 500f;
-        else if (output[1] < -0.5f)
-            motorSpeed2 = -500f;
+        if (output[1] > threshold)
+            motorSpeed2 = motorPower;
+        else if (output[1] < -threshold)
+            motorSpeed2 = -motorPower;
         else
             motorSpeed2 = 0f;
 
-        if (output[2] > 0.5f)
-            motorSpeed3 = 500f;
-        else if (output[2] < -0.5f)
-            motorSpeed3 = -500f;
+        if (output[2] > threshold)
+            motorSpeed3 = motorPower;
+        else if (output[2] < -threshold)
+            motorSpeed3 = -motorPower;
         else
             motorSpeed3 = 0f;
 
-        if (output[3] > 0.5f)
-            motorSpeed4 = 500f;
-        else if (output[3] < -0.5f)
-            motorSpeed4 = -500f;
+        if (output[3] > threshold)
+            motorSpeed4 = motorPower;
+        else if (output[3] < -threshold)
+            motorSpeed4 = -motorPower;
         else
             motorSpeed4 = 0f;
 
-        if (output[4] > 0.5f)
-            motorSpeed5 = 500f;
-        else if (output[4] < -0.5f)
-            motorSpeed5 = -500f;
+        if (output[4] > threshold)
+            motorSpeed5 = motorPower;
+        else if (output[4] < -threshold)
+            motorSpeed5 = -motorPower;
         else
             motorSpeed5 = 0f;
 
-        if (output[5] > 0.5f)
-            motorSpeed6 = 500f;
-        else if (output[5] < -0.5f)
-            motorSpeed6 = -500f;
+        if (output[5] > threshold)
+            motorSpeed6 = motorPower;
+        else if (output[5] < -threshold)
+            motorSpeed6 = -motorPower;
         else
             motorSpeed6 = 0f;
 
-        if (output[6] > 0.5f)
-            motorSpeed7 = 500f;
-        else if (output[6] < -0.5f)
-            motorSpeed7 = -500f;
+        if (output[6] > threshold)
+            motorSpeed7 = motorPower;
+        else if (output[6] < -threshold)
+            motorSpeed7 = -motorPower;
         else
             motorSpeed7 = 0f;
-        if (output[7] > 0.5f)
-            motorSpeed8 = 500f;
-        else if (output[7] < -0.5f)
-            motorSpeed8 = -500f;
+        if (output[7] > threshold)
+            motorSpeed8 = motorPower;
+        else if (output[7] < -threshold)
+            motorSpeed8 = -motorPower;
         else
             motorSpeed8 = 0f;
 
         JointMotor2D motor1 = bodies[1].GetComponent<HingeJoint2D>().motor;
         motor1.motorSpeed = motorSpeed1;
+        if (motorSpeed1 == 0)
+            bodies[1].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[1].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[1].GetComponent<HingeJoint2D>().motor = motor1;
-
+        
         JointMotor2D motor2 = bodies[2].GetComponent<HingeJoint2D>().motor;
         motor2.motorSpeed = motorSpeed2;
+        if (motorSpeed2 == 0)
+            bodies[2].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[2].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[2].GetComponent<HingeJoint2D>().motor = motor2;
 
         JointMotor2D motor3 = bodies[3].GetComponent<HingeJoint2D>().motor;
         motor3.motorSpeed = motorSpeed3;
+        if (motorSpeed3 == 0)
+            bodies[3].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[3].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[3].GetComponent<HingeJoint2D>().motor = motor3;
 
         JointMotor2D motor4 = bodies[4].GetComponent<HingeJoint2D>().motor;
         motor4.motorSpeed = motorSpeed4;
+        if (motorSpeed4 == 0)
+            bodies[4].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[4].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[4].GetComponent<HingeJoint2D>().motor = motor4;
 
         JointMotor2D motor5 = bodies[5].GetComponent<HingeJoint2D>().motor;
         motor5.motorSpeed = motorSpeed5;
+        if (motorSpeed5 == 0)
+            bodies[5].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[5].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[5].GetComponent<HingeJoint2D>().motor = motor5;
 
         JointMotor2D motor6 = bodies[6].GetComponent<HingeJoint2D>().motor;
         motor6.motorSpeed = motorSpeed6;
+        if (motorSpeed6 == 0)
+            bodies[6].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[6].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[6].GetComponent<HingeJoint2D>().motor = motor6;
 
         JointMotor2D motor7 = bodies[7].GetComponent<HingeJoint2D>().motor;
         motor7.motorSpeed = motorSpeed7;
+        if (motorSpeed7 == 0)
+            bodies[7].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[7].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[7].GetComponent<HingeJoint2D>().motor = motor7;
 
         JointMotor2D motor8 = bodies[8].GetComponent<HingeJoint2D>().motor;
         motor8.motorSpeed = motorSpeed8;
+        if (motorSpeed8 == 0)
+            bodies[8].GetComponent<HingeJoint2D>().useMotor = false;
+        else
+            bodies[8].GetComponent<HingeJoint2D>().useMotor = true;
         bodies[8].GetComponent<HingeJoint2D>().motor = motor8;
 
-        Invoke("UpdateOverTime",0.01f);
+        Invoke("UpdateOverTime",0.1f);
     }
 
 
@@ -449,45 +482,7 @@ public class Tester : MonoBehaviour
         else if (type == 4)
             sensorTouchRight2 = 1f;
 
-        /*if (type == -1)
-            sensorTouchLeft1 = -1f;
-        else if (type == 1)
-        {
-            if (sensorTouchLeft1 == -1)
-                sensorTouchLeft1 = 1f;
-            else
-                sensorTouchLeft1 += 0.1f;
-        }
-
-        else if (type == -2)
-            sensorTouchLeft2 = -1f;
-        else if (type == 2)
-        {
-            if (sensorTouchLeft2 == -1)
-                sensorTouchLeft2 = 1f;
-            else
-                sensorTouchLeft2 += 0.1f;
-        }
-
-        else if (type == -3)
-            sensorTouchRight1 = -1f;
-        else if (type == 3)
-        {
-            if (sensorTouchRight1 == -1)
-                sensorTouchRight1 = 1f;
-            else
-                sensorTouchRight1 += 0.1f;
-        }
-
-        else if (type == -4)
-            sensorTouchRight2 = -1f;
-        else if (type == 4)
-        {
-            if (sensorTouchRight2 == -1)
-                sensorTouchRight2 = 1f;
-            else
-                sensorTouchRight2 += 0.1f;
-        }*/
+        
 
         if (type == 0)
             damage = 0;
@@ -523,7 +518,7 @@ public class Tester : MonoBehaviour
                 return true;
         }*/
 
-        if (bodies[0].transform.localPosition.y > 1f || bodies[0].transform.localPosition.y < -2f) 
+        if (bodies[0].transform.localPosition.y > 2f || bodies[0].transform.localPosition.y < -2f) 
             return true; 
         
         if (bodies[0].transform.eulerAngles.z > 35f && bodies[0].transform.eulerAngles.z<215)
@@ -634,12 +629,12 @@ public class Tester : MonoBehaviour
             velo = velo / points.Count;
         }
 
-        float avg = bodies[0].transform.localPosition.x * velo/** bodies[0].velocity.x*/;
+        float avg = bodies[0].transform.localPosition.x * velo;
         if (bodies[0].transform.localPosition.x < 0 || avg<0)
             avg = 0;
-        this.net.SetNetFitness(avg);
 
-        
+
+        this.net.SetNetFitness(avg);
 
         /*float life = this.net.GetTimeLived();
         life = (life / net.GetTestTime()) * 2f;

@@ -12,16 +12,17 @@
 		$gene_total = $_GET["gene_total"];
 		$genome_total = $_GET["genome_total"];
 		$genome = $_GET["genome"];
-		$consultor_ genome = $_GET["consultor_genome"];
+		$consultor_genome = $_GET["consultor_genome"];
 		
-		$node_insert_query = "INSERT INTO $node_table (creature_name, node_total, node_inputs, node_outputs, gene_total, genome) VALUES ('$creature_name', $node_total, $node_inputs, $node_outputs, $gene_total,$genome_total, '$genome','$consultor_genome')";
-
+		
+		$node_insert_query = "INSERT INTO $node_table (creature_name, node_total, node_inputs, node_outputs, gene_total,genome_total,genome,consultor_genome) VALUES ('$creature_name', $node_total, $node_inputs, $node_outputs, $gene_total,$genome_total, '$genome','$consultor_genome')";
+		
 		$result = mysqli_query($connection, $node_insert_query);
 		
 		if($result === true)
 		{
 			echo "SUCCESS";
-		}
+		}	
 	}
 	else
 	{
