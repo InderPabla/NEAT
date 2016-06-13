@@ -109,7 +109,7 @@ public class NEATNetDraw : MonoBehaviour {
 
             lineRen.SetColors(color, color);
             lineRen.SetWidth(size,size);
-        }
+        } 
     }
 
     public void Clear() {

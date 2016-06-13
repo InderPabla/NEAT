@@ -64,7 +64,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
 
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 3f, 3f, 3f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.05f, 5f, 5f, 5f);
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -274,7 +274,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 int[] randomId = allID[randomIndex];
                 allID.RemoveAt(randomIndex);
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
+                CreateIndividual(new Vector3(25,25, 0), species[randomId[0]][randomId[1]], color, randomId);
 
                 //CreateIndividual(new Vector3(width, height, 0), species[i][j],color);
 
