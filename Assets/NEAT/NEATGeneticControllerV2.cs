@@ -64,7 +64,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
 
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.05f, 5f, 5f, 5f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 4f);
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -185,10 +185,13 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         if (computing == true) {
             //progressBar.GetComponent<ProgressRadialBehaviour>().IncrementValue(currentIncrement*Time.deltaTime);
             if (worldActivation == true) {
-                bodies[0].transform.position += new Vector3(Time.deltaTime / 2f, 0, 0);
-                bodies[1].transform.position += new Vector3(-Time.deltaTime / 2f, 0, 0);
-                bodies[2].transform.position += new Vector3(0, Time.deltaTime / 8f, 0);
-                bodies[3].transform.position += new Vector3(0, -Time.deltaTime / 8f, 0);
+                /*bodies[0].transform.localPosition += new Vector3(-Time.deltaTime / 1f, 0, 0);
+                bodies[1].transform.localPosition += new Vector3(Time.deltaTime / 1f, 0, 0);
+                bodies[2].transform.localPosition += new Vector3(0, Time.deltaTime / 4f, 0);
+                bodies[3].transform.localPosition += new Vector3(0, -Time.deltaTime / 4f, 0);
+                bodies[4].transform.eulerAngles += new Vector3(0, 0, Time.deltaTime);*/
+                bodies[5].transform.localPosition += new Vector3(Time.deltaTime*3f, 0, 0);
+                bodies[6].transform.localPosition += new Vector3(-Time.deltaTime*3f, 0, 0);
             }
         }
 
@@ -197,10 +200,13 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
     private void ResetWorld() {
         if (worldActivation) {
-            bodies[0].transform.position = new Vector3(-22f, 0, 0);
-            bodies[1].transform.position = new Vector3(22f, 0, 0);
-            bodies[2].transform.position = new Vector3(0, -8f, 0);
-            bodies[3].transform.position = new Vector3(0, 12f, 0);
+            bodies[0].transform.localPosition = new Vector3(65f, 0, 0);
+            bodies[1].transform.localPosition = new Vector3(-65f, 0, 0);
+            bodies[2].transform.localPosition = new Vector3(0, -50f, 0);
+            bodies[3].transform.localPosition = new Vector3(0, 50f, 0);
+            bodies[4].transform.eulerAngles = new Vector3(0,0,0);
+            bodies[5].transform.localPosition = new Vector3(-84.95f, 0, 0);
+            bodies[6].transform.localPosition = new Vector3(84.95f, 0, 0);
         }
         
     }
@@ -254,8 +260,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     private void GeneratePopulation() {
 
         List<int[]> allID = new List<int[]>();
-        float height = 10f;
-        float width = -20f;
+        float height = 100f;
+        float width = -50f;
         int numberOfSpecies = species.Count;
 
         for (int i = 0; i < numberOfSpecies; i++) {
@@ -274,16 +280,16 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 int[] randomId = allID[randomIndex];
                 allID.RemoveAt(randomIndex);
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(25,25, 0), species[randomId[0]][randomId[1]], color, randomId);
+                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
 
-                //CreateIndividual(new Vector3(width, height, 0), species[i][j],color);
+                //CreateIndividual(new Vector3(width, height, 0), species[i][j],color, new int[] { i,j});
 
-                if (width % 20 == 0 && width > 0) {
-                    width = -20f;
-                    height += -4f;
+                if (width % 50 == 0 && width > 0) {
+                    width = -50f;
+                    height += -10f;
                 }
                 else
-                    width += 2f;
+                    width += 10f;
             }
         }
     }
@@ -300,9 +306,10 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         finished.WaitOne();
 
         testCounter++;
-
+        //Debug.Log(testCounter);
         if (testCounter == populationSize) {
-            TestFinished();
+            Invoke("TestFinished",1f);
+            //TestFinished();
         }
 
         finished.Release();

@@ -9,7 +9,7 @@ public class CollsionCheck : MonoBehaviour {
         //else
         //transform.parent.SendMessage("OtherActivity", (object)1);
 
-        //if (coll.collider.name.Contains("G"))
+        //if (coll.collider.name.Contains("G") )
         transform.parent.SendMessage("OnFinished");
        
     }
