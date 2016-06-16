@@ -14,6 +14,11 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ## Quadrupedal creature
 ![](http://imgur.com/de6P6Cu.gif)
 
+## Food seeking behaviour resulting to flocking 
+![](http://imgur.com/d9yZZE3.gif)
+
 ## Panel System 
 - Shows graph, traning completion informer, and the image of the neural net.
 ![Alt text](https://github.com/InderPabla/NEAT/blob/master/Images/Panel.PNG "Panel System")
+
+
