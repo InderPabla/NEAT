@@ -8,8 +8,8 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 - Creature is rewarded for having lower number of genetic connections (this proves better in the long run, simplest nets evolve)
 
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/2.gif)
-![](https://github.com/InderPabla/NEAT/blob/master/Images/1.gif)
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/3.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/1.gif)
 
 ## Quadrupedal creature
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/4.gif)
