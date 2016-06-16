@@ -7,15 +7,15 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 - Creature is rewarded higher for traveling large distances (Position points are taken every second). 
 - Creature is rewarded for having lower number of genetic connections (this proves better in the long run, simplest nets evolve)
 
-![](http://imgur.com/8rXClcx.gif)
-![](http://imgur.com/Fy4w4sb.gif)
-![](http://imgur.com/1vvlWrX.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/1.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/2.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/3.gif)
 
 ## Quadrupedal creature
-![](http://imgur.com/de6P6Cu.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/4.gif)
 
 ## Food seeking behaviour resulting to flocking 
-![](http://imgur.com/d9yZZE3.gif)
+![](https://github.com/InderPabla/NEAT/blob/master/Images/5.gif)
 
 ## Panel System 
 - Shows graph, traning completion informer, and the image of the neural net.
