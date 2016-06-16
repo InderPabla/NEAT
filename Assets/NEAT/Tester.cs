@@ -19,14 +19,14 @@ public class Tester : MonoBehaviour
     List<Vector2> points = new List<Vector2>();
     float damage = 100f;
 
-    //public Transform pos;
+    public Transform pos;
     bool finished = false;
     void Start()
     {
         //mutex = new Semaphore(1, 1);
 
-        //pos = GameObject.Find("Pos").transform;
-        TakePoint();
+        pos = GameObject.Find("Pos").transform;
+        //TakePoint();
         //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
         //transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f, 360f));
     }
@@ -74,6 +74,7 @@ public class Tester : MonoBehaviour
     float hurt = 0f;
     float bodyRad, leftUpRad1, leftDownRad1, rightUpRad1, rightDownRad1, leftUpRad2, leftDownRad2, rightUpRad2, rightDownRad2,
         jointAngle1, jointAngle2, jointAngle3, jointAngle4, jointAngle5, jointAngle6, jointAngle7, jointAngle8;
+
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet() {
@@ -306,95 +307,195 @@ public class Tester : MonoBehaviour
         if (hurt < 0)
             hurt = 0f;*/
 
-        leftUpRad1 = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
-        leftDownRad1 = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
-        rightUpRad1 = Mathf.Deg2Rad * bodies[3].transform.eulerAngles.z;
-        rightDownRad1 = Mathf.Deg2Rad * bodies[4].transform.eulerAngles.z;
-        if (leftUpRad1 > Math.PI)
-            leftUpRad1 = (2 * Mathf.PI) - leftUpRad1;
-        if (leftDownRad1 > Math.PI)
-            leftDownRad1 = (2 * Mathf.PI) - leftDownRad1;
-        if (rightUpRad1 > Math.PI)
-            rightUpRad1 = (2 * Mathf.PI) - rightUpRad1;
-        if (rightDownRad1 > Math.PI)
-            rightDownRad1 = (2 * Mathf.PI) - rightDownRad1;
+        float angle = -100f;
+        float angleAdd = 22.22f;
+        int ignoreFoodLayer = ~(1 << 9);
+        Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir2 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir3 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir4 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir5 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir6 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir7 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir8 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir9 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
 
-        jointAngle1 = bodies[1].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
-        jointAngle2 = bodies[2].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
-        jointAngle3 = bodies[3].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
-        jointAngle4 = bodies[4].GetComponent<HingeJoint2D>().jointAngle * Mathf.Deg2Rad;
+        Vector2 position1 = bodies[0].transform.position + (0.35f * dir1);
+        RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, 2f, ignoreFoodLayer);
 
-        //float[] inputValues = { jointAngle1, jointAngle2, jointAngle3, jointAngle4, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
-        float[] inputValues = {leftUpRad1, leftDownRad1, rightUpRad1, rightDownRad1, sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2 };
+        Vector2 position2 = bodies[0].transform.position + (0.35f * dir2);
+        RaycastHit2D hit2 = Physics2D.Raycast(position2, dir2, 2f, ignoreFoodLayer);
+
+        Vector2 position3 = bodies[0].transform.position + (0.35f * dir3);
+        RaycastHit2D hit3 = Physics2D.Raycast(position3, dir3, 2f, ignoreFoodLayer);
+
+        Vector2 position4 = bodies[0].transform.position + (0.35f * dir4);
+        RaycastHit2D hit4 = Physics2D.Raycast(position4, dir4, 2f, ignoreFoodLayer);
+
+        Vector2 position5 = bodies[0].transform.position + (0.35f * dir5);
+        RaycastHit2D hit5 = Physics2D.Raycast(position5, dir5, 2f, ignoreFoodLayer);
+
+        Vector2 position6 = bodies[0].transform.position + (0.35f * dir6);
+        RaycastHit2D hit6 = Physics2D.Raycast(position6, dir6, 2f, ignoreFoodLayer);
+
+        Vector2 position7 = bodies[0].transform.position + (0.35f * dir7);
+        RaycastHit2D hit7 = Physics2D.Raycast(position7, dir7, 2f, ignoreFoodLayer);
+
+        Vector2 position8 = bodies[0].transform.position + (0.35f * dir8);
+        RaycastHit2D hit8 = Physics2D.Raycast(position8, dir8, 2f, ignoreFoodLayer);
+
+        Vector2 position9 = bodies[0].transform.position + (0.35f * dir9);
+        RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, 2f, ignoreFoodLayer);
+
+        Vector3 dir10 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
+        Vector2 position10 = bodies[0].transform.position + (0.3f * dir10);
+        RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, 2f, ignoreFoodLayer);
+
+        h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
+        bool draw = false;
+        float hitCreatureAdd = 0f;
+        string otherCreatureName = "B";
+        if (hit1.collider != null)
+        {
+            h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / 2f;
+            if (h1 != -1 && draw == true)
+                Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+        }
+
+        if (hit2.collider != null)
+        {
+            h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / 2f;
+            if (h2 != -1 && draw == true)
+                Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
+        }
+
+        if (hit3.collider != null)
+        {
+            h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / 2f;
+            if (h3 != -1 && draw == true)
+                Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
+        }
+
+        if (hit4.collider != null)
+        {
+            h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / 2f;
+            if (h4 != -1 && draw == true)
+                Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
+        }
+
+        if (hit5.collider != null)
+        {
+            h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / 2f;
+            if (h5 != -1 && draw == true)
+                Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
+        }
+
+        if (hit6.collider != null)
+        {
+            h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / 2f;
+            if (h6 != -1 && draw == true)
+                Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
+        }
+
+        if (hit7.collider != null)
+        {
+            h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / 2f;
+            if (h7 != -1 && draw == true)
+                Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
+        }
+        if (hit8.collider != null)
+        {
+            h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / 2f;
+            if (h8 != -1 && draw == true)
+                Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
+        }
+        if (hit9.collider != null)
+        {
+            h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / 2f;
+            if (h9 != -1 && draw == true)
+                Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
+        }
+        if (hit10.collider != null)
+        {
+            h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / 2f;
+            if (h10 != -1 && draw == true)
+                Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
+        }
+
+        int ignoreLayer = ~(1 << 8);
+        Vector2 point = bodies[0].transform.position;
+        Collider2D[] cols = Physics2D.OverlapCircleAll(point,10f, ignoreLayer);
+
+        float distance = 100f;
+        int index = -1;
+
+        if (cols.Length > 0)
+        {
+            for (int i = 0; i < cols.Length; i++)
+            {
+                float newDistance = Vector2.Distance(point, cols[i].transform.position);
+                if (newDistance < distance) {
+                    distance = newDistance;
+                    index = i;
+                }
+            }
+        }
+
+        float rad2 = 0;
+        float dis = -1;
+        if (index != -1) {
+            Vector2 deltaVector = cols[index].transform.position - bodies[0].transform.position;
+            deltaVector = deltaVector.normalized;
+
+            rad2 = Mathf.Atan2(deltaVector.y, deltaVector.x);
+
+            rad2 *= Mathf.Rad2Deg;
+            rad2 = 90f - rad2;
+
+            if (rad2 < 0f)
+            {
+                rad2 += 360f;
+            }
+            rad2 = 360 - rad2;
+
+            rad2 -= bodies[0].transform.eulerAngles.z;
+            if (rad2 < 0)
+                rad2 = 360 + rad2;
+
+
+            if (rad2 >= 180f)
+            {
+                rad2 = 360 - rad2;
+                rad2 *= -1f;
+            }
+
+            rad2 *= Mathf.Deg2Rad;
+
+            dis = Vector2.Distance(bodies[0].transform.position, cols[index].transform.position);
+        }
+
+        
+        Vector2 dir = bodies[0].transform.up;
+        float[] inputValues = {rad2, dis};
         output = net.FireNet(inputValues);
-
-        float motorSpeed1, motorSpeed2, motorSpeed3, motorSpeed4;
-        float threshold = 0.1f;
-        float motorPower = 100f;
-
-        if (output[0] > threshold)
-            motorSpeed1 = motorPower;
-        else if (output[0] < -threshold)
-            motorSpeed1 = -motorPower;
+        if (output[0] > 0)
+            bodies[0].angularVelocity = 200f;
         else
-            motorSpeed1 = 0f;
+            bodies[0].angularVelocity = -200f;
 
-        if (output[1] > threshold)
-            motorSpeed2 = motorPower;
-        else if (output[1] < -threshold)
-            motorSpeed2 = -motorPower;
-        else
-            motorSpeed2 = 0f;
+        bodies[0].velocity = dir * 5f;
 
-        if (output[2] > threshold)
-            motorSpeed3 = motorPower;
-        else if (output[2] < -threshold)
-            motorSpeed3 = -motorPower;
-        else
-            motorSpeed3 = 0f;
 
-        if (output[3] > threshold)
-            motorSpeed4 = motorPower;
-        else if (output[3] < -threshold)
-            motorSpeed4 = -motorPower;
-        else
-            motorSpeed4 = 0f;
-
-        JointMotor2D motor1 = bodies[1].GetComponent<HingeJoint2D>().motor;
-        motor1.motorSpeed = motorSpeed1;
-        /*if (motorSpeed1 == 0)
-            bodies[1].GetComponent<HingeJoint2D>().useMotor = true;
-        else
-            bodies[1].GetComponent<HingeJoint2D>().useMotor = true;*/
-        bodies[1].GetComponent<HingeJoint2D>().motor = motor1;
-
-        JointMotor2D motor2 = bodies[2].GetComponent<HingeJoint2D>().motor;
-        motor2.motorSpeed = motorSpeed2;
-        /*if (motorSpeed2 == 0)
-            bodies[2].GetComponent<HingeJoint2D>().useMotor = true;
-        else
-            bodies[2].GetComponent<HingeJoint2D>().useMotor = true;*/
-        bodies[2].GetComponent<HingeJoint2D>().motor = motor2;
-
-        JointMotor2D motor3 = bodies[3].GetComponent<HingeJoint2D>().motor;
-        motor3.motorSpeed = motorSpeed3;
-        /*if (motorSpeed3 == 0)
-            bodies[3].GetComponent<HingeJoint2D>().useMotor = true;
-        else
-            bodies[3].GetComponent<HingeJoint2D>().useMotor = true;*/
-        bodies[3].GetComponent<HingeJoint2D>().motor = motor3;
-
-        JointMotor2D motor4 = bodies[4].GetComponent<HingeJoint2D>().motor;
-        motor4.motorSpeed = motorSpeed4;
-        /*if (motorSpeed4 == 0)
-            bodies[4].GetComponent<HingeJoint2D>().useMotor = true;
-        else
-            bodies[4].GetComponent<HingeJoint2D>().useMotor = true;*/
-        bodies[4].GetComponent<HingeJoint2D>().motor = motor4;
-
-        net.AddNetFitness(bodies[4].transform.localPosition.y*Time.deltaTime);
     }
-
+     
     Vector3 position;
     public void UpdateOverTime() {
         /*bodyRad = Mathf.Deg2Rad * bodies[0].transform.eulerAngles.z;
@@ -556,7 +657,7 @@ public class Tester : MonoBehaviour
     float sensorTouchLeft1, sensorTouchRight1, sensorTouchLeft2, sensorTouchRight2;
     float fail = 0;
     public void LegTouch(int type) {
-        if(type == -1)
+        /*if(type == -1)
             sensorTouchLeft1 = -1f;
         else if (type == 1)  
             sensorTouchLeft1 = 1f;
@@ -574,7 +675,7 @@ public class Tester : MonoBehaviour
             sensorTouchRight2 = 1f;
 
         if (type == 0)
-            damage = 0;
+            damage = 0;*/
     }
 
 
@@ -620,7 +721,6 @@ public class Tester : MonoBehaviour
     }
 
     bool isUp = false;
-    private object pos;
 
     //--Add your own neural net fail code here--//
     //Fitness calculation
@@ -766,7 +866,9 @@ public class Tester : MonoBehaviour
 
     public void OtherActivity(int type) {
         //mutex.WaitOne();
-
+        //if (type == 0) {
+            net.AddNetFitness(0.1f);
+        //}
         //if(hurt<=0)
             //hurt = 1f;
 

@@ -47,6 +47,8 @@
   <ItemGroup>
      <Compile Include="Assets\NEAT\CollsionCheck.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
+     <Compile Include="Assets\NEAT\Food.cs" />
+     <Compile Include="Assets\NEAT\FoodSeek.cs" />
      <Compile Include="Assets\NEAT\Leg1.cs" />
      <Compile Include="Assets\NEAT\LineGraphDrawer.cs" />
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
@@ -57,6 +59,7 @@
      <Compile Include="Assets\NEAT\NEATNetDraw.cs" />
      <Compile Include="Assets\NEAT\NEATNode.cs" />
      <Compile Include="Assets\NEAT\NEATPacket.cs" />
+     <Compile Include="Assets\NEAT\NEATWorld.cs" />
      <Compile Include="Assets\NEAT\Tester.cs" />
      <Compile Include="Assets\NEAT\Testingstuff.cs" />
      <Compile Include="Assets\ProgressBar\Script\ProgressBarBehaviour.cs" />

@@ -9,8 +9,18 @@ public class CollsionCheck : MonoBehaviour {
         //else
         //transform.parent.SendMessage("OtherActivity", (object)1);
 
-        //if (coll.collider.name.Contains("G") )
-        transform.parent.SendMessage("OnFinished");
+        if (coll.collider.name.Contains("Food"))
+        {
+
+            transform.parent.SendMessage("OtherActivity", (object)0);
+
+            Destroy(coll.gameObject);
+        }
+        else {
+            //transform.parent.SendMessage("OnFinished");
+        }
+
+        //transform.parent.SendMessage("OnFinished");
        
     }
 
