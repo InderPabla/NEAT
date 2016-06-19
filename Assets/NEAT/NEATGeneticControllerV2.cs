@@ -66,7 +66,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
 
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.5f, 1f, 1f, 1f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.1f, 2f, 2f, 4f);
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -200,17 +200,19 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
 
     private void DeleteWorld() {
-        Destroy(foodMaker);
+        if (worldActivation)
+        {
+            Destroy(foodMaker);
+        }
     }
     private void ResetWorld() {
-        //if (worldActivation) {
+        if (worldActivation) {
             /*bodies[0].transform.localPosition = new Vector3(65f, 0, 0);
             bodies[1].transform.localPosition = new Vector3(-65f, 0, 0);
             bodies[2].transform.localPosition = new Vector3(0, -50f, 0);
             bodies[3].transform.localPosition = new Vector3(0, 50f, 0);*/
             foodMaker = Instantiate(foodMakerPrefab);
-            //foodMaker.SendMessage("Activate");
-        //}
+        }
         
     }
 
