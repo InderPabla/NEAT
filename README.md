@@ -17,10 +17,12 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ## Food Seekers
 ### Single sensor - food seeker 
 - Hard coded closest food source as input 
+- Flocking behaviour can be observed as the local group of food seekers share the same food source as input 
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/5.gif)
 
 ### Nine sensor - food seeker 
 - Neural network evolves to learn how use 9 sight sensors
+- Lack of flocking behaviour due to the fact that food seeker can use multiple sensors to choose which direction to go
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/7.gif)
 
 ## Double pole balancing with velocities
