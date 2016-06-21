@@ -14,8 +14,14 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ## Quadrupedal creature
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/4.gif)
 
-## Food seeking behaviour resulting to flocking 
+## Food Seekers
+### Single sensor - food seeker 
+- Hard coded closest food source as input 
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/5.gif)
+
+### Nine sensor - food seeker 
+- Neural network evolves to learn how use 9 sight sensors
+![](https://github.com/InderPabla/NEAT/blob/master/Images/7.gif)
 
 ## Double pole balancing with velocities
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/6.gif)
