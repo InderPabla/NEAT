@@ -18,6 +18,7 @@ public class CollsionCheck : MonoBehaviour {
         }
         else {
             //transform.parent.SendMessage("OnFinished");
+            transform.parent.SendMessage("OtherActivity", (object)1);
         }
 
         //transform.parent.SendMessage("OnFinished");

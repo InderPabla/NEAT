@@ -27,7 +27,7 @@ public class Tester : MonoBehaviour
 
         //pos = GameObject.Find("Pos").transform;
         //TakePoint();
-        //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
+        bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
         //transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f, 360f));
         //Invoke("TakePoint", 1f);
     }
@@ -299,8 +299,8 @@ public class Tester : MonoBehaviour
 
         float angle = -100f;
         float angleAdd = 22.22f;
-        float distance = 5f;
-        int ignoreFoodLayer = ~(1 << 8);
+        float distance = 10f;
+        int ignoreFoodLayer = ~(1 << 10);
         Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
         angle += angleAdd;
         Vector3 dir2 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
@@ -354,67 +354,67 @@ public class Tester : MonoBehaviour
         bool draw = true;
         float hitCreatureAdd = 0f;
         string otherCreatureName = "B";
-        if (hit1.collider != null && hit1.collider.name.StartsWith("F"))
+        if (hit1.collider != null /*&& hit1.collider.name.StartsWith("F")*/)
         {
             h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / distance;
             if (h1 != -1 && draw == true)
                 Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
         }
 
-        if (hit2.collider != null && hit2.collider.name.StartsWith("F"))
+        if (hit2.collider != null /*&& hit2.collider.name.StartsWith("F")*/)
         {
             h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / distance;
             if (h2 != -1 && draw == true)
                 Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
         }
 
-        if (hit3.collider != null && hit3.collider.name.StartsWith("F"))
+        if (hit3.collider != null /*&& hit3.collider.name.StartsWith("F")*/)
         {
             h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / distance;
             if (h3 != -1 && draw == true)
                 Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
         }
 
-        if (hit4.collider != null && hit4.collider.name.StartsWith("F"))
+        if (hit4.collider != null /*&& hit4.collider.name.StartsWith("F")*/)
         {
             h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / distance;
             if (h4 != -1 && draw == true)
                 Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
         }
 
-        if (hit5.collider != null && hit5.collider.name.StartsWith("F"))
+        if (hit5.collider != null /*&& hit5.collider.name.StartsWith("F")*/)
         {
             h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / distance;
             if (h5 != -1 && draw == true)
                 Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
         }
 
-        if (hit6.collider != null && hit6.collider.name.StartsWith("F"))
+        if (hit6.collider != null /*&& hit6.collider.name.StartsWith("F")*/)
         {
             h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / distance;
             if (h6 != -1 && draw == true)
                 Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
         }
 
-        if (hit7.collider != null && hit7.collider.name.StartsWith("F"))
+        if (hit7.collider != null /*&& hit7.collider.name.StartsWith("F")*/)
         {
             h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / distance;
             if (h7 != -1 && draw == true)
                 Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
         }
-        if (hit8.collider != null && hit8.collider.name.StartsWith("F"))
+        if (hit8.collider != null /*&& hit8.collider.name.StartsWith("F")*/)
         {
             h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / distance;
             if (h8 != -1 && draw == true)
                 Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
         }
-        if (hit9.collider != null && hit9.collider.name.StartsWith("F"))
+        if (hit9.collider != null /*&& hit9.collider.name.StartsWith("F")*/)
         {
             h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / distance;
             if (h9 != -1 && draw == true)
                 Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
         }
-        if (hit10.collider != null && hit10.collider.name.StartsWith("F"))
+        if (hit10.collider != null /*&& hit10.collider.name.StartsWith("F")*/)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / distance;
             if (h10 != -1 && draw == true)
@@ -474,15 +474,22 @@ public class Tester : MonoBehaviour
         }
  
         Vector2 dir = bodies[0].transform.up;
-        float[] inputValues = {/*radShort, disShort,*/h1,h2,h3,h4,h5,h6,h7,h8,h9, (damage/100f) };
+        float[] inputValues = {/*radShort, disShort,*/h1,h2,h3,h4,h5,h6,h7,h8,h9, (damage/100f), bodies[0].transform.eulerAngles.z*Mathf.Deg2Rad };
         output = net.FireNet(inputValues);
 
-        if (output[0] > 0)
-            bodies[0].angularVelocity = 200f;
-        else
-            bodies[0].angularVelocity = -200f;
 
-        bodies[0].velocity = dir * 5;
+        /*if (output[0] > 0f)
+            bodies[0].angularVelocity = 250f ;
+        else 
+            bodies[0].angularVelocity = -250f;
+
+        bodies[0].velocity = dir * 5;*/
+
+        bodies[0].angularVelocity = output[0]*250f;
+        if (output[1] >= 0)
+            bodies[0].velocity = dir * output[1] * 5f;
+        else
+            bodies[0].velocity /= 2f;
 
         damage -= Time.deltaTime * 30f;
     }
@@ -859,7 +866,10 @@ public class Tester : MonoBehaviour
             damage = 100f;
             
         }
-
+        if (type == 1) {
+            net.SetNetFitness(net.GetNetFitness()*0f);
+            OnFinished();
+        }
         /* (type == 1)
         {
             damage -= 10f;

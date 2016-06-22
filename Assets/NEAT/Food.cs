@@ -10,7 +10,7 @@ public class Food : MonoBehaviour {
     void Start () {
         for (int i = 0; i < 250; i++)
         {
-            GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-29f, 29f), Random.Range(-29f, 29f), 0), foodPrefab.transform.rotation);
+            GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-25f, 25f), Random.Range(-25f, 25f), 0), foodPrefab.transform.rotation);
             food.transform.parent = transform;
         }
         resourceCondition = Random.Range(0.05f,0.1f);
@@ -21,7 +21,7 @@ public class Food : MonoBehaviour {
 
     public void Spawn()
     {
-        GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-29f, 29f), Random.Range(-29f, 29f), 0), foodPrefab.transform.rotation);
+        GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-25f, 25f), Random.Range(-25f, 25f), 0), foodPrefab.transform.rotation);
         food.transform.parent = transform;
         Invoke("Spawn", resourceCondition);
     }
