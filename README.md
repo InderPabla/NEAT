@@ -35,7 +35,9 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/6.gif)
 
 ## Panel System 
-- Shows graph, traning completion informer, and the image of the neural net.
+- Shows fitness graph
+- Traning progress bar
+- Visual display of the neural net
 ![Alt text](https://github.com/InderPabla/NEAT/blob/master/Images/9.PNG "Panel System")
 
 
