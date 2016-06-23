@@ -12,6 +12,9 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/1.gif)
 
 ## Quadrupedal creature
+- 12 inputs consisting of, 8 joint angles and 4 touch sensors
+- 8 outputs which give motor control to the joints 
+- Fitness is calculated based on (distance travelled * average speed)
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/4.gif)
 
 ## Food Seekers
@@ -28,7 +31,7 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ### Nine sensor - advanced food seeker 
 - Network learns to distinguish between food and wall 
 - Touching the wall kills the seeker immediately and sets the fitness to 0, thus making it crucial to not get near the wall. 
-- Networks must create an internal model of what it means to see a wall, another seeker, or food. 
+- Networks must create an internal model of what it means to see a wall, another seeker, and food. 
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/8.gif)
 
 ## Double pole balancing with velocities
