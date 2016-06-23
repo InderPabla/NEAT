@@ -13,7 +13,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     public GameObject progressBar;
     public GameObject netDrawer;
     public GameObject lineGraph;
-
+    public TextMesh displayText;
     public List<Transform> bodies;
 
     public bool worldActivation = false;
@@ -369,7 +369,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]);
             lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness);
 
-            Debug.Log("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness+", Delta: "+consultor.GetDeltaThreshold());
+            DisplayInformation("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
             netDrawer.SendMessage("DrawNet",bestNet);
             
             for (int i = 0; i < distribution.GetLength(0); i++) {
@@ -506,6 +506,22 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             }
         }
         return sort;
+    }
+
+    List<string> informationList = new List<string>();
+    int INFORMATION_LIST_SIZE = 10;
+    public void DisplayInformation(string info) {
+        if (informationList.Count >= INFORMATION_LIST_SIZE) {
+            informationList.RemoveAt(INFORMATION_LIST_SIZE-1);
+        }
+
+        informationList.Insert(0, info);
+        displayText.text = "";
+
+        for (int i = 0; i < informationList.Count; i++) {
+            displayText.text += informationList[i] + "\n";
+        }
+        
     }
 
     private bool ErrorCheck() {

@@ -793,7 +793,7 @@ public class Tester : MonoBehaviour
         if (output[1] < 0f )
             this.net.AddNetFitness(-1f);*/
 
-
+        net.AddNetFitness(Time.deltaTime);
     }
 
 
@@ -862,7 +862,7 @@ public class Tester : MonoBehaviour
     public void OtherActivity(int type) {
         //mutex.WaitOne();
         if (type == 0) {
-            net.AddNetFitness(0.1f);
+            //net.AddNetFitness(0.1f);
             damage = 100f;
             
         }

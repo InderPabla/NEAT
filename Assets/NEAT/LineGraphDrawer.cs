@@ -11,6 +11,7 @@ public class LineGraphDrawer : MonoBehaviour {
     private Vector2 oldLocation;
     private Vector2 centerLocation;
     LineRenderer linePlot;
+    List<Vector2> linePlotList = new List<Vector2>();
     int vertextCount = 2;
     void Start () {
         lines = new List<GameObject>();
@@ -67,17 +68,38 @@ public class LineGraphDrawer : MonoBehaviour {
         lines.Add(plot);
 
         oldLocation = centerLocation;
-
+        
     }
 
     public void PlotData(float dataPoint) {
         float y = (seperationY * dataPoint) + centerLocation.y;
         float x = seperationX + oldLocation.x;
-        vertextCount++;
+
+
+        /*vertextCount++;
         linePlot.SetVertexCount(vertextCount);
+
         Vector2 newPosition = new Vector2(x,y);
         linePlot.SetPosition(vertextCount-1,newPosition);
-        oldLocation = newPosition;
+        oldLocation = newPosition;*/
+
+
+        Vector2 newPosition = new Vector2(x, y);
+        if (linePlotList.Count > maxX) {
+            linePlotList.RemoveAt(linePlotList.Count-1);
+        }
+        linePlotList.Insert(0, newPosition);
+
+        linePlot.SetVertexCount(linePlotList.Count);
+
+        float newX = centerLocation.x;
+        for (int i = 0; i < linePlotList.Count; i++) {
+            Vector2 pos = linePlotList[i];
+            pos.x = newX;
+            newX += seperationX;
+            linePlot.SetPosition(i, pos);          
+        }
+
 
     }
 }

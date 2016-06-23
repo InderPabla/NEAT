@@ -14,7 +14,6 @@ public class Food : MonoBehaviour {
             food.transform.parent = transform;
         }
         resourceCondition = Random.Range(0.05f,0.1f);
-        Debug.Log(resourceCondition);
         Spawn();
 
     }
