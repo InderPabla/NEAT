@@ -55,7 +55,8 @@ public class NEATNet {
         geneList = new List<NEATGene>();
 
         for (int i = 0; i < geneInformation.Length; i+=informationSize) {
-            gene = new NEATGene(0, (int)geneInformation[i], (int)geneInformation[i + 1], geneInformation[i + 2], geneInformation[i + 3] == 1.0? true:false);
+            int inno = this.consultor.CheckGeneExistance((int)geneInformation[i], (int)geneInformation[i + 1]);
+            gene = new NEATGene(inno, (int)geneInformation[i], (int)geneInformation[i + 1], geneInformation[i + 2], geneInformation[i + 3] == 1.0? true:false);
             geneList.Add(gene);
         }
 

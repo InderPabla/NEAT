@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 public class NEATConsultor  {
     private float deltaThreshold;
@@ -12,6 +13,29 @@ public class NEATConsultor  {
     private int numberOfOutputs;
 
     private List<NEATGene> geneList;
+
+    public NEATConsultor(NEATPacket packet, float deltaThreshold, float disjointCoefficient, float excessCoefficient, float averageWeightDifferenceCoefficient) {
+
+        this.numberOfInputs = packet.node_inputs;
+        this.numberOfOutputs = packet.node_outputs;
+
+        this.deltaThreshold = deltaThreshold;
+        this.disjointCoefficient = disjointCoefficient;
+        this.excessCoefficient = excessCoefficient;
+        this.averageWeightDifferenceCoefficient = averageWeightDifferenceCoefficient;
+
+        NEATGene gene = null;
+        int informationSize = NEATGene.GENE_INFORMATION_SIZE;
+        float[] geneInformation = packet.consultor_genome.Split('_').Select(x => float.Parse(x)).ToArray();
+        geneList = new List<NEATGene>();
+
+        
+        for (int i = 0; i < geneInformation.Length; i += informationSize) {
+            gene = new NEATGene(innovationNumber, (int)geneInformation[i], (int)geneInformation[i + 1], 1f, true);
+            geneList.Add(gene);
+            innovationNumber++;
+        }
+    }
 
     public NEATConsultor(int numberOfInputs, int numberOfOutputs, float deltaThreshold, float disjointCoefficient, float excessCoefficient, float averageWeightDifferenceCoefficient) {
         this.numberOfInputs = numberOfInputs;

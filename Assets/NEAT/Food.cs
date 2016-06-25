@@ -6,15 +6,17 @@ public class Food : MonoBehaviour {
     float resourceCondition = 0f;
     // Use this for initialization
 
-
     void Start () {
-        for (int i = 0; i < 250; i++)
+
+        float numberOfFood = Random.Range(250f, 750f);
+        for (int i = 0; i < numberOfFood; i++)
         {
             GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-25f, 25f), Random.Range(-25f, 25f), 0), foodPrefab.transform.rotation);
             food.transform.parent = transform;
         }
+
         resourceCondition = Random.Range(0.05f,0.1f);
-        Spawn();
+        //Spawn();
 
     }
 

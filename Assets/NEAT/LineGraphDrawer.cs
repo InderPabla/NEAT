@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class LineGraphDrawer : MonoBehaviour {
 
     public GameObject linePrefab;
+    public TextMesh displayText;
 
     List<GameObject> lines;
 
@@ -13,6 +14,11 @@ public class LineGraphDrawer : MonoBehaviour {
     LineRenderer linePlot;
     List<Vector2> linePlotList = new List<Vector2>();
     int vertextCount = 2;
+
+    List<string> informationList = new List<string>();
+    int INFORMATION_LIST_SIZE = 10;
+    
+
     void Start () {
         lines = new List<GameObject>();
         centerLocation = transform.position;
@@ -71,7 +77,7 @@ public class LineGraphDrawer : MonoBehaviour {
         
     }
 
-    public void PlotData(float dataPoint) {
+    public void PlotData(float dataPoint, string info) {
         float y = (seperationY * dataPoint) + centerLocation.y;
         float x = seperationX + oldLocation.x;
 
@@ -100,6 +106,24 @@ public class LineGraphDrawer : MonoBehaviour {
             linePlot.SetPosition(i, pos);          
         }
 
+        DisplayInformation(info);
+    }
+
+    
+    public void DisplayInformation(string info)
+    {
+        if (informationList.Count >= INFORMATION_LIST_SIZE)
+        {
+            informationList.RemoveAt(INFORMATION_LIST_SIZE - 1);
+        }
+
+        informationList.Insert(0, info);
+        displayText.text = "";
+
+        for (int i = 0; i < informationList.Count; i++)
+        {
+            displayText.text += informationList[i] + "\n";
+        }
 
     }
 }

@@ -297,203 +297,15 @@ public class Tester : MonoBehaviour
         if (hurt < 0)
             hurt = 0f;*/
 
-        float angle = -100f;
-        float angleAdd = 22.22f;
-        float distance = 10f;
-        int ignoreFoodLayer = ~(1 << 10);
-        Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir2 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir3 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir4 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir5 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir6 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir7 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir8 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-        angle += angleAdd;
-        Vector3 dir9 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
-
-        Vector2 position1 = bodies[0].transform.position + (0.35f * dir1);
-        RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, distance, ignoreFoodLayer);
-
-        Vector2 position2 = bodies[0].transform.position + (0.35f * dir2);
-        RaycastHit2D hit2 = Physics2D.Raycast(position2, dir2, distance, ignoreFoodLayer);
-
-        Vector2 position3 = bodies[0].transform.position + (0.35f * dir3);
-        RaycastHit2D hit3 = Physics2D.Raycast(position3, dir3, distance, ignoreFoodLayer);
-
-        Vector2 position4 = bodies[0].transform.position + (0.35f * dir4);
-        RaycastHit2D hit4 = Physics2D.Raycast(position4, dir4, distance, ignoreFoodLayer);
-
-        Vector2 position5 = bodies[0].transform.position + (0.35f * dir5);
-        RaycastHit2D hit5 = Physics2D.Raycast(position5, dir5, distance, ignoreFoodLayer);
-
-        Vector2 position6 = bodies[0].transform.position + (0.35f * dir6);
-        RaycastHit2D hit6 = Physics2D.Raycast(position6, dir6, distance, ignoreFoodLayer);
-
-        Vector2 position7 = bodies[0].transform.position + (0.35f * dir7);
-        RaycastHit2D hit7 = Physics2D.Raycast(position7, dir7, distance, ignoreFoodLayer);
-
-        Vector2 position8 = bodies[0].transform.position + (0.35f * dir8);
-        RaycastHit2D hit8 = Physics2D.Raycast(position8, dir8, distance, ignoreFoodLayer);
-
-        Vector2 position9 = bodies[0].transform.position + (0.35f * dir9);
-        RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, distance, ignoreFoodLayer);
-
-        Vector3 dir10 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 position10 = bodies[0].transform.position + (0.3f * dir10);
-        RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, distance, ignoreFoodLayer);
-
-        h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
-        bool draw = true;
-        float hitCreatureAdd = 0f;
-        string otherCreatureName = "B";
-        if (hit1.collider != null /*&& hit1.collider.name.StartsWith("F")*/)
-        {
-            h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / distance;
-            if (h1 != -1 && draw == true)
-                Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+       
+        if (start == false) {
+            UpdateOverTime();
+            start = true;
         }
-
-        if (hit2.collider != null /*&& hit2.collider.name.StartsWith("F")*/)
-        {
-            h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / distance;
-            if (h2 != -1 && draw == true)
-                Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
-        }
-
-        if (hit3.collider != null /*&& hit3.collider.name.StartsWith("F")*/)
-        {
-            h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / distance;
-            if (h3 != -1 && draw == true)
-                Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
-        }
-
-        if (hit4.collider != null /*&& hit4.collider.name.StartsWith("F")*/)
-        {
-            h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / distance;
-            if (h4 != -1 && draw == true)
-                Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
-        }
-
-        if (hit5.collider != null /*&& hit5.collider.name.StartsWith("F")*/)
-        {
-            h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / distance;
-            if (h5 != -1 && draw == true)
-                Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
-        }
-
-        if (hit6.collider != null /*&& hit6.collider.name.StartsWith("F")*/)
-        {
-            h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / distance;
-            if (h6 != -1 && draw == true)
-                Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
-        }
-
-        if (hit7.collider != null /*&& hit7.collider.name.StartsWith("F")*/)
-        {
-            h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / distance;
-            if (h7 != -1 && draw == true)
-                Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
-        }
-        if (hit8.collider != null /*&& hit8.collider.name.StartsWith("F")*/)
-        {
-            h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / distance;
-            if (h8 != -1 && draw == true)
-                Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
-        }
-        if (hit9.collider != null /*&& hit9.collider.name.StartsWith("F")*/)
-        {
-            h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / distance;
-            if (h9 != -1 && draw == true)
-                Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
-        }
-        if (hit10.collider != null /*&& hit10.collider.name.StartsWith("F")*/)
-        {
-            h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / distance;
-            if (h10 != -1 && draw == true)
-                Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
-        }
-
-        int ignoreLayer = ~(1 << 8);
-        Vector2 point = bodies[0].transform.position;
-        Collider2D[] cols = Physics2D.OverlapCircleAll(point,10f, ignoreLayer);
-
-        float distanceShort = 100f;
-        int indexShort = -1;
-
-        if (cols.Length > 0)
-        {
-            for (int i = 0; i < cols.Length; i++)
-            {
-                float newDistance = Vector2.Distance(point, cols[i].transform.position);
-                if (newDistance < distanceShort) {
-                    distanceShort = newDistance;
-                    indexShort = i;
-                }
-            }
-        }
-
-        float radShort = 0;
-        float disShort = -1;
-        if (indexShort != -1) {
-            Vector2 deltaVector = cols[indexShort].transform.position - bodies[0].transform.position;
-            deltaVector = deltaVector.normalized;
-
-            radShort = Mathf.Atan2(deltaVector.y, deltaVector.x);
-
-            radShort *= Mathf.Rad2Deg;
-            radShort = 90f - radShort;
-
-            if (radShort < 0f)
-            {
-                radShort += 360f;
-            }
-            radShort = 360 - radShort;
-
-            radShort -= bodies[0].transform.eulerAngles.z;
-            if (radShort < 0)
-                radShort = 360 + radShort;
-
-
-            if (radShort >= 180f)
-            {
-                radShort = 360 - radShort;
-                radShort *= -1f;
-            }
-
-            radShort *= Mathf.Deg2Rad;
-
-            disShort = Vector2.Distance(bodies[0].transform.position, cols[indexShort].transform.position);
-        }
- 
-        Vector2 dir = bodies[0].transform.up;
-        float[] inputValues = {/*radShort, disShort,*/h1,h2,h3,h4,h5,h6,h7,h8,h9, (damage/100f), bodies[0].transform.eulerAngles.z*Mathf.Deg2Rad };
-        output = net.FireNet(inputValues);
-
-
-        /*if (output[0] > 0f)
-            bodies[0].angularVelocity = 250f ;
-        else 
-            bodies[0].angularVelocity = -250f;
-
-        bodies[0].velocity = dir * 5;*/
-
-        bodies[0].angularVelocity = output[0]*250f;
-        if (output[1] >= 0)
-            bodies[0].velocity = dir * output[1] * 5f;
-        else
-            bodies[0].velocity /= 2f;
-
-        damage -= Time.deltaTime * 30f;
+        damage -= Time.deltaTime * 30;
     }
 
+    float stress = 0f;
     public void UpdateOverTime() {
         /*bodyRad = Mathf.Deg2Rad * bodies[0].transform.eulerAngles.z;
         leftUpRad1 = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
@@ -643,10 +455,149 @@ public class Tester : MonoBehaviour
            bodies[8].GetComponent<HingeJoint2D>().useMotor = true;
        bodies[8].GetComponent<HingeJoint2D>().motor = motor8;*/
 
+        float angle = -100f;
+        float angleAdd = 22.22f;
+        float distance = 10f;
+        int ignoreFoodLayer = ~(1 << 8);
+        Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir2 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir3 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir4 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir5 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir6 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir7 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir8 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir9 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
 
-       
+        Vector2 position1 = bodies[0].transform.position + (0.35f * dir1);
+        RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, distance, ignoreFoodLayer);
 
-        Invoke("UpdateOverTime",0.01f);
+        Vector2 position2 = bodies[0].transform.position + (0.35f * dir2);
+        RaycastHit2D hit2 = Physics2D.Raycast(position2, dir2, distance, ignoreFoodLayer);
+
+        Vector2 position3 = bodies[0].transform.position + (0.35f * dir3);
+        RaycastHit2D hit3 = Physics2D.Raycast(position3, dir3, distance, ignoreFoodLayer);
+
+        Vector2 position4 = bodies[0].transform.position + (0.35f * dir4);
+        RaycastHit2D hit4 = Physics2D.Raycast(position4, dir4, distance, ignoreFoodLayer);
+
+        Vector2 position5 = bodies[0].transform.position + (0.35f * dir5);
+        RaycastHit2D hit5 = Physics2D.Raycast(position5, dir5, distance, ignoreFoodLayer);
+
+        Vector2 position6 = bodies[0].transform.position + (0.35f * dir6);
+        RaycastHit2D hit6 = Physics2D.Raycast(position6, dir6, distance, ignoreFoodLayer);
+
+        Vector2 position7 = bodies[0].transform.position + (0.35f * dir7);
+        RaycastHit2D hit7 = Physics2D.Raycast(position7, dir7, distance, ignoreFoodLayer);
+
+        Vector2 position8 = bodies[0].transform.position + (0.35f * dir8);
+        RaycastHit2D hit8 = Physics2D.Raycast(position8, dir8, distance, ignoreFoodLayer);
+
+        Vector2 position9 = bodies[0].transform.position + (0.35f * dir9);
+        RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, distance, ignoreFoodLayer);
+
+        Vector3 dir10 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
+        Vector2 position10 = bodies[0].transform.position + (0.3f * dir10);
+        RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, distance, ignoreFoodLayer);
+
+        h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
+        bool draw = true;
+        float hitCreatureAdd = 0f;
+        string otherCreatureName = "B";
+        if (hit1.collider != null /*&& hit1.collider.name.StartsWith("F")*/)
+        {
+            h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / distance;
+            if (h1 != -1 && draw == true)
+                Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+        }
+
+        if (hit2.collider != null /*&& hit2.collider.name.StartsWith("F")*/)
+        {
+            h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / distance;
+            if (h2 != -1 && draw == true)
+                Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
+        }
+
+        if (hit3.collider != null /*&& hit3.collider.name.StartsWith("F")*/)
+        {
+            h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / distance;
+            if (h3 != -1 && draw == true)
+                Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
+        }
+
+        if (hit4.collider != null /*&& hit4.collider.name.StartsWith("F")*/)
+        {
+            h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / distance;
+            if (h4 != -1 && draw == true)
+                Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
+        }
+
+        if (hit5.collider != null /*&& hit5.collider.name.StartsWith("F")*/)
+        {
+            h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / distance;
+            if (h5 != -1 && draw == true)
+                Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
+        }
+
+        if (hit6.collider != null /*&& hit6.collider.name.StartsWith("F")*/)
+        {
+            h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / distance;
+            if (h6 != -1 && draw == true)
+                Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
+        }
+
+        if (hit7.collider != null /*&& hit7.collider.name.StartsWith("F")*/)
+        {
+            h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / distance;
+            if (h7 != -1 && draw == true)
+                Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
+        }
+        if (hit8.collider != null /*&& hit8.collider.name.StartsWith("F")*/)
+        {
+            h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / distance;
+            if (h8 != -1 && draw == true)
+                Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
+        }
+        if (hit9.collider != null /*&& hit9.collider.name.StartsWith("F")*/)
+        {
+            h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / distance;
+            if (h9 != -1 && draw == true)
+                Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
+        }
+        if (hit10.collider != null /*&& hit10.collider.name.StartsWith("F")*/)
+        {
+            h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / distance;
+            if (h10 != -1 && draw == true)
+                Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
+        }
+
+        Vector2 dir = bodies[0].transform.up;
+        float[] inputValues = { h1, h2, h3, h4, h5, h6, h7, h8, h9, (damage / 100f), bodies[0].transform.eulerAngles.z * Mathf.Deg2Rad };
+        output = net.FireNet(inputValues);
+
+        bodies[0].angularVelocity = output[0] * 250f;
+        if (output[1] >= 0)
+            bodies[0].velocity = dir * output[1] * 5f;
+        else
+            bodies[0].velocity /= 2f;
+
+        
+        /*stress = 0f;
+        if (output[2]>0)
+            stress = output[2];
+        float time = Mathf.Clamp(stress, 0.01f, 0.1f);
+        if (time < 0.01f)
+            time = 0.01f;*/
+
+        Invoke("UpdateOverTime", 0.08f);
     }
 
 
@@ -862,7 +813,7 @@ public class Tester : MonoBehaviour
     public void OtherActivity(int type) {
         //mutex.WaitOne();
         if (type == 0) {
-            //net.AddNetFitness(0.1f);
+            net.AddNetFitness(0.1f);
             damage = 100f;
             
         }

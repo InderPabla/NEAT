@@ -3,7 +3,6 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
 using ProgressBar;
 
 public class NEATGeneticControllerV2 : MonoBehaviour
@@ -13,7 +12,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     public GameObject progressBar;
     public GameObject netDrawer;
     public GameObject lineGraph;
-    public TextMesh displayText;
+   
     public List<Transform> bodies;
 
     public bool worldActivation = false;
@@ -46,7 +45,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
     private bool viewMode = false;
     private bool computing = false;
-    
+    private bool load = false;
+
     float currentIncrement = 0;
 
     public GameObject foodMakerPrefab;
@@ -65,8 +65,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             finished = new Semaphore(1, 1);
             //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
             //{1f, 2f, 2f, 2f} works for collision avoidance
-
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 2f, 2f, 2f);
+            
             operations = new DatabaseOperation();
 
             colors[0, 0] = UnityEngine.Random.Range(0f, 1f);
@@ -140,16 +139,44 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     }
 
     public void ActionCreateNew() {
-        GenerateInitialNets();
+        if (load == false) {
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 2f, 2f, 2f);
+            GenerateInitialNets();
+        }
+        else {
+            consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.25f, 2f, 2f, 2f);
+            NEATNet net = new NEATNet(operations.retrieveNet[operations.retrieveNet.Length-1], consultor);
+
+            species = new List<List<NEATNet>>();
+            List<NEATNet> initialList = new List<NEATNet>();
+            for (int i = 0; i < populationSize; i++) {
+                NEATNet netCopy = new NEATNet(net);
+                netCopy.SetNetFitness(0f);
+                netCopy.SetTimeLived(0f);
+                netCopy.SetTestTime(testTime);
+                netCopy.ClearNodeValues();
+                initialList.Add(netCopy);
+            }
+            species.Add(initialList);
+
+
+
+            //GenerateCopyNets(net);
+            //load = false;
+        }
     }
 
     public void ActionSetTimeScale(float timeScale) {
         Time.timeScale = timeScale;
     }
 
-    public void ActionSaveCurrent()
-    {
+    public void ActionSaveCurrent() {
         StartCoroutine(operations.SaveNet(bestNet,creatureName));
+    }
+
+    public void ActionDatabaseLoad()  {
+        StartCoroutine(operations.GetNet(creatureName));
+        load = true;
     }
 
     private void SetCameraLocation() {
@@ -185,14 +212,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         }
 
         if (computing == true) {
-            if (worldActivation == true) {
-                /*bodies[0].transform.localPosition += new Vector3(-Time.deltaTime / 1f, 0, 0);
-                bodies[1].transform.localPosition += new Vector3(Time.deltaTime / 1f, 0, 0);
-                bodies[2].transform.localPosition += new Vector3(0, Time.deltaTime / 4f, 0);
-                bodies[3].transform.localPosition += new Vector3(0, -Time.deltaTime / 4f, 0);*/
-
             
-            }
         }
 
         
@@ -200,22 +220,15 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
 
     private void DeleteWorld() {
-        if (worldActivation)
-        {
+        if (worldActivation) {
             Destroy(foodMaker);
         }
     }
     private void ResetWorld() {
         if (worldActivation) {
-            /*bodies[0].transform.localPosition = new Vector3(65f, 0, 0);
-            bodies[1].transform.localPosition = new Vector3(-65f, 0, 0);
-            bodies[2].transform.localPosition = new Vector3(0, -50f, 0);
-            bodies[3].transform.localPosition = new Vector3(0, 50f, 0);*/
             foodMaker = Instantiate(foodMakerPrefab);
         }
-        
     }
-
 
     private void GenerateInitialNets() {
         generationNumber = 0;
@@ -258,8 +271,52 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         }
     }
 
-    private void GenerateCopyNets(NEATNet net) {
+    private void GenerateCopyNets(NEATNet copyNet) {
+        generationNumber = 0;
+        testCounter = 0;
+        species = new List<List<NEATNet>>();
 
+        for (int i = 0; i < populationSize; i++)
+        {
+            NEATNet net = new NEATNet(copyNet);
+            for (int j = 0; j < 1; j++)
+            {
+                net.Mutate();
+            }
+
+            if (species.Count == 0)
+            {
+                List<NEATNet> newSpecies = new List<NEATNet>();
+                newSpecies.Add(net);
+                species.Add(newSpecies);
+            }
+            else
+            {
+                int numberOfSpecies = species.Count;
+                int location = -1;
+                for (int j = 0; j < numberOfSpecies; j++)
+                {
+                    int numberOfNets = species[j].Count;
+                    int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
+                    if (NEATNet.SameSpeciesV2(species[j][randomIndex], net))
+                    {
+                        location = j;
+                        break;
+                    }
+                }
+
+                if (location == -1)
+                {
+                    List<NEATNet> newSpecies = new List<NEATNet>();
+                    newSpecies.Add(net);
+                    species.Add(newSpecies);
+                }
+                else
+                {
+                    species[location].Add(net);
+                }
+            }
+        }
     }
 
     private void GeneratePopulation() {
@@ -367,9 +424,9 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             distribution = SortFitness(distribution);
 
             bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]);
-            lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness);
+            lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
 
-            DisplayInformation("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
+            //DisplayInformation("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
             netDrawer.SendMessage("DrawNet",bestNet);
             
             for (int i = 0; i < distribution.GetLength(0); i++) {
@@ -506,22 +563,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             }
         }
         return sort;
-    }
-
-    List<string> informationList = new List<string>();
-    int INFORMATION_LIST_SIZE = 10;
-    public void DisplayInformation(string info) {
-        if (informationList.Count >= INFORMATION_LIST_SIZE) {
-            informationList.RemoveAt(INFORMATION_LIST_SIZE-1);
-        }
-
-        informationList.Insert(0, info);
-        displayText.text = "";
-
-        for (int i = 0; i < informationList.Count; i++) {
-            displayText.text += informationList[i] + "\n";
-        }
-        
     }
 
     private bool ErrorCheck() {
