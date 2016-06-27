@@ -21,6 +21,10 @@ public class Tester : MonoBehaviour
 
     public Transform pos;
     bool finished = false;
+
+    public GameObject linePrefab;
+    private GameObject[] lineObjects = new GameObject[17];
+    private LineRenderer[] lines = new LineRenderer[17];
     void Start()
     {
         //mutex = new Semaphore(1, 1);
@@ -30,6 +34,14 @@ public class Tester : MonoBehaviour
         bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
         //transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f, 360f));
         //Invoke("TakePoint", 1f);
+
+        for (int i = 0; i < 17; i++) {
+            lineObjects[i] = (GameObject)Instantiate(linePrefab);
+            lineObjects[i].transform.parent = transform;
+            lines[i] = lineObjects[i].GetComponent<LineRenderer>();
+            lines[i].SetWidth(0.05f,0.05f);
+            
+        }
     }
     float avgAngle = 0;
     void TakePoint() {
@@ -73,7 +85,8 @@ public class Tester : MonoBehaviour
         }
     }
 
-    float h1 = -1f, h2 = -1f, h3 = -1f, h4 = -1f, h5 = -1f, h6 = -1f, h7 = -1f, h8 = -1f, h9 = -1f, h10 = -1f;
+    float h1 = -1f, h2 = -1f, h3 = -1f, h4 = -1f, h5 = -1f, h6 = -1f, h7 = -1f, h8 = -1f, h9 = -1f,
+        h10 = -1f, h11 = -1f, h12 = -1f, h13 = -1f, h14 = -1f, h15 = -1f, h16 = -1f, h17 = -1f;
     float[] output;
     float state = 0f;
     float hurt = 0f;
@@ -298,10 +311,10 @@ public class Tester : MonoBehaviour
             hurt = 0f;*/
 
        
-        if (start == false) {
+        //if (start == false) {
             UpdateOverTime();
-            start = true;
-        }
+            //start = true;
+        //}
         damage -= Time.deltaTime * 30;
     }
 
@@ -456,8 +469,8 @@ public class Tester : MonoBehaviour
        bodies[8].GetComponent<HingeJoint2D>().motor = motor8;*/
 
         float angle = -100f;
-        float angleAdd = 22.22f;
-        float distance = 10f;
+        float angleAdd = (22.22f)/2f;
+        float distance = 5f;
         int ignoreFoodLayer = ~(1 << 8);
         Vector3 dir1 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
         angle += angleAdd;
@@ -476,6 +489,23 @@ public class Tester : MonoBehaviour
         Vector3 dir8 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
         angle += angleAdd;
         Vector3 dir9 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir10 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir11 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir12 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir13 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir14 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir15 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir16 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+        angle += angleAdd;
+        Vector3 dir17 = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+
 
         Vector2 position1 = bodies[0].transform.position + (0.35f * dir1);
         RaycastHit2D hit1 = Physics2D.Raycast(position1, dir1, distance, ignoreFoodLayer);
@@ -504,83 +534,245 @@ public class Tester : MonoBehaviour
         Vector2 position9 = bodies[0].transform.position + (0.35f * dir9);
         RaycastHit2D hit9 = Physics2D.Raycast(position9, dir9, distance, ignoreFoodLayer);
 
-        Vector3 dir10 = Quaternion.AngleAxis(180f, Vector3.forward) * bodies[0].transform.up;
-        Vector2 position10 = bodies[0].transform.position + (0.3f * dir10);
+        Vector2 position10 = bodies[0].transform.position + (0.35f * dir10);
         RaycastHit2D hit10 = Physics2D.Raycast(position10, dir10, distance, ignoreFoodLayer);
 
-        h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f; h10 = -1f;
+        Vector2 position11 = bodies[0].transform.position + (0.35f * dir11);
+        RaycastHit2D hit11 = Physics2D.Raycast(position11, dir11, distance, ignoreFoodLayer);
+
+        Vector2 position12 = bodies[0].transform.position + (0.35f * dir12);
+        RaycastHit2D hit12 = Physics2D.Raycast(position12, dir12, distance, ignoreFoodLayer);
+
+        Vector2 position13 = bodies[0].transform.position + (0.35f * dir13);
+        RaycastHit2D hit13 = Physics2D.Raycast(position13, dir13, distance, ignoreFoodLayer);
+
+        Vector2 position14 = bodies[0].transform.position + (0.35f * dir14);
+        RaycastHit2D hit14 = Physics2D.Raycast(position14, dir14, distance, ignoreFoodLayer);
+
+        Vector2 position15 = bodies[0].transform.position + (0.35f * dir15);
+        RaycastHit2D hit15 = Physics2D.Raycast(position15, dir15, distance, ignoreFoodLayer);
+
+        Vector2 position16 = bodies[0].transform.position + (0.35f * dir16);
+        RaycastHit2D hit16 = Physics2D.Raycast(position16, dir16, distance, ignoreFoodLayer);
+
+        Vector2 position17 = bodies[0].transform.position + (0.35f * dir17);
+        RaycastHit2D hit17 = Physics2D.Raycast(position17, dir17, distance, ignoreFoodLayer);
+
+        for (int i = 0; i < 17; i++)
+        {
+            lines[i].SetPosition(0, Vector3.zero);
+            lines[i].SetPosition(1, Vector3.zero);
+        }
+
+        h1 = -1f; h2 = -1f; h3 = -1f; h4 = -1f; h5 = -1f; h6 = -1f; h7 = -1f; h8 = -1f; h9 = -1f;
+        h10 = -1f; h11 = -1; h12 = -1; h13 = -1; h14 = -1; h15 = -1; h16 = -1; h17 = -1;
         bool draw = true;
         float hitCreatureAdd = 0f;
         string otherCreatureName = "B";
-        if (hit1.collider != null /*&& hit1.collider.name.StartsWith("F")*/)
+        if (hit1.collider != null)
         {
             h1 = Vector2.Distance(hit1.point, bodies[0].transform.position) / distance;
-            if (h1 != -1 && draw == true)
-                Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+            lines[0].SetPosition(0, position1);
+            if (h1 != -1 && draw == true) {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[0].SetPosition(1, hit1.point);
+            }
+            
+           
         }
 
-        if (hit2.collider != null /*&& hit2.collider.name.StartsWith("F")*/)
+        if (hit2.collider != null)
         {
             h2 = Vector2.Distance(hit2.point, bodies[0].transform.position) / distance;
-            if (h2 != -1 && draw == true)
-                Debug.DrawLine(position2, hit2.point, Color.red, 0.002f);
+            lines[1].SetPosition(0, position2);
+            if (h2 != -1 && draw == true) {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[1].SetPosition(1, hit2.point);
+            }
         }
 
-        if (hit3.collider != null /*&& hit3.collider.name.StartsWith("F")*/)
+        if (hit3.collider != null)
         {
             h3 = Vector2.Distance(hit3.point, bodies[0].transform.position) / distance;
+            lines[2].SetPosition(0, position3);
             if (h3 != -1 && draw == true)
-                Debug.DrawLine(position3, hit3.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[2].SetPosition(1, hit3.point);
+            }
         }
 
-        if (hit4.collider != null /*&& hit4.collider.name.StartsWith("F")*/)
+        if (hit4.collider != null)
         {
             h4 = Vector2.Distance(hit4.point, bodies[0].transform.position) / distance;
+            lines[3].SetPosition(0, position4);
             if (h4 != -1 && draw == true)
-                Debug.DrawLine(position4, hit4.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+              
+                lines[3].SetPosition(1, hit4.point);
+            }
         }
 
-        if (hit5.collider != null /*&& hit5.collider.name.StartsWith("F")*/)
+        if (hit5.collider != null)
         {
             h5 = Vector2.Distance(hit5.point, bodies[0].transform.position) / distance;
+            lines[4].SetPosition(0, position5);
             if (h5 != -1 && draw == true)
-                Debug.DrawLine(position5, hit5.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[4].SetPosition(1, hit5.point);
+            }
         }
 
-        if (hit6.collider != null /*&& hit6.collider.name.StartsWith("F")*/)
+        if (hit6.collider != null)
         {
             h6 = Vector2.Distance(hit6.point, bodies[0].transform.position) / distance;
+            lines[5].SetPosition(0, position6);
             if (h6 != -1 && draw == true)
-                Debug.DrawLine(position6, hit6.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[5].SetPosition(1, hit6.point);
+            }
         }
 
-        if (hit7.collider != null /*&& hit7.collider.name.StartsWith("F")*/)
+        if (hit7.collider != null)
         {
             h7 = Vector2.Distance(hit7.point, bodies[0].transform.position) / distance;
+            lines[6].SetPosition(0, position7);
             if (h7 != -1 && draw == true)
-                Debug.DrawLine(position7, hit7.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[6].SetPosition(1, hit7.point);
+            }
         }
-        if (hit8.collider != null /*&& hit8.collider.name.StartsWith("F")*/)
+        if (hit8.collider != null)
         {
             h8 = Vector2.Distance(hit8.point, bodies[0].transform.position) / distance;
+            lines[7].SetPosition(0, position8);
             if (h8 != -1 && draw == true)
-                Debug.DrawLine(position8, hit8.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[7].SetPosition(1, hit8.point);
+            }
         }
-        if (hit9.collider != null /*&& hit9.collider.name.StartsWith("F")*/)
+        if (hit9.collider != null)
         {
             h9 = Vector2.Distance(hit9.point, bodies[0].transform.position) / distance;
+            lines[8].SetPosition(0, position9);
             if (h9 != -1 && draw == true)
-                Debug.DrawLine(position9, hit9.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[8].SetPosition(1, hit9.point);
+            }
         }
-        if (hit10.collider != null /*&& hit10.collider.name.StartsWith("F")*/)
+
+        if (hit10.collider != null)
         {
             h10 = Vector2.Distance(hit10.point, bodies[0].transform.position) / distance;
+            lines[9].SetPosition(0, position10);
             if (h10 != -1 && draw == true)
-                Debug.DrawLine(position10, hit10.point, Color.red, 0.002f);
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[9].SetPosition(1, hit10.point);
+            }
+        }
+
+        if (hit11.collider != null)
+        {
+            h11 = Vector2.Distance(hit11.point, bodies[0].transform.position) / distance;
+            lines[10].SetPosition(0, position11);
+            if (h11 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[10].SetPosition(1, hit11.point);
+            }
+        }
+
+        if (hit12.collider != null)
+        {
+            h12 = Vector2.Distance(hit12.point, bodies[0].transform.position) / distance;
+            lines[11].SetPosition(0, position12);
+            if (h12 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[11].SetPosition(1, hit12.point);
+            }
+        }
+
+        if (hit13.collider != null)
+        {
+            h13 = Vector2.Distance(hit13.point, bodies[0].transform.position) / distance;
+            lines[12].SetPosition(0, position13);
+            if (h13 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[12].SetPosition(1, hit13.point);
+            }
+        }
+
+        if (hit14.collider != null)
+        {
+            h14 = Vector2.Distance(hit14.point, bodies[0].transform.position) / distance;
+            lines[13].SetPosition(0, position14);
+            if (h14 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[13].SetPosition(1, hit14.point);
+            }
+        }
+
+        if (hit15.collider != null)
+        {
+            h15 = Vector2.Distance(hit15.point, bodies[0].transform.position) / distance;
+            lines[14].SetPosition(0, position15);
+            if (h15 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[14].SetPosition(1, hit15.point);
+            }
+        }
+
+        if (hit16.collider != null)
+        {
+            h16 = Vector2.Distance(hit16.point, bodies[0].transform.position) / distance;
+            lines[15].SetPosition(0, position16);
+            if (h16 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+               
+                lines[15].SetPosition(1, hit16.point);
+            }
+        }
+
+        if (hit17.collider != null)
+        {
+            h17 = Vector2.Distance(hit17.point, bodies[0].transform.position) / distance;
+            lines[16].SetPosition(0, position17);
+            if (h17 != -1 && draw == true)
+            {
+                //Debug.DrawLine(position1, hit1.point, Color.red, 0.002f);
+                
+                lines[16].SetPosition(1, hit17.point);
+            }
         }
 
         Vector2 dir = bodies[0].transform.up;
-        float[] inputValues = { h1, h2, h3, h4, h5, h6, h7, h8, h9, (damage / 100f), bodies[0].transform.eulerAngles.z * Mathf.Deg2Rad };
+        float[] inputValues = { h1, h2, h3, h4, h5, h6, h7, h8, h9, h10,h11,h12,h13,h14,h15,h16,h17,(damage / 100f), bodies[0].transform.eulerAngles.z * Mathf.Deg2Rad };
         output = net.FireNet(inputValues);
 
         bodies[0].angularVelocity = output[0] * 250f;
@@ -597,7 +789,7 @@ public class Tester : MonoBehaviour
         if (time < 0.01f)
             time = 0.01f;*/
 
-        Invoke("UpdateOverTime", 0.08f);
+        //Invoke("UpdateOverTime", 0.08f);
     }
 
 
@@ -819,7 +1011,13 @@ public class Tester : MonoBehaviour
         }
         if (type == 1) {
             net.SetNetFitness(net.GetNetFitness()*0f);
+            //net.SetNetFitness(net.GetNetFitness()/2f);
             OnFinished();
+        }
+        if (type == 2)
+        {
+            //net.SetNetFitness(net.GetNetFitness()/2f);
+            //OnFinished();
         }
         /* (type == 1)
         {

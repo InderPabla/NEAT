@@ -11,18 +11,18 @@ public class CollsionCheck : MonoBehaviour {
 
         if (coll.collider.name.Contains("Food"))
         {
-
             transform.parent.SendMessage("OtherActivity", (object)0);
-
             Destroy(coll.gameObject);
         }
-        else {
-            //transform.parent.SendMessage("OnFinished");
+        else if (coll.collider.name.Contains("Ground")){
             transform.parent.SendMessage("OtherActivity", (object)1);
+        }
+        else  {
+            transform.parent.SendMessage("OtherActivity", (object)2);
         }
 
         //transform.parent.SendMessage("OnFinished");
-       
+
     }
 
     void OnCollisionExit2D(Collision2D coll)
