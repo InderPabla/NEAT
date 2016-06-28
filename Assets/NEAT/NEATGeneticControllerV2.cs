@@ -109,13 +109,18 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     }
 
     public void ActionGeneration(int gens) {
-        if (numberOfGenerationsToRun == 0 && species.Count>0) {
+        if (numberOfGenerationsToRun == 0 && species.Count > 0) {
             progressBar.GetComponent<ProgressRadialBehaviour>().Value = 0;
             computing = true;
             currentIncrement = 100f / gens;
             numberOfGenerationsToRun = gens;
             GeneratePopulation();
-        }    
+            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Running " + gens + " generations");
+        }
+        else {
+            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Simulation currently running");
+        }
+          
     }
 
     public void ActionViewCurrent() {
@@ -134,7 +139,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             for (int i = 0; i < populationSize; i++) {
                 newSpecies.Add(new NEATNet(bestNet));
             }
-            species.Add(newSpecies);
+            species.Add(newSpecies); 
         }
     }
 
@@ -142,6 +147,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         if (load == false) {
             consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 2f, 2f, 2f);
             GenerateInitialNets();
+            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: New neural networks created");
         }
         else {
             consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.25f, 2f, 2f, 2f);
@@ -158,9 +164,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 initialList.Add(netCopy);
             }
             species.Add(initialList);
-
-
-
+            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Neural networks copied from sample");
             //GenerateCopyNets(net);
             //load = false;
         }
@@ -168,10 +172,12 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
     public void ActionSetTimeScale(float timeScale) {
         Time.timeScale = timeScale;
+        lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Time changed to "+ timeScale);
     }
 
     public void ActionSaveCurrent() {
         StartCoroutine(operations.SaveNet(bestNet,creatureName));
+        
     }
 
     public void ActionDatabaseLoad()  {
@@ -425,14 +431,11 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
             bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]);
             lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
-
-            //DisplayInformation("Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
             netDrawer.SendMessage("DrawNet",bestNet);
             
             for (int i = 0; i < distribution.GetLength(0); i++) {
                 distribution[i, 1] = (int)((distribution[i, 1] / totalSharedFitness) * populationSize);
                 totalOrganisums += distribution[i, 1];
-                //Debug.Log(distribution[i, 0] + " " + i + " " + species[i].Count + " " + distribution[i, 1]);
             }
 
             for (int i = 0; i < (populationSize - totalOrganisums); i++) {
@@ -512,12 +515,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour
                 }
             }
         } //number of generation > 0
-        /*float deltaThresh = consultor.GetDeltaThreshold();
-
-        if (species.Count < 10)
-            consultor.SetDeltaThreshold(deltaThresh-(deltaThresh*0.5f));
-        else
-            consultor.SetDeltaThreshold(deltaThresh + (deltaThresh * 0.5f));*/
 
         if (numberOfGenerationsToRun > 0) {
             numberOfGenerationsToRun--;
@@ -529,7 +526,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             computing = false;
             SetCameraLocation();
         }
-        //ResetWorld();
     }
 
     private float[,] SortedFitnessIndicies(List<NEATNet> organisums) {

@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public class LineGraphDrawer : MonoBehaviour {
 
     public GameObject linePrefab;
-    public TextMesh displayText;
+    public TextMesh displayGenerationalText;
+    public TextMesh displayActionText;
 
     List<GameObject> lines;
 
@@ -15,7 +16,8 @@ public class LineGraphDrawer : MonoBehaviour {
     List<Vector2> linePlotList = new List<Vector2>();
     int vertextCount = 2;
 
-    List<string> informationList = new List<string>();
+    List<string> generationalInformationList = new List<string>();
+    List<string> actionInformationList = new List<string>();
     int INFORMATION_LIST_SIZE = 10;
     
 
@@ -106,23 +108,34 @@ public class LineGraphDrawer : MonoBehaviour {
             linePlot.SetPosition(i, pos);          
         }
 
-        DisplayInformation(info);
+        DisplayGenerationalInformation(info);
     }
 
     
-    public void DisplayInformation(string info)
-    {
-        if (informationList.Count >= INFORMATION_LIST_SIZE)
-        {
-            informationList.RemoveAt(INFORMATION_LIST_SIZE - 1);
+    public void DisplayGenerationalInformation(string info) {
+        if (generationalInformationList.Count >= INFORMATION_LIST_SIZE) {
+            generationalInformationList.RemoveAt(INFORMATION_LIST_SIZE - 1);
         }
 
-        informationList.Insert(0, info);
-        displayText.text = "";
+        generationalInformationList.Insert(0, info);
+        displayGenerationalText.text = "";
 
-        for (int i = 0; i < informationList.Count; i++)
-        {
-            displayText.text += informationList[i] + "\n";
+        for (int i = 0; i < generationalInformationList.Count; i++) {
+            displayGenerationalText.text += generationalInformationList[i] + "\n";
+        }
+    }
+
+    public void DisplayActionInformation(string info)
+    {
+        if (actionInformationList.Count >= INFORMATION_LIST_SIZE) {
+            actionInformationList.RemoveAt(INFORMATION_LIST_SIZE - 1);
+        }
+
+        actionInformationList.Insert(0, info);
+        displayActionText.text = "";
+
+        for (int i = 0; i < actionInformationList.Count; i++) {
+            displayActionText.text += actionInformationList[i] + "\n";
         }
 
     }
