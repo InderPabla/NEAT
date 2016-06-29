@@ -145,12 +145,12 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
     public void ActionCreateNew() {
         if (load == false) {
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 2f, 2f, 2f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.2f, 2f, 2f, 4f);
             GenerateInitialNets();
             lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: New neural networks created");
         }
         else {
-            consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.25f, 2f, 2f, 2f);
+            consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.2f, 2f, 2f, 4f);
             NEATNet net = new NEATNet(operations.retrieveNet[operations.retrieveNet.Length-1], consultor);
 
             species = new List<List<NEATNet>>();

@@ -47,12 +47,13 @@ public class NEATNetDraw : MonoBehaviour {
             locationIndex++;
         }
 
-        staryY = (topLeft.y - (numberOfInputs / 2f)) + (numberOfOutputs / 2f);
+        //staryY = (topLeft.y - (numberOfInputs / 2f)) + (numberOfOutputs / 2f);
+        staryY = (topLeft.y);
         for (int i = numberOfInputs; i < hiddenStartIndex; i++) {
             Vector3 loc = new Vector3(topLeft.x + 7f, staryY, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
             node.transform.parent = transform;
-            node.GetComponent<Renderer>().material.color = Color.red;
+            node.GetComponent<Renderer>().material.color = Color.white;
             nodeList.Add(node);
             staryY--;
 
@@ -67,10 +68,10 @@ public class NEATNetDraw : MonoBehaviour {
             xn = Mathf.Sin(Mathf.Deg2Rad * angle) * 2;
             yn = Mathf.Cos(Mathf.Deg2Rad * angle) * 2;
 
-            Vector3 loc = new Vector3(xn + 3.5f + topLeft.x, (yn + topLeft.y) - numberOfInputs / 2f, 0);
+            Vector3 loc = new Vector3(xn + /*3.5f*/5f + topLeft.x, ((yn + topLeft.y) - (numberOfInputs / 2f))-7f, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
             node.transform.parent = transform;
-            node.GetComponent<Renderer>().material.color = Color.magenta;
+            node.GetComponent<Renderer>().material.color = Color.red;
             nodeList.Add(node);
             angle += (360f / numberOfHiddens);
 
@@ -82,33 +83,38 @@ public class NEATNetDraw : MonoBehaviour {
         int colSize = geneConnections.GetLength(0);
         
         for (int i = 0; i < colSize; i++) {
-            GameObject lineObj = (GameObject)Instantiate(linePrefab);
-            lineObj.transform.parent = transform;
-            lineList.Add(lineObj);
-            LineRenderer lineRen = lineObj.GetComponent<LineRenderer>();
-            lineRen.SetPosition(0, locations[(int)geneConnections[i][0]]);
-            lineRen.SetPosition(1, locations[(int)geneConnections[i][1]]);
-            lineRen.material = new Material(Shader.Find("Particles/Additive"));
-            float size = 0.1f;
-            float weight = geneConnections[i][2];
-            float factor = Mathf.Abs(weight);
-            Color color;
+            if (geneConnections[i][2] != 0f){
+                GameObject lineObj = (GameObject)Instantiate(linePrefab);
+                lineObj.transform.parent = transform;
+                lineList.Add(lineObj);
+                LineRenderer lineRen = lineObj.GetComponent<LineRenderer>();
+                lineRen.SetPosition(0, locations[(int)geneConnections[i][0]]);
+                if ((int)geneConnections[i][0] != (int)geneConnections[i][1])
+                    lineRen.SetPosition(1, locations[(int)geneConnections[i][1]]);
+                else
+                    lineRen.SetPosition(1, locations[(int)geneConnections[i][1]] + new Vector3(1f, 0, 0));
+                lineRen.material = new Material(Shader.Find("Particles/Additive"));
+                float size = 0.1f;
+                float weight = geneConnections[i][2];
+                float factor = Mathf.Abs(weight);
+                Color color;
 
-            if (weight > 0)
-                color = Color.green;
-            else if (weight < 0)
-                color = Color.red;
-            else
-                color = Color.white;
+                if (weight > 0)
+                    color = Color.green;
+                else if (weight < 0)
+                    color = Color.red;
+                else
+                    color = Color.white;
 
-            size = size * factor;
-            if (size < 0.05f)
-                size = 0.05f;
-            if (size > 0.15f)
-                size = 0.15f;
+                size = size * factor;
+                if (size < 0.05f)
+                    size = 0.05f;
+                if (size > 0.15f)
+                    size = 0.15f;
 
-            lineRen.SetColors(color, color);
-            lineRen.SetWidth(size,size);
+                lineRen.SetColors(color, color);
+                lineRen.SetWidth(0.05f, 0.05f);
+            }
         } 
     }
 

@@ -127,10 +127,10 @@ public class Tester : MonoBehaviour
 
         rad2 *= Mathf.Deg2Rad;*/
 
-        if(start == false)
+        //if(start == false)
             UpdateOverTime();
-        start = true;
-
+        //start = true;
+        
 
         float angle = -100f;
         float angleAdd = (22.22f) / 2f;
@@ -201,7 +201,7 @@ public class Tester : MonoBehaviour
         else
             bodies[0].velocity /= 2f;
 
-        Invoke("UpdateOverTime",0.1f);
+        //Invoke("UpdateOverTime",0.1f);
     }
     
     //--Add your own neural net fail code here--//
@@ -386,7 +386,7 @@ public class Tester : MonoBehaviour
         mutex.WaitOne();
 
         if (type == 0) {
-            net.AddNetFitness(0.1f);
+            net.AddNetFitness(0.25f);
             damage = 100f;
         }
 
