@@ -12,7 +12,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     public GameObject progressBar;
     public GameObject netDrawer;
     public GameObject lineGraph;
-   
+    public GameObject arrow;
+
     public List<Transform> bodies;
 
     public bool worldActivation = false;
@@ -60,6 +61,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
         
         if (ErrorCheck() == false)
         {
+            Time.timeScale = 1f;
             timeScale = Time.timeScale;
             testCounter = 0;
             finished = new Semaphore(1, 1);
@@ -145,12 +147,12 @@ public class NEATGeneticControllerV2 : MonoBehaviour
 
     public void ActionCreateNew() {
         if (load == false) {
-            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.2f, 2f, 2f, 4f);
+            consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, 0.25f, 2f, 2f, 2f);
             GenerateInitialNets();
             lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: New neural networks created");
         }
         else {
-            consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.2f, 2f, 2f, 4f);
+            consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], 0.25f, 2f, 2f, 2f);
             NEATNet net = new NEATNet(operations.retrieveNet[operations.retrieveNet.Length-1], consultor);
 
             species = new List<List<NEATNet>>();
@@ -171,6 +173,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     }
 
     public void ActionSetTimeScale(float timeScale) {
+        this.timeScale = timeScale;
         Time.timeScale = timeScale;
         lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Time changed to "+ timeScale);
     }
@@ -206,7 +209,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour
     private void FixedUpdate() {
         
 
-        if (timeScale <= 1f) {
+        if (timeScale <= 2f) {
             if (Input.GetMouseButtonDown(0)) {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit2D hit = Physics2D.GetRayIntersection(ray, Mathf.Infinity);
@@ -221,7 +224,11 @@ public class NEATGeneticControllerV2 : MonoBehaviour
             
         }
 
-        
+        if (timeScale <= 2) {
+            Vector3 worldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            worldPos.z = -1f;
+            arrow.transform.position = worldPos;
+        }
     }
 
 

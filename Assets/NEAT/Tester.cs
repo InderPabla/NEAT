@@ -134,7 +134,7 @@ public class Tester : MonoBehaviour
 
         float angle = -100f;
         float angleAdd = (22.22f) / 2f;
-        float distance = 5f;
+        float distance = 10f;
         float outDistance = 0.35f;
         int ignoreFoodLayer = ~(1 << 8);
 
@@ -142,6 +142,9 @@ public class Tester : MonoBehaviour
         Vector3[] relativePosition = new Vector3[18];
         RaycastHit2D[] rayHit = new RaycastHit2D[18];
 
+        float redness = 1f-(damage / 100f);
+        Color lineColor = new Color(1f, redness, redness);
+        
 
         for (int i = 0; i < 18; i++) {
             direction[i] = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
@@ -157,6 +160,8 @@ public class Tester : MonoBehaviour
             else {
                 lines[i].SetPosition(1, relativePosition[i]);
             }
+
+            lines[i].SetColors(lineColor, lineColor);
 
             angle += angleAdd;
         }
