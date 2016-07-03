@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using LitJson;
 
+/// <summary>
+/// 
+/// </summary>
 public class DatabaseOperation  {
 
 
@@ -13,6 +16,12 @@ public class DatabaseOperation  {
     public WWW web;
     public bool done = false;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="net"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public IEnumerator SaveNet(NEATNet net,string name) {
         string page = insertPage;
 
@@ -41,6 +50,11 @@ public class DatabaseOperation  {
         yield return web;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public IEnumerator GetNet(string name) {
         string page = retrievePage;
 
@@ -55,6 +69,10 @@ public class DatabaseOperation  {
         JsonParser(web.text);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="jsonText"></param>
     public void JsonParser(string jsonText) {
         JsonReader reader  = new JsonReader(jsonText);
         JsonData data = JsonMapper.ToObject(reader);

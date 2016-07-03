@@ -1,5 +1,7 @@
-﻿public class NEATPacket
-{
+﻿/// <summary>
+/// 
+/// </summary>
+public class NEATPacket {
     public int creature_id { get; set; }
     public string creature_name { get; set; }
     public int node_total { get; set; }

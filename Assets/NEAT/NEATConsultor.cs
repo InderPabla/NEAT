@@ -112,18 +112,15 @@ public class NEATConsultor  {
         return geneList.Count;
     }
 
-    public string GetGenomeString()
-    {
+    public string GetGenomeString() {
         string genome = "";
         int numberOfGenes = geneList.Count;
 
-        for (int i = 0; i < numberOfGenes; i++)
-        {
+        for (int i = 0; i < numberOfGenes; i++) {
             NEATGene gene = geneList[i];
             genome += gene.GetGeneString();
 
-            if (i < numberOfGenes - 1)
-            {
+            if (i < numberOfGenes - 1) {
                 genome += "_";
             }
         }

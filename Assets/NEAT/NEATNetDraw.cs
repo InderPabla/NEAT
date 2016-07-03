@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// 
+/// </summary>
 public class NEATNetDraw : MonoBehaviour {
     public GameObject linePrefab;
     public GameObject nodePrefab;
@@ -11,18 +14,26 @@ public class NEATNetDraw : MonoBehaviour {
     private Vector3[] locations;
     private Vector3 topLeft;
 
-    // Use this for initialization
+    /// <summary>
+    /// 
+    /// </summary>
     void Start () {
         lineList = new List<GameObject>();
         nodeList = new List<GameObject>();
         topLeft = transform.position;
     }
 	
-	// Update is called once per frame
+	/// <summary>
+    /// 
+    /// </summary>
 	void Update () {
 	    
 	}
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="net"></param>
     public void DrawNet(NEATNet net) {
         Clear();
 
@@ -118,6 +129,9 @@ public class NEATNetDraw : MonoBehaviour {
         } 
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void Clear() {
         for(int i = 0; i < lineList.Count; i++) {
             Destroy(lineList[i]);

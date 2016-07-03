@@ -1,5 +1,8 @@
 ﻿using System;
 
+/// <summary>
+/// 
+/// </summary>
 public class NEATNode {
 
     //constant node types
@@ -13,12 +16,21 @@ public class NEATNode {
 
     private float value;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="copy"></param>
     public NEATNode(NEATNode copy) {
         this.ID = copy.ID;
         this.type = copy.type;
         this.value = copy.value;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ID"></param>
+    /// <param name="type"></param>
     public NEATNode(int ID, int type) {
         this.ID = ID;
         this.type = type;      
@@ -31,25 +43,42 @@ public class NEATNode {
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public int GetNodeID() {
         return ID;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public int GetNodeType(){
         return type;
     }
 
-    public float GetValue()
-    {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public float GetValue() {
         return value;
     }
 
-    public void SetValue(float value)
-    {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetValue(float value) {
         if(type != INPUT_BIAS_NODE)
             this.value = value;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public void Activation() {
         value =  (float)Math.Tanh(value);
         //value= 1.0f / (1.0f + (float)Math.Exp(-value));
