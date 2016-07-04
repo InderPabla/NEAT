@@ -4,99 +4,98 @@ using UnityEngine;
 using System.Linq;
 
 /// <summary>
-/// 
+/// Handels mutation, crossover, specification, feedforward activation and creation of neural network genome. 
 /// </summary>
 public class NEATNet {
 
-    private NEATConsultor consultor;
+    private NEATConsultor consultor; //Handles consultor genome sequence
 
-    private List<NEATGene> geneList;
-    private List<NEATNode> nodeList;
+    private List<NEATGene> geneList; //list of the genome sequence for this neural network
+    private List<NEATNode> nodeList; //list of nodes for this neural network
 
-    private int numberOfInputs;
-    private int numberOfOutputs;
-    private int[] netID = new int[2];
+    private int numberOfInputs; //Number of input perceptrons of neural network (including bias)
+    private int numberOfOutputs; //Number of output perceptrons 
+    private int[] netID = new int[2]; //ID of this neural network
 
-    private float time;
-    private float timeLived;
-    private float netFitness;
+    private float time; //time to run test on this neural network
+    private float timeLived; //time the neural network actually lived in the test enviroment
+    private float netFitness; //fitness of this neural network
 
     /// <summary>
-    /// 
+    /// Creating neural network structure from deep copying another network
     /// </summary>
-    /// <param name="copy"></param>
+    /// <param name="copy">Neural network to deep copy</param>
     public NEATNet(NEATNet copy) {
-        this.consultor = copy.consultor;
-        this.numberOfInputs = copy.numberOfInputs;
-        this.numberOfOutputs = copy.numberOfOutputs;
+        this.consultor = copy.consultor; //shallow copy consultor
+        this.numberOfInputs = copy.numberOfInputs; //copy number of inputs
+        this.numberOfOutputs = copy.numberOfOutputs; //copy number of outputs
 
-        CopyNodes(copy.nodeList);
-        CopyGenes(copy.geneList);
+        CopyNodes(copy.nodeList); //deep copy node list
+        CopyGenes(copy.geneList); //deep copy gene list
 
-        this.netID = new int[2];
-        this.time = 0f;
-        this.netFitness = 0f;
-        this.timeLived = 0f;
+        this.netID = new int[2]; //reset ID
+        this.time = 0f; //reset time
+        this.netFitness = 0f; //reset fitness
+        this.timeLived = 0f; //reset time lived
     }
 
     /// <summary>
-    /// 
+    /// Creating neural network structure using neat packet from database
     /// </summary>
-    /// <param name="packet"></param>
-    /// <param name="consultor"></param>
+    /// <param name="packet">Neat packet received from database</param>
+    /// <param name="consultor">Consultor with master genome and specification information</param>
     public NEATNet(NEATPacket packet, NEATConsultor consultor) {
-        this.consultor = consultor;
-        this.numberOfInputs = packet.node_inputs;
-        this.numberOfOutputs = packet.node_outputs;
-        
-        InitilizeNodes();
+        this.consultor = consultor; //shallow copy consultor
+        this.numberOfInputs = packet.node_inputs; //copy number of inputs
+        this.numberOfOutputs = packet.node_outputs; //copy number of outputs
 
-        int numberOfNodes = packet.node_total;
-        int numberOfgenes = packet.gene_total;
-        int informationSize = NEATGene.GENE_INFORMATION_SIZE;
+        int numberOfNodes = packet.node_total; //number of nodes in the network from database
+        int numberOfgenes = packet.gene_total; //number of genes in the network from database
+        int informationSize = NEATGene.GENE_INFORMATION_SIZE; //size of genome information
 
-        NEATNode node = null;
-        NEATGene gene = null;
+        geneList = new List<NEATGene>(); //create an empty gene list
 
-        for (int i = numberOfInputs + numberOfOutputs; i < numberOfNodes; i++) {
-            node = new NEATNode(i, NEATNode.HIDDEN_NODE);
-            nodeList.Add(node);
+        InitilizeNodes(); //initialize initial nodes
+
+        for (int i = numberOfInputs + numberOfOutputs; i < numberOfNodes; i++) { //run through the left over nodes, since (numberOfInputs + numberOfOutputs) where created by initilize node method
+            NEATNode node = new NEATNode(i, NEATNode.HIDDEN_NODE); //create node with index i as id and will be hidden node
+            nodeList.Add(node); //add node to node list
         }
 
-        float[] geneInformation = packet.genome.Split('_').Select(x => float.Parse(x)).ToArray();
-        geneList = new List<NEATGene>();
+        float[] geneInformation = packet.genome.Split('_').Select(x => float.Parse(x)).ToArray(); //using Linq libary and delimiters, parse and spilt string genome from neat packet into float array
 
-        for (int i = 0; i < geneInformation.Length; i+=informationSize) {
-            int inno = this.consultor.CheckGeneExistance((int)geneInformation[i], (int)geneInformation[i + 1]);
-            gene = new NEATGene(inno, (int)geneInformation[i], (int)geneInformation[i + 1], geneInformation[i + 2], geneInformation[i + 3] == 1.0? true:false);
-            geneList.Add(gene);
+        for (int i = 0; i < geneInformation.Length; i+=informationSize) { //run through all gene information, 4 information make up 1 gene, thus increment by 4
+            int inno = this.consultor.CheckGeneExistance((int)geneInformation[i], (int)geneInformation[i + 1]); //check if this gene exists in the consultor
+            NEATGene gene = new NEATGene(inno, (int)geneInformation[i], (int)geneInformation[i + 1], geneInformation[i + 2], geneInformation[i + 3] == 1.0? true:false); //create gene
+            geneList.Add(gene); //add gene to the gene list
         }
 
-        this.netID = new int[2];
-        this.time = 0f;
-        this.netFitness = 0f;
-        this.timeLived = 0f;
+        this.netID = new int[2]; //reset ID
+        this.time = 0f; //reset time
+        this.netFitness = 0f; //reset fitness
+        this.timeLived = 0f; //reset time lived
     }
 
     /// <summary>
-    /// 
+    /// Create fresh network structure (every input connect to every output) from provided parameters
     /// </summary>
-    /// <param name="consultor"></param>
-    /// <param name="netID"></param>
-    /// <param name="numberOfInputs"></param>
-    /// <param name="numberOfOutputs"></param>
-    /// <param name="time"></param>
+    /// <param name="consultor">Consultor with master genome and specification information</param>
+    /// <param name="netID">ID of the network</param>
+    /// <param name="numberOfInputs">Number of input perceptrons</param>
+    /// <param name="numberOfOutputs">Number of output perceptrons</param>
+    /// <param name="time">Time to test the network</param>
     public NEATNet(NEATConsultor consultor, int[] netID, int numberOfInputs, int numberOfOutputs, float time) {
-        this.consultor = consultor;
-        this.netID = new int[] {netID[0], netID[1]};
-        this.numberOfInputs = numberOfInputs;
-        this.numberOfOutputs = numberOfOutputs;
-        this.time = time;
-        this.netFitness = 0f;
-        this.timeLived = 0f;
+        this.consultor = consultor; //shallow copy consultor
+        this.netID = new int[] {netID[0], netID[1]}; //copy ID
+        this.numberOfInputs = numberOfInputs; //copy number of inputs
+        this.numberOfOutputs = numberOfOutputs; //copy number of outputs
+        this.time = time; //copy time to test
 
-        InitilizeNodes();
-        InitilizeGenes();
+        this.netFitness = 0f; //reset net fitness
+        this.timeLived = 0f; //reset time lived
+
+        InitilizeNodes(); //initialize initial nodes
+        InitilizeGenes(); //initialize initial gene sequence
     }
 
     /// <summary>

@@ -180,6 +180,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
              
             for (int i = 0; i < populationSize; i++) { //populate new species
                 NEATNet netCopy = new NEATNet(net); //create a deep copy with net retrieved from database
+
                 //reset copied stats
                 netCopy.SetNetFitness(0f);
                 netCopy.SetTimeLived(0f);
@@ -391,115 +392,130 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         if (numberOfGenerationsToRun > 0) { //if computing
             generationNumber++; // increment generation number
 
-            float highestFitness = 0f; //highest fitness to saved
             List<List<NEATNet>> bestSpecies = new List<List<NEATNet>>(); //50% best networks from each species list
 
             float[,] distribution = new float[species.Count,2]; //population distribution for species in the next generation
-            float totalSharedFitness = 0f;
-            float totalOrganisums = 0f;
-            int[] bestIndex = new int[2];
+            float totalSharedFitness = 0f; //total shared fitness of the whole population 
+            float totalNetworks = 0f; //total number of organisums (used for distribution)
+            float highestFitness = 0f; //highest fitness to saved
 
-            for (int i = 0; i < species.Count; i++) {
-                float sharedAmount = 0f;
-                distribution[i, 0] = i;
-                for (int j = 0; j < species[i].Count; j++) {
-                    distribution[i,1] += species[i][j].GetNetFitness();
-                    if (species[i][j].GetNetFitness() > highestFitness) {
-                        highestFitness = species[i][j].GetNetFitness();
-                        bestIndex[0] = i; bestIndex[1] = j;
+            int[] bestIndex = new int[2]; //Index of best creature
+
+            for (int i = 0; i < species.Count; i++) { //run through number of species
+                float sharedAmount = 0f; //number of networks in species at index i that can be stated to in the same species 
+                //Question: Why not just make shared amount equal to species[i].Count? 
+                /*Answer: Due to the fact that when the network was chosen to be part of species[i], it was tested randomly with another network. 
+                          We did not know if it would match other networks.*/
+
+                distribution[i, 0] = i; //set index on first row
+
+                for (int j = 0; j < species[i].Count; j++) { //run through number of networks at index i
+                    distribution[i,1] += species[i][j].GetNetFitness(); //get network fitness from species at index i, and network at j to second row of distribution 
+
+                    if (species[i][j].GetNetFitness() > highestFitness) { //if the fitness of the network is greater than highest fitness
+                        highestFitness = species[i][j].GetNetFitness(); //set new highest fitness 
+                        bestIndex[0] = i; bestIndex[1] = j; //change best index
                     }
-                    for (int k = j+1; k < species[i].Count; k++) {
-                        sharedAmount += NEATNet.SameSpeciesV2(species[i][j],species[i][k]) == true?1:0;
+
+                    for (int k = j+1; k < species[i].Count; k++) { //run through rest of species
+                        sharedAmount += NEATNet.SameSpeciesV2(species[i][j],species[i][k]) == true?1:0;  //if 2 networks are in the same species, then increment shared amount by 1
                     }
                 }
-                if (sharedAmount == 0)
-                    sharedAmount = 1f;
-                distribution[i,1] = distribution[i, 1] / sharedAmount;
-                totalSharedFitness += distribution[i,1];
 
-                float[,] sortedFitness = SortedFitnessIndicies(species[i]);
-                List<NEATNet> bestOrganisums = new List<NEATNet>();
-
-                for (int j = sortedFitness.GetLength(0) / 2; j < sortedFitness.GetLength(0); j++) {
-                    bestOrganisums.Add(species[i][(int)sortedFitness[j, 0]]);
+                if (sharedAmount == 0) { //if shared amount is 0
+                    sharedAmount = 1f; //make shared amount 1 to about division by 0  
                 }
-                bestSpecies.Add(bestOrganisums);
+
+                distribution[i,1] = distribution[i, 1] / sharedAmount; //converting total added fitness of species at index i to EXPICIT FITNESS 
+                totalSharedFitness += distribution[i,1]; //add new EXPICIT FITNESS to total shared fitness
+
+                float[,] sortedFitness = SortedFitnessIndicies(species[i]); //sort species at index i based on their rank (ascending order)
+                List<NEATNet> bestNetworks = new List<NEATNet>(); //List of best networks
+
+                for (int j = sortedFitness.GetLength(0) / 2; j < sortedFitness.GetLength(0); j++) { //since it's ranked in ascending order, skip the first 50% of networks
+                    bestNetworks.Add(species[i][(int)sortedFitness[j, 0]]); //add network from species at index i, and networks at j to best network list
+                }
+
+                bestSpecies.Add(bestNetworks); //add best networks to species list
             }
 
-            distribution = SortFitness(distribution);
+            distribution = SortFitness(distribution); //sort distribution
 
-            bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]);
-            lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold());
-            netDrawer.SendMessage("DrawNet",bestNet);
+            bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]); //set best net from the best index
+            lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold()); //plot highest fitness on graph
+            netDrawer.SendMessage("DrawNet",bestNet); //Draw best network
             
-            for (int i = 0; i < distribution.GetLength(0); i++) {
-                distribution[i, 1] = (int)((distribution[i, 1] / totalSharedFitness) * populationSize);
-                totalOrganisums += distribution[i, 1];
+            for (int i = 0; i < distribution.GetLength(0); i++) { //run through all species (which have been sorted)
+                distribution[i, 1] = (int)((distribution[i, 1] / totalSharedFitness) * populationSize); //use rank distribution to calculate new population distribution for each species
+                totalNetworks += distribution[i, 1]; //add up new distribution
+            }
+            /*The total networks will be slight less than population size due to int type casting on distribution.
+              So, we much run another loop to insert the missing networks*/
+
+            for (int i = 0; i < (populationSize - totalNetworks); i++) { //run the missing amount time (population size - total networks)
+                int highIndex = distribution.GetLength(0)/2; //since distribution was sort acending order, we will only add networks to the top  50% 
+                int randomInsertIndex = UnityEngine.Random.Range(highIndex, distribution.GetLength(0)); //pick randomly from the top 50%
+                distribution[randomInsertIndex, 1]++; //increment some species population size in the top 50%
             }
 
-            for (int i = 0; i < (populationSize - totalOrganisums); i++) {
-                int highIndex = distribution.GetLength(0)/2;
-                int randomInsertIndex = UnityEngine.Random.Range(highIndex, distribution.GetLength(0));
-                distribution[randomInsertIndex, 1]++;
-            }
+            species = new List<List<NEATNet>>(); //create an empty population list
 
-            species = new List<List<NEATNet>>();
+            for (int i = 0; i < distribution.GetLength(0); i++) { //run through new population distribution of each species
+                if (distribution[i, 1] > 0) { //if distribution of species at index i is more than 0
+                    for (int j = 0; j < distribution[i, 1]; j++) { //run through new distribution size for index i
+                        List<NEATNet> bestNetworks= bestSpecies[(int)distribution[i, 0]]; //Get best networks from nest species list
+                        NEATNet net = null; //offspring which will represent the new network to add after sexual or asexual reproduction
 
-            for (int i = 0; i < distribution.GetLength(0); i++) {
-                if (distribution[i, 1] > 0) {
-                    for (int j = 0; j < distribution[i, 1]; j++) {
-                        List<NEATNet> bestOrganisums = bestSpecies[(int)distribution[i, 0]];
-                        NEATNet net = null;
+                        if (j > (float)distribution[i, 1] * elite) { //after 10% elite have been chosen
+                            //logarithmic ranked pick to make sure highest fitness networks have a greater chance of being chosen than the less fit
+                            float random = UnityEngine.Random.Range(1f, 100f); 
+                            float powerNeeded = Mathf.Log(bestNetworks.Count - 1, 100);
+                            float logIndex = Mathf.Abs(((bestNetworks.Count - 1) - Mathf.Pow(random, powerNeeded)));
 
-                        if (j > (float)distribution[i, 1] * elite) {
-                            NEATNet organisum1 = bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)];
+                            NEATNet organisum1 = bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)];  //pick randomly from best networks                     
+                            NEATNet organisum2 = bestNetworks[(int)logIndex]; //use logarithmicly chosen random index from best network 
 
-                            float random = UnityEngine.Random.Range(1f,100f);
-                            float powerNeeded = Mathf.Log(bestOrganisums.Count-1,100);
-                            float logIndex = Mathf.Abs(((bestOrganisums.Count - 1) -Mathf.Pow(random, powerNeeded)));
-                       
-                            NEATNet organisum2 = bestOrganisums[(int)logIndex];
-                       
-                            net = NEATNet.Corssover(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)], bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
-                            //net = NEATNet.Corssover(organisum1, organisum2);
-                            net.Mutate();
+                            net = NEATNet.Corssover(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)], bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //crossover both networks to create an offspring 
+                            net.Mutate(); //mutate offspring
                         }
-                        else {
-                            net = new NEATNet(bestOrganisums[UnityEngine.Random.Range(0, bestOrganisums.Count)]);
+                        else { //pick 10% elite
+                            net = new NEATNet(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //pick randomly and keep elite the same
                         }
 
+                        //reset copied stats
                         net.SetNetFitness(0f);
                         net.SetTimeLived(0f);
                         net.SetTestTime(testTime);
                         net.ClearNodeValues();
 
-                        if (species.Count == 0) {
-                            List<NEATNet> newSpecies = new List<NEATNet>();
-                            newSpecies.Add(net);
-                            species.Add(newSpecies);
+                        if (species.Count == 0) { //if nothing exists yet
+                            List<NEATNet> newSpecies = new List<NEATNet>(); //create a new species
+                            newSpecies.Add(net); //add net to this new species
+                            species.Add(newSpecies); //add new species to species list
                         }
-                        else {
-                            int numberOfSpecies = species.Count;
-                            int location = -1;
-                            for (int k = 0; k < numberOfSpecies; k++) {
-                                int numberOfNets = species[k].Count;
-                                int randomIndex = UnityEngine.Random.Range(0, numberOfNets);
-                                if (NEATNet.SameSpeciesV2(species[k][randomIndex], net)) {
-                                    location = k;
-                                    break;
+                        else { //if at least one species exists
+                            int numberOfSpecies = species.Count; //save species count
+                            int location = -1; //-1 means no species match found,  0 >= will mean a species match has been found at a given index
+                            for (int k = 0; k < numberOfSpecies; k++) { //run through species count
+                                int numberOfNets = species[k].Count; //number of organisum in species at index k
+                                int randomIndex = UnityEngine.Random.Range(0, numberOfNets); //pick a random network within this species
+                                if (NEATNet.SameSpeciesV2(species[k][randomIndex], net)) { //check if new network and random network belong to the same species
+                                    location = k; //new species can be added to index j
+                                    break; //break out of loop
                                 }
                             }
 
-                            if (location == -1) {
+                            if (location == -1) { //if no species found
+                                //create new species and add to that
                                 List<NEATNet> newSpecies = new List<NEATNet>();
                                 newSpecies.Add(net);
-                                net.SetNetID(new int[] {species.Count, 0 });
-                                species.Add(newSpecies);
-                                    
+                                net.SetNetID(new int[] {species.Count, 0 }); //set new id
+                                species.Add(newSpecies); //add net to new species
+
                             }
-                            else {
-                                net.SetNetID(new int[] {location, species[location].Count});
-                                species[location].Add(net);
+                            else { //found species that match this network
+                                net.SetNetID(new int[] {location, species[location].Count}); //set new id
+                                species[location].Add(net); //add net to the matched species list
                             }      
                         } 
                     }
@@ -507,78 +523,91 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             }
         } //number of generation > 0
 
-        if (numberOfGenerationsToRun > 0) {
-            numberOfGenerationsToRun--;
-            progressBar.GetComponent<ProgressRadialBehaviour>().IncrementValue(currentIncrement);
-            GeneratePopulation();
+        if (numberOfGenerationsToRun > 0) { //if computing
+            numberOfGenerationsToRun--; //decrement number of generations to run
+            progressBar.GetComponent<ProgressRadialBehaviour>().IncrementValue(currentIncrement); //increment progress bar by previously caluclated increment value
+            GeneratePopulation(); //Generate population with neural networks
         }
-        else {
-            viewMode = false;
-            computing = false;
-            SetCameraLocation();
+        else { //done computing
+            viewMode = false; //view is false
+            computing = false; //computing is false
+            SetCameraLocation(); //ser camera location back to panel
         }
     }
 
     /// <summary>
-    /// 
+    /// Create and return sorted fitness with indicies corresponding to the list of neural networks provided
     /// </summary>
-    /// <param name="organisums"></param>
-    /// <returns></returns>
-    private float[,] SortedFitnessIndicies(List<NEATNet> organisums) {
-        float[,] sorted = new float[organisums.Count, 2];
-        for (int i = 0; i < sorted.GetLength(0); i++) {
-            sorted[i, 0] = i;
-            sorted[i, 1] = organisums[i].GetNetFitness();
+    /// <param name="networks">Networks to use to create a sorted list</param>
+    /// <returns>Sorted fitness of 2D array</returns>
+    private float[,] SortedFitnessIndicies(List<NEATNet> networks) { 
+        float[,] sorted = new float[networks.Count, 2]; //sorted 2D array of networks, first row represents index and second represents fitness
+
+        for (int i = 0; i < sorted.GetLength(0); i++) { //run through number of networks
+            sorted[i, 0] = i; 
+            sorted[i, 1] = networks[i].GetNetFitness();
         }
-        return SortFitness(sorted);
+
+        return SortFitness(sorted); //return sorted fitness
     }
 
     /// <summary>
-    /// 
+    /// Simple bubble sort to sort and return fitness of a given 2D array. 
+    /// First row is supposed to be indicies which is swapped around while second row which is fitness is being sorted. 
     /// </summary>
-    /// <param name="sort"></param>
-    /// <returns></returns>
+    /// <param name="sort">Fitness to sort</param>
+    /// <returns>Sorted fitness of 2D array</returns>
     private float[,] SortFitness(float[,] sort) {
-        float[] tempFitness = new float[2];
-        bool swapped = true;
-        int j = 0;
-        while (swapped) {
-            swapped = false;
-            j++;
-            for (int i = 0; i < sort.GetLength(0) - j; i++) {
-                if (sort[i, 1] > sort[i + 1, 1]) {
+        float[] tempFitness = new float[2]; //temp 
+        bool swapped = true; //sawp has occurred
+        int j = 0; //counter
+
+        while (swapped == true) {
+            swapped = false; //suppose no swap has occurred
+            j++; //increment counter
+
+            for (int i = 0; i < sort.GetLength(0) - j; i++) { //run through sort length - j
+                if (sort[i, 1] > sort[i + 1, 1]) { //if fitness at i is greater than fitness at i + 1
+                    //save index i information in temp
                     tempFitness[0] = sort[i, 0];
                     tempFitness[1] = sort[i, 1];
 
+                    //swap information from index i with i+1
                     sort[i, 0] = sort[i + 1, 0];
                     sort[i, 1] = sort[i + 1, 1];
 
+                    //fill index i+1 with temp 
                     sort[i + 1, 0] = tempFitness[0];
                     sort[i + 1, 1] = tempFitness[1];
-                    swapped = true;
+
+                    swapped = true; //swap has occurred
                 }
             }
         }
-        return sort;
+
+        return sort; //return sort
     }
 
     /// <summary>
-    /// 
+    /// Basic error check to make sure all inputs are valid
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True or false if an error has occurred</returns>
     private bool ErrorCheck() {
         bool error = false;
 
-        if (numberOfInputPerceptrons <= 0) {
+        //incorrect number of input perceptrons
+        if (numberOfInputPerceptrons <= 0) { 
             Debug.LogError("Need one or more input perceptrons.");
             error = true;
         }
 
+        //incorrect number of output perceptrons
         if (numberOfOutputPerceptrons <= 0) {
             Debug.LogError("Need one or more output perceptrons.");
             error = true;
         }
 
+        //incorrect population size
         if (populationSize <= 0) {
             Debug.LogError("Population size must be greater than 0.");
             error = true;
@@ -589,12 +618,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             error = true;
         }
 
+        //incorrect test time
         if (testTime <= 0) {
             Debug.LogError("Time to test must be greater than 0 seconds.");
             error = true;
         }
 
-        if (error) {
+        //error has occurred if error is true
+        if (error == true) {
             Debug.LogError("One or more issues found. Exiting.");
             return true;
         }
