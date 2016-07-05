@@ -77,7 +77,7 @@ public class NEATNet {
     }
 
     /// <summary>
-    /// Create fresh network structure (every input connect to every output) from provided parameters
+    /// Creating a primitive network structure (every input connect to every output) from provided parameters
     /// </summary>
     /// <param name="consultor">Consultor with master genome and specification information</param>
     /// <param name="netID">ID of the network</param>
@@ -99,433 +99,442 @@ public class NEATNet {
     }
 
     /// <summary>
-    /// 
+    /// Creating an already designed network structure from given node and gene lists
     /// </summary>
-    /// <param name="consultor"></param>
-    /// <param name="numberOfInputs"></param>
-    /// <param name="numberOfOutputs"></param>
-    /// <param name="copyNodes"></param>
-    /// <param name="copyGenes"></param>
+    /// <param name="consultor">Consultor with master genome and specification information</param>
+    /// <param name="numberOfInputs">Number of input perceptrons</param>
+    /// <param name="numberOfOutputs">Number of output perceptrons</param>
+    /// <param name="copyNodes">Node list to deep copy</param>
+    /// <param name="copyGenes">Gene list to deep copy</param>
     public NEATNet(NEATConsultor consultor, int numberOfInputs, int numberOfOutputs, List<NEATNode> copyNodes, List<NEATGene> copyGenes) {
-        this.consultor = consultor;
-        this.numberOfInputs = numberOfInputs;
-        this.numberOfOutputs = numberOfOutputs;
+        this.consultor = consultor; //shallow copy consultor
+        this.numberOfInputs = numberOfInputs; //copy number of inputs
+        this.numberOfOutputs = numberOfOutputs; //copy number of outputs
 
-        CopyNodes(copyNodes);
-        CopyGenes(copyGenes);
-        
-        this.netID = new int[2];
-        this.time = 0f;
-        this.netFitness = 0f;
-        this.timeLived = 0f;
+        CopyNodes(copyNodes); //deep copy node list
+        CopyGenes(copyGenes); //deep copy gene list
+
+        this.netID = new int[2]; //reset ID
+        this.time = 0f; //reset time
+        this.netFitness = 0f; //reset fitness
+        this.timeLived = 0f; //reset time lived
     }
 
     /// <summary>
-    /// 
+    /// Initilizing initial node list with given number of input perceptrons which includes the bias node
     /// </summary>
-    public void InitilizeNodes() {
-        nodeList = new List<NEATNode>();
+    private void InitilizeNodes() {
+        nodeList = new List<NEATNode>(); //create an empty node list
 
-        NEATNode node = null;
+        NEATNode node = null; 
 
-        for (int i = 0; i < numberOfInputs; i++) {
+        for (int i = 0; i < numberOfInputs; i++) { //run through number of input perceptrons
 
-            if(i == (numberOfInputs - 1))
-                node = new NEATNode(i,NEATNode.INPUT_BIAS_NODE);
-            else
-                node = new NEATNode(i, NEATNode.INPUT_NODE);
+            if(i == (numberOfInputs - 1)) //if this is the last input 
+                node = new NEATNode(i,NEATNode.INPUT_BIAS_NODE); //make it a input bias type node  with index i as node ID
+            else //if this is not the last input
+                node = new NEATNode(i, NEATNode.INPUT_NODE); //make it a input type node with index i as node ID
 
-            nodeList.Add(node);
+            nodeList.Add(node); //add node to the node list
         }
 
-        for (int i = numberOfInputs; i < numberOfInputs+numberOfOutputs; i++){
-            node = new NEATNode(i, NEATNode.OUTPUT_NODE);
-            nodeList.Add(node);
+        for (int i = numberOfInputs; i < numberOfInputs+numberOfOutputs; i++){  //run through number of output perceptrons
+            node = new NEATNode(i, NEATNode.OUTPUT_NODE); //make it a putput type node  with index i as node ID
+            nodeList.Add(node); //add node to the node list
         }
     }
 
     /// <summary>
-    /// 
+    /// Initilizing initial gene list with given number of input and output perceptrons to create a primitive genome (all inputs connected to all outputs)
     /// </summary>
-    public void InitilizeGenes() {
-        geneList = new List<NEATGene>();
-        NEATGene gene = null;
+    private void InitilizeGenes() {
+        geneList = new List<NEATGene>(); //create an empty gene list
 
-        for (int i = 0; i < numberOfInputs; i++){
-            for (int j = numberOfInputs; j < numberOfInputs+numberOfOutputs; j++){
-                int inno = consultor.CheckGeneExistance(i,j);
-                gene = new NEATGene(inno, i, j, 1f, true);
-                InsertNewGene(gene);
+        for (int i = 0; i < numberOfInputs; i++){ //run through number of inputs
+            for (int j = numberOfInputs; j < numberOfInputs+numberOfOutputs; j++){ //run through number of outputs
+                int inno = consultor.CheckGeneExistance(i,j);  //check if gene exists in consultor
+                NEATGene gene = new NEATGene(inno, i, j, 1f, true); // create gene with default weight of 1.0 and and is active 
+
+                InsertNewGene(gene); //insert gene to correct location in gene list
             }
         }
     }
 
     /// <summary>
-    /// 
+    /// Returns the fitness of this network
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Fitness</returns>
     public float GetNetFitness() {
-        return netFitness;
+        return netFitness; //reutrn fitness
     }
 
     /// <summary>
-    /// 
+    /// Returns the time this network has lived
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Time lived</returns>
     public float GetTimeLived() {
-        return timeLived;
+        return timeLived; //return time lived
     }
 
     /// <summary>
-    /// 
+    /// Set ID of the network
     /// </summary>
-    /// <param name="netID"></param>
+    /// <param name="netID">Network ID to set</param>
     public void SetNetID(int[] netID) {
-        this.netID = new int[] {netID[0], netID[1]};
+        this.netID = new int[] {netID[0], netID[1]}; //set ID
     }
 
     /// <summary>
-    /// 
+    /// Set fitness to given fitness
     /// </summary>
-    /// <param name="netFitness"></param>
+    /// <param name="netFitness">Fitness to set network fitness to</param>
     public void SetNetFitness(float netFitness) {
-        this.netFitness = netFitness;
+        this.netFitness = netFitness; //set fitness
     }
 
     /// <summary>
-    /// 
+    /// Add given fitness to the current fitness
     /// </summary>
-    /// <param name="netFitness"></param>
+    /// <param name="netFitness">Fitness to add</param>
     public void AddNetFitness(float netFitness) {
-        this.netFitness += netFitness;
+        this.netFitness += netFitness; //increment by given fitness
     }
 
     /// <summary>
-    /// 
+    /// Set time lived of this network
     /// </summary>
-    /// <param name="timeLived"></param>
+    /// <param name="timeLived">Time lived to set</param>
     public void SetTimeLived(float timeLived) {
-        this.timeLived = timeLived;
+        this.timeLived = timeLived; //set time lived
     }
 
     /// <summary>
-    /// 
+    /// Add given time lived to current time lived
     /// </summary>
-    /// <param name="timeLived"></param>
+    /// <param name="timeLived">Time lived to add</param>
     public void AddTimeLived(float timeLived) {
-        this.timeLived += timeLived;
+        this.timeLived += timeLived; //increment by given time lived
     }
 
     /// <summary>
-    /// 
+    /// Return ID of this network
     /// </summary>
-    /// <returns></returns>
+    /// <returns>ID of this network</returns>
     public int[] GetNetID() {
-        return netID;
+        return netID; //return network ID
     }
 
     /// <summary>
-    /// 
+    /// Return test time of this network
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Test time</returns>
     public float GetTestTime() {
-        return time;
+        return time; //return test time
     }
 
     /// <summary>
-    /// 
+    /// Return total number of nodes (perceptrons) in this network
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Number of total nodes</returns>
     public int GetNodeCount() {
-        return nodeList.Count;
+        return nodeList.Count; //return node code
     }
 
     /// <summary>
-    /// 
+    /// Return number of genes in the genome
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Number of genes in the genome</returns>
     public int GetGeneCount() {
-        return geneList.Count;
+        return geneList.Count; //gene count
     }
 
     /// <summary>
-    /// 
+    /// Return number of input perceptrons
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Number of input nodes</returns>
     public int GetNumberOfInputNodes() {
-        return numberOfInputs;
+        return numberOfInputs; //return number of inputs
     }
 
     /// <summary>
-    /// 
+    /// Return number of output perceptrons
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Number of output nodes</returns>
     public int GetNumberOfOutputNodes() {
-        return numberOfOutputs;
+        return numberOfOutputs; //return number of outputs
     }
 
     /// <summary>
-    /// 
+    /// Return consultor of this network
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Consultor</returns>
     public NEATConsultor GetConsultor() {
-        return consultor;
+        return consultor; //return consultor
     }
 
     /// <summary>
-    /// 
+    /// Set test time to given time
     /// </summary>
-    /// <param name="time"></param>
+    /// <param name="time">Test time</param>
     public void SetTestTime(float time) {
-        this.time = time;
+        this.time = time; //set test time
     }
 
     /// <summary>
-    /// 
+    /// Compile and return gene connections information which include weight, in node, and out node in a 2D array
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Array of gene connections information in a 2D array</returns>
     public float[][] GetGeneDrawConnections() {
-        float[][] connections = null;
-        List<float[]> connectionList = new List<float[]>();
-        int numberOfGenes = geneList.Count;
+        int numberOfGenes = geneList.Count; //copy gene count
 
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = geneList[i];
-            //if (gene.GetGeneState() == true) {
-                float[] details = new float[3];
-                details[0] = gene.GetInID();
-                details[1] = gene.GetOutID();
+        float[][] connections = null; //2D connections to return 
 
-                if (gene.GetGeneState() == true)
-                    details[2] = gene.GetWeight();
-                else
-                    details[2] = 0f;
+        List<float[]> connectionList = new List<float[]>(); //empty connections list to fill with genome details
 
-                connectionList.Add(details);
-            //}
+        for (int i = 0; i < numberOfGenes; i++) { //run through all genes
+            NEATGene gene = geneList[i]; // get gene at index i
 
+            float[] details = new float[3]; //will copy in node ID, out node ID and weight
+
+            details[0] = gene.GetInID(); //copy in node ID
+            details[1] = gene.GetOutID(); //copy out node ID
+
+            if (gene.GetGeneState() == true) //gene is enabled
+                details[2] = gene.GetWeight(); //copy weight
+            else //gene is disabled
+                details[2] = 0f; //set to 0
+
+            connectionList.Add(details); //add detail to the connection list
         }
-        connections = connectionList.ToArray();
-        return connections;
+
+        connections = connectionList.ToArray(); //convert connection list to 2D connection array
+        return connections; //return 2D connection array
     }
 
     /// <summary>
-    /// 
+    /// Compile and return genome in a large string to be saved in a database
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Genome string</returns>
     public string GetGenomeString() {
-        string genome = "";
-        int numberOfGenes = geneList.Count;
+        string genome = ""; //genome to return
+        int numberOfGenes = geneList.Count; //get number of genes
 
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = geneList[i];
-            genome += gene.GetGeneString();
+        for (int i = 0; i < numberOfGenes; i++) { //run through all genes
+            NEATGene gene = geneList[i]; //get gene at index i
+            genome += gene.GetGeneString(); //concatenate gene string to genome
 
-            if (i < numberOfGenes - 1)  {
-                genome += "_";
+            if (i < numberOfGenes - 1)  { //if this is not the last index
+                genome += "_"; //add seperation underscore to seperate 2 different genomes
             }
         }
-        return genome;
+
+        return genome; //return string genome
     }
 
     /// <summary>
-    /// 
+    /// Change network's input perceptron values to the given input array
     /// </summary>
-    /// <param name="inputs"></param>
+    /// <param name="inputs">Replacing input perceptron values with this array</param>
     public void SetInputValues(float[] inputs) {
-        for (int i = 0; i < numberOfInputs; i++) {
-            if (nodeList[i].GetNodeType() == NEATNode.INPUT_NODE) {
-                nodeList[i].SetValue(inputs[i]);
+        for (int i = 0; i < numberOfInputs; i++) { //run through number of inputs
+            if (nodeList[i].GetNodeType() == NEATNode.INPUT_NODE) { //only if this is a input node
+                nodeList[i].SetValue(inputs[i]); //change value of node to given value at index i
             }
-            else {
-                break;
+            else { //if this is not an input type node
+                break; 
             }
         }
     }
 
     /// <summary>
-    /// 
+    /// Compile and return all node values in an array
     /// </summary>
-    /// <returns></returns>
-    public float[] GetAllNodeValues() {
-        float[] values = new float[nodeList.Count];
+    /// <returns>All node values in an array</returns>
+    private float[] GetAllNodeValues() {
+        float[] values = new float[nodeList.Count]; //create an array with the szie of number of nodes
 
-        for (int i = 0; i < values.Length; i++){
-            values[i] = nodeList[i].GetValue();
+        for (int i = 0; i < values.Length; i++){ //run through number of nodes
+            values[i] = nodeList[i].GetValue(); //set node values 
         }
-        return values;
+        return values; //return all nodes value array
     }
 
     /// <summary>
-    /// 
+    /// Compile and return only input node values in an array
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Only input node values in an array</returns>
     private float[] GetInputValues(){
-        float[] values = new float[numberOfInputs];
+        float[] values = new float[numberOfInputs]; //create an array with size of number of input nodes
 
-        for (int i = 0; i < numberOfInputs; i++){
-            values[i] = nodeList[i].GetValue();
+        for (int i = 0; i < numberOfInputs; i++){ //run through number of inputs
+            values[i] = nodeList[i].GetValue(); //set input nodes value
         }
-        return values;
+
+        return values; //return input nodes value array
     }
 
     /// <summary>
-    /// 
+    /// Compile and return only output node values in an array
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Only ouput node values in an array</returns>
     private float[] GetOutputValues(){
-        float[] values = new float[numberOfOutputs];
+        float[] values = new float[numberOfOutputs]; //create an array with size of number of output nodes
 
-        for (int i = 0; i < numberOfOutputs; i++) {
-            values[i] = nodeList[i + numberOfInputs].GetValue();
+        for (int i = 0; i < numberOfOutputs; i++) { //run through number of outputs
+            values[i] = nodeList[i + numberOfInputs].GetValue(); //set output nodes value
         }
-        return values;
+
+        return values; //return output nodes value array
     }
 
     /// <summary>
-    /// 
+    /// Compile and return only hidden node values in an array
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Only hidden node values in an array</returns>
     private float[] GetHiddenValues(){
-        int numberOfHiddens = nodeList.Count - (numberOfInputs + numberOfOutputs);
-        float[] values = new float[numberOfHiddens];
+        int numberOfHiddens = nodeList.Count - (numberOfInputs + numberOfOutputs); //get number of hidden nodes that exist
+        float[] values = new float[numberOfHiddens];  //create an array with size of number of hidden nodes
 
-        for (int i = 0; i < numberOfHiddens; i++){
-            values[i] = nodeList[i + numberOfInputs + numberOfOutputs].GetValue();
+        for (int i = 0; i < numberOfHiddens; i++){  //run through number of hiddens
+            values[i] = nodeList[i + numberOfInputs + numberOfOutputs].GetValue();  //set hidden nodes value
         }
-        return values;
+
+        return values; //return hidden nodes value array
     }
 
     /// <summary>
-    /// 
+    /// Create node list from deep copying a given node list
     /// </summary>
-    /// <param name="copyNodes"></param>
-    public void CopyNodes(List<NEATNode> copyNodes) {
-        nodeList = new List<NEATNode>();
-        int numberOfNodes = copyNodes.Count;
+    /// <param name="copyNodes">Node list to deep copy</param>
+    private void CopyNodes(List<NEATNode> copyNodes) {
+        nodeList = new List<NEATNode>(); //create an empty node list
+        int numberOfNodes = copyNodes.Count; //number of nodes to copy
 
-        for (int i = 0; i < numberOfNodes; i++) {
-            NEATNode node = new NEATNode(copyNodes[i]);
-            nodeList.Add(node);
-        }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="copyGenes"></param>
-    public void CopyGenes(List<NEATGene> copyGenes) {
-        geneList = new List<NEATGene>();
-        int numberOfGenes = copyGenes.Count;
-
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = new NEATGene(copyGenes[i]);
-            geneList.Add(gene);
+        for (int i = 0; i < numberOfNodes; i++) { //run through number of nodes to copy
+            NEATNode node = new NEATNode(copyNodes[i]); //create deep copy of node at index i 
+            nodeList.Add(node); //add node to node list
         }
     }
 
     /// <summary>
-    /// 
+    /// Create gene list from deep copying a given gene list
     /// </summary>
-    /// <param name="inputs"></param>
-    /// <returns></returns>
+    /// <param name="copyGenes">Gene list to deep copy</param>
+    private void CopyGenes(List<NEATGene> copyGenes) {
+        geneList = new List<NEATGene>(); //create an empty node list
+        int numberOfGenes = copyGenes.Count; //number of nodes to copy
+
+        for (int i = 0; i < numberOfGenes; i++) { //run through number of genes to copy
+            NEATGene gene = new NEATGene(copyGenes[i]); //create deep copy of gene at index i 
+            geneList.Add(gene); //add gene to gene list
+        }
+    }
+
+    /// <summary>
+    /// Feed-forward the neural network by creating a temporary phenotype from the genotype
+    /// </summary>
+    /// <param name="inputs">Inputs to set as the input perceptron values</param>
+    /// <returns>An array of output values after feed-forward</returns>
     public float[] FireNet(float[] inputs){
-        float[] output = new float[numberOfOutputs];
+        int numberOfGenes = geneList.Count; //get number of genes
 
-        //set input values to the input nodes
-        SetInputValues(inputs);
+        SetInputValues(inputs); //set input values to the input nodes
 
         //feed forward reccurent net 
-        float[] tempValues = GetAllNodeValues();
-        int numberOfGenes = geneList.Count;
+        float[] tempValues = GetAllNodeValues(); //create a temporary storage of previous node values (used as a phenotype)
 
-        for (int i = 0; i < numberOfGenes; i++) {
-            NEATGene gene = geneList[i];
-            bool on = gene.GetGeneState();
-            if (on == true) {
-                int inID = gene.GetInID();
-                int outID = gene.GetOutID();
-                float weight = gene.GetWeight();
+        for (int i = 0; i < numberOfGenes; i++) { //run through number of genes
+            NEATGene gene = geneList[i]; //get gene at index i
+            bool on = gene.GetGeneState(); //get state of the gene
 
-                NEATNode outNode = nodeList[outID];
+            if (on == true) { //if gene is active
+                int inID = gene.GetInID(); //get in node ID
+                int outID = gene.GetOutID(); //get out node ID
+                float weight = gene.GetWeight(); //get weight of the connection
 
-                float inNodeValue = tempValues[inID];
-                float outNodeValue = tempValues[outID];
+                NEATNode outNode = nodeList[outID]; //get out node 
 
-                float newOutNodeValue = outNodeValue + (inNodeValue*weight);
-                outNode.SetValue(newOutNodeValue);
+                float inNodeValue = tempValues[inID]; //get in node's value
+                float outNodeValue = tempValues[outID]; //get out node's value
+
+                float newOutNodeValue = outNodeValue + (inNodeValue*weight); //calculate new out node's value
+                outNode.SetValue(newOutNodeValue); //set new value to the out node
             }
         }
 
         //Activation
-        for (int i = 0; i < nodeList.Count; i++) {
-            nodeList[i].Activation();
+        for (int i = 0; i < nodeList.Count; i++) { //run through number of nodes
+            nodeList[i].Activation(); //provide an activation function over all nodes
         }
 
-        // return output values 
-        output = GetOutputValues();
-
-        return output;
+        return GetOutputValues(); //return output
     }
 
     /// <summary>
-    /// 
+    /// Mutating this neural network
     /// </summary>
     public void Mutate() {
-        int randomNumber = Random.Range(1, 101);
-        int chance = 25;
+        int randomNumber = Random.Range(1, 101); //random number between 1 and 100
+        int chance = 25; //25% chance of mutation
 
-        if (randomNumber <= chance) {
-            AddConnection();
+        if (randomNumber <= chance) { //random number is below chance
+            AddConnection(); //add connection between 2 nodes
         }
-        else if (randomNumber <= (chance+chance)) {
-            AddNode();
+        else if (randomNumber <= (chance*2)) {//random number is below chance*2
+            AddNode(); //add a new node bettwen an existing connection
         }
-        MutateWeight();
+
+        MutateWeight(); //mutate weight
     }
 
     /// <summary>
-    /// 
+    /// Adding a connection between 2 previously unconnected nodes (except no inputs shall ever connect to other inputs)  
     /// </summary>
-    public void AddConnection(){
-        int randomNodeID1, randomNodeID2, inno;
-        bool found = false;
-        int totalAttemptsAllowed = (int)Mathf.Pow(nodeList.Count,2);
+    private void AddConnection(){
+        int randomNodeID1, randomNodeID2, inno; //random node ID's and innovation number
+        int totalAttemptsAllowed = (int)Mathf.Pow(nodeList.Count,2); //total attempts allowed to find two unconnected nodes
 
-        while (totalAttemptsAllowed > 0 && found == false) {
-            randomNodeID1 = Random.Range(0, nodeList.Count);
-            randomNodeID2 = Random.Range(numberOfInputs, nodeList.Count);
+        bool found = false; //used to check if a connection is found
 
-            if (!ConnectionExists(randomNodeID1, randomNodeID2)) {
-                inno = consultor.CheckGeneExistance(randomNodeID1, randomNodeID2);
-                NEATGene gene = new NEATGene(inno, randomNodeID1, randomNodeID2, 1f, true);
-                InsertNewGene(gene);
+        while (totalAttemptsAllowed > 0 && found == false) { //if connection is found and greater than 0 attempts left
+            randomNodeID1 = Random.Range(0, nodeList.Count); //pick a random node
+            randomNodeID2 = Random.Range(numberOfInputs, nodeList.Count); //pick a random node that is not the input
 
-                found = true;
+            if (!ConnectionExists(randomNodeID1, randomNodeID2)) { //if connection does not exist with random node 1 as in node and random node 2 and out node
+                inno = consultor.CheckGeneExistance(randomNodeID1, randomNodeID2); //get the new innovation number
+                NEATGene gene = new NEATGene(inno, randomNodeID1, randomNodeID2, 1f, true); //create gene which is enabled and 1 as default weight
+
+                InsertNewGene(gene); //add gene to the gene list
+
+                found = true; //connection made
             }
-            else if(nodeList[randomNodeID1].GetNodeType() > 1 && !ConnectionExists(randomNodeID2, randomNodeID1)) {
-                inno = consultor.CheckGeneExistance(randomNodeID2, randomNodeID1);
-                NEATGene gene = new NEATGene(inno, randomNodeID2, randomNodeID1, 1f, true);
-                InsertNewGene(gene);
+            else if(nodeList[randomNodeID1].GetNodeType() > 1 && !ConnectionExists(randomNodeID2, randomNodeID1)) { //if random node 1 isn't input type and connection does not exist with random node 2 as in node and random node 1 and out node
+                inno = consultor.CheckGeneExistance(randomNodeID2, randomNodeID1); //get the new innovation number
+                NEATGene gene = new NEATGene(inno, randomNodeID2, randomNodeID1, 1f, true); //create gene which is enabled and 1 as default weight
 
-                found = true;
+                InsertNewGene(gene); //add gene to the gene list
+
+                found = true; //connection made
             }
 
-            if(randomNodeID1 == randomNodeID2)
-                totalAttemptsAllowed --;
-            else
-                totalAttemptsAllowed -= 2;   
+            if(randomNodeID1 == randomNodeID2) //both random nodes are equal
+                totalAttemptsAllowed --; //only one attemp removed becuase only 1 connection can be made
+            else //both nodes are different
+                totalAttemptsAllowed -= 2; //two connections can be made
         }
 
-        if (found == false) {
-            AddNode();
+        if (found == false) { //if not found and attempts ran out
+            AddNode(); //
         }
     }
 
     /// <summary>
-    /// 
+    /// Adding a new node between an already existing connection. 
+    /// Disable the existing connection, add a node which with connection that bbecomes the out node to the old connections in node, and a connection with in node to the old connection out node. 
+    /// The first new connections gets a weight of 1.
+    /// The second second new connections gets a weight of the old weight
     /// </summary>
-    public void AddNode(){
+    private void AddNode(){
         int firstID, secondID, thirdID, inno;
         float oldWeight;
         int randomGeneIndex = Random.Range(0, geneList.Count);
@@ -554,7 +563,7 @@ public class NEATNet {
     /// <summary>
     /// 
     /// </summary>
-    public void DeleteConnection() {
+    private void DeleteConnection() {
         int randomGeneIndex = Random.Range(0, geneList.Count);
         geneList.RemoveAt(randomGeneIndex);
     }
@@ -563,7 +572,7 @@ public class NEATNet {
     /// <summary>
     /// 
     /// </summary>
-    public void DeleteNode() {
+    private void DeleteNode() {
         int randomNodeIndex = Random.Range(numberOfInputs+numberOfOutputs, nodeList.Count);
         
         for (int i = 0; i < geneList.Count; i++) {
@@ -582,7 +591,7 @@ public class NEATNet {
     /// <summary>
     /// 
     /// </summary>
-    public void MutateWeight(){
+    private void MutateWeight(){
         int numberOfGenes = geneList.Count;
         float weight;
 
@@ -616,14 +625,14 @@ public class NEATNet {
         }
 
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="inID"></param>
     /// <param name="outID"></param>
     /// <returns></returns>
-    public bool ConnectionExists(int inID, int outID) {
+    private bool ConnectionExists(int inID, int outID) {
         int numberOfGenes = geneList.Count;
 
         for (int i = 0; i < numberOfGenes; i++) {
@@ -653,7 +662,7 @@ public class NEATNet {
     /// 
     /// </summary>
     /// <param name="gene"></param>
-    public void InsertNewGene(NEATGene gene) {
+    private void InsertNewGene(NEATGene gene) {
         int inno = gene.GetInnovation();
         int insertIndex = FindInnovationInsertIndex(inno);
 
@@ -670,7 +679,7 @@ public class NEATNet {
     /// </summary>
     /// <param name="inno"></param>
     /// <returns></returns>
-    public int FindInnovationInsertIndex(int inno) {
+    private int FindInnovationInsertIndex(int inno) {
         int numberOfGenes = geneList.Count;
         int startIndex = 0;
         int endIndex = numberOfGenes - 1;
@@ -853,7 +862,7 @@ public class NEATNet {
     /// <param name="copyGene"></param>
     /// <param name="state"></param>
     /// <returns></returns>
-    public static NEATGene CrossoverCopyGene(NEATGene copyGene, int state) {
+    private static NEATGene CrossoverCopyGene(NEATGene copyGene, int state) {
         NEATGene gene = new NEATGene(copyGene);
 
 
@@ -984,18 +993,23 @@ public class NEATNet {
     /// 
     /// </summary>
     public void PrintDetails() {
-        Debug.Log("-----------------");
         int numberOfNodes = nodeList.Count;
+        int numberOfGenes = geneList.Count;
+
+        Debug.Log("-----------------");
+
         for (int i = 0; i < numberOfNodes; i++) {
             NEATNode node = nodeList[i];
             Debug.Log("ID:" + node.GetNodeID() + ", Type:" + node.GetNodeType());
         }
+
         Debug.Log("-----------------");
-        int numberOfGenes = geneList.Count;
+
         for (int i = 0; i < numberOfGenes; i++) {
             NEATGene gene = geneList[i];
             Debug.LogWarning("Inno " + gene.GetInnovation() + ", In:" + gene.GetInID() + ", Out:" + gene.GetOutID() + ", On:" + gene.GetGeneState() + ", Wi:" + gene.GetWeight());
         }
+
         Debug.Log("-----------------");
     }
 
