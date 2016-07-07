@@ -535,21 +535,32 @@ public class NEATNet {
     /// The second second new connections gets a weight of the old weight
     /// </summary>
     private void AddNode(){
-        int firstID, secondID, thirdID, inno;
-        float oldWeight;
-        int randomGeneIndex = Random.Range(0, geneList.Count);
+        int firstID, secondID, thirdID, inno; //first ID is old connections in node, third ID is old connections out node, second ID is the new node, and new innovation number for the connections
+        //int randomGeneIndex = Random.Range(0, geneList.Count); //find a random gene
 
-        NEATGene oldGene = geneList[randomGeneIndex];
-        oldGene.SetGeneState(false);
-        firstID = oldGene.GetInID();
-        thirdID = oldGene.GetOutID();
-        oldWeight = oldGene.GetWeight();
+        float oldWeight; //weight from the old gene
 
-        NEATNode newNode = new NEATNode(nodeList.Count, NEATNode.HIDDEN_NODE);
-        nodeList.Add(newNode);
-        secondID = newNode.GetNodeID();
+        //NEATGene oldGene = geneList[randomGeneIndex]; //get old gene
 
-        inno = consultor.CheckGeneExistance(firstID, secondID);
+        NEATGene oldGene = null;
+        while (true) {
+            int randomGeneIndex = Random.Range(0, geneList.Count);
+            oldGene = geneList[randomGeneIndex];
+            if (oldGene.GetGeneState() == true) {
+                break;
+            }
+        }
+
+        oldGene.SetGeneState(false); //disable this gene
+        firstID = oldGene.GetInID(); //get in node ID
+        thirdID = oldGene.GetOutID(); //get out node ID
+        oldWeight = oldGene.GetWeight(); //get old weight
+
+        NEATNode newNode = new NEATNode(nodeList.Count, NEATNode.HIDDEN_NODE); //create new hidden node
+        nodeList.Add(newNode); //add new node to the node list
+        secondID = newNode.GetNodeID(); //get new node's ID
+
+        inno = consultor.CheckGeneExistance(firstID, secondID); 
         NEATGene newGene1 = new NEATGene(inno, firstID, secondID, 1f, true);
 
         inno = consultor.CheckGeneExistance(secondID, thirdID);
@@ -620,7 +631,7 @@ public class NEATNet {
                 gene.SetWeight(weight);
             }
             else if (randomNumber <= 5) {
-                gene.SetGeneState(!gene.GetGeneState());
+                //gene.SetGeneState(!gene.GetGeneState());
             }
         }
 
@@ -866,12 +877,12 @@ public class NEATNet {
         NEATGene gene = new NEATGene(copyGene);
 
 
-       /* int randomNrandomNumber = Random.Range(0, 5);
+        int randomNrandomNumber = Random.Range(0, 5);
         if (gene.GetGeneState() == false && 5 == 0) {
             gene.SetGeneState(true);
-        }*/
+        }
 
-        if (state == 1) {
+        /*if (state == 1) {
             int randomNumber = Random.Range(0, 11);
             if (randomNumber == 0) {
                 gene.SetGeneState(false);
@@ -888,7 +899,7 @@ public class NEATNet {
             if (randomNumber == 0) {
                 gene.SetGeneState(!gene.GetGeneState());
             }
-        }
+        }*/
 
         return gene;
     }

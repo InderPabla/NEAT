@@ -30,7 +30,7 @@ public class Tester : MonoBehaviour
     {
         mutex = new Semaphore(1, 1);
 
-        bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
+        /*bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
 
         for (int i = 0; i < 18; i++) {
             lineObjects[i] = (GameObject)Instantiate(linePrefab);
@@ -39,7 +39,9 @@ public class Tester : MonoBehaviour
             lines[i].SetWidth(0.1f,0.1f);
             lines[i].material = new Material(Shader.Find("Particles/Additive"));
             lines[i].SetColors(Color.red,Color.red);
-        }
+        }*/
+
+
     }
     float avgAngle = 0;
     void TakePoint() {
@@ -132,7 +134,7 @@ public class Tester : MonoBehaviour
         //start = true;
         
 
-        float angle = -100f;
+        /*float angle = -100f;
         float angleAdd = (22.22f) / 2f;
         float distance = 10f;
         float outDistance = 0.35f;
@@ -166,7 +168,7 @@ public class Tester : MonoBehaviour
             angle += angleAdd;
         }
 
-        damage -= Time.deltaTime * 30;
+        damage -= Time.deltaTime * 30;*/
     }
 
     public void UpdateOverTime() {
@@ -185,8 +187,8 @@ public class Tester : MonoBehaviour
            bodies[1].GetComponent<HingeJoint2D>().useMotor = true;
        bodies[1].GetComponent<HingeJoint2D>().motor = motor1;*/
 
-        
-        Vector2 dir = bodies[0].transform.up;
+
+        /*Vector2 dir = bodies[0].transform.up;
 
         float[] inputValues = 
             {
@@ -206,7 +208,31 @@ public class Tester : MonoBehaviour
         else
             bodies[0].velocity /= 2f;
 
-        //Invoke("UpdateOverTime",0.1f);
+        Invoke("UpdateOverTime",0.08f);*/
+
+        float deg = bodies[0].transform.eulerAngles.z;
+        if (deg > 180f)
+            deg = (deg - 180f) * -1f;
+        deg = deg * Mathf.Deg2Rad;
+        float isIn = -1f;
+        if (Mathf.Abs(bodies[0].transform.position.y) < 0.25f)
+        {
+            isIn = 1f;
+        }
+
+        float[] inputValues = 
+            {
+                bodies[0].transform.position.y,
+                isIn,
+                deg
+            };
+        float[] output = net.FireNet(inputValues);
+
+        //bodies[0].velocity = new Vector2(output[0]*5f,output[1]*5f);
+
+        Vector2 dir = bodies[0].transform.right;
+        bodies[0].velocity = dir * output[1] * 5f;
+        bodies[0].angularVelocity = output[0] * 250f;
     }
     
     //--Add your own neural net fail code here--//
@@ -320,15 +346,16 @@ public class Tester : MonoBehaviour
             this.net.AddNetFitness(-1f);
         if (output[1] < 0f )
             this.net.AddNetFitness(-1f);*/
-
-        net.AddNetFitness(Time.deltaTime);
+        float y = Mathf.Abs(bodies[0].transform.position.y);
+        if (y<= 1f)
+            net.AddNetFitness(Time.deltaTime*(1f+(1f-y)));
     }
 
 
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
-       
+        
         /*float fit = net.GetNetFitness();
         float angle = bodies[0].transform.eulerAngles.z;
         if (angle > 180)
@@ -390,15 +417,19 @@ public class Tester : MonoBehaviour
     public void OtherActivity(int type) {
         mutex.WaitOne();
 
-        if (type == 0) {
-            net.AddNetFitness(0.25f);
+        if (type == 0)
+        {
+            OnFinished();
+        }
+        /*if (type == 0) {
+            net.AddNetFitness(1f);
             damage = 100f;
         }
 
         if (type == 1) {
-            net.SetNetFitness(net.GetNetFitness()*0f);
+            net.SetNetFitness(net.GetNetFitness()*0.5f);
             OnFinished();
-        }
+        }*/
 
         mutex.Release();
     }

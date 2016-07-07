@@ -9,7 +9,7 @@ using ProgressBar;
 /// This is a general purpose genetic controller, which handles generational computation if a given tester, specification calculation and visual display and mechanics of the panel system.
 /// </summary>
 public class NEATGeneticControllerV2 : MonoBehaviour {
-
+    
     //All public variables are inputs are from the editor
     public GameObject testPrefab; //Prebaf of the object to test   
     public GameObject progressBar; //Progress bar to showcase amount finished
@@ -131,8 +131,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         }
         else { //Currently simulation is running
             lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Simulation currently running");  //information for the user on action performed
-        }
-          
+        }   
     }
 
     /// <summary>
@@ -338,7 +337,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
                 //create gameobject given location, network address, color and id value
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(width, height, 0), species[randomId[0]][randomId[1]], color, randomId);
+                CreateIndividual(new Vector3(0, -3, 0), species[randomId[0]][randomId[1]], color, randomId);
 
                 //update withd and height location
                 if (width % 25 == 0 && width > 0) {

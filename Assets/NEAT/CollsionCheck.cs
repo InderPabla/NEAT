@@ -9,7 +9,7 @@ public class CollsionCheck : MonoBehaviour {
         //else
         //transform.parent.SendMessage("OtherActivity", (object)1);
 
-        if (coll.collider.name.Contains("Food"))
+        /*if (coll.collider.name.Contains("Food"))
         {
             transform.parent.SendMessage("OtherActivity", (object)0);
             Destroy(coll.gameObject);
@@ -19,6 +19,11 @@ public class CollsionCheck : MonoBehaviour {
         }
         else  {
             transform.parent.SendMessage("OtherActivity", (object)2);
+        }*/
+
+        if (coll.collider.name.Contains("Car"))
+        {
+            transform.parent.SendMessage("OtherActivity", (object)0);
         }
 
         //transform.parent.SendMessage("OnFinished");
