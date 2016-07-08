@@ -4,6 +4,12 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 #Video Demo:
 [![ScreenShot](https://github.com/InderPabla/NEAT/blob/master/Images/10.PNG)](http://youtu.be/6p-cZO-py0w)
 
+## AI Racer
+- 6 inputs consisting of, 5 sight detection sensors and 1 directional angle
+- 2 ouputs which control rotaitonal velocity
+- Fitness is based on number of tracks passed through in succession
+![](https://github.com/InderPabla/NEAT/blob/master/Images/11.gif)
+
 ## Creature learns to to maximize distance travelled without dieing. 
 - If creature touches the wall it does immediately
 - If creature gets too near another creature it starts taking damage and does onces damage reaches 100 
