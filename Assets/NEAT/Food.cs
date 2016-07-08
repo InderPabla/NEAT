@@ -8,9 +8,8 @@ public class Food : MonoBehaviour {
 
     void Start () {
 
-        float numberOfFood = Random.Range(250f, 750f);
-        for (int i = 0; i < numberOfFood; i++)
-        {
+        float numberOfFood = Random.Range(500f, 750f);
+        for (int i = 0; i < numberOfFood; i++) {
             GameObject food = (GameObject)Instantiate(foodPrefab, new Vector3(Random.Range(-25f, 25f), Random.Range(-25f, 25f), 0), foodPrefab.transform.rotation);
             food.transform.parent = transform;
         }

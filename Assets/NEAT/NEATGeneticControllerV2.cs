@@ -337,7 +337,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
                 //create gameobject given location, network address, color and id value
                 Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                CreateIndividual(new Vector3(0, -3, 0), species[randomId[0]][randomId[1]], color, randomId);
+                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
 
                 //update withd and height location
                 if (width % 25 == 0 && width > 0) {
@@ -345,7 +345,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                     height += -5f;
                 }
                 else
-                    width += 5f;
+                    width += 10f;
             }
         }
     }
@@ -477,7 +477,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                             net = NEATNet.Corssover(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)], bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //crossover both networks to create an offspring 
                             net.Mutate(); //mutate offspring
                         }
-                        else { //pick 10% elite
+                        else { //pick % elite to keep safe
                             net = new NEATNet(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //pick randomly and keep elite the same
                         }
 

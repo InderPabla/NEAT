@@ -30,7 +30,7 @@ public class Tester : MonoBehaviour
     {
         mutex = new Semaphore(1, 1);
 
-        /*bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
+        //bodies[0].transform.eulerAngles = new Vector3(0f, 0f, UnityEngine.Random.Range(0f,360f));
 
         for (int i = 0; i < 18; i++) {
             lineObjects[i] = (GameObject)Instantiate(linePrefab);
@@ -39,7 +39,7 @@ public class Tester : MonoBehaviour
             lines[i].SetWidth(0.1f,0.1f);
             lines[i].material = new Material(Shader.Find("Particles/Additive"));
             lines[i].SetColors(Color.red,Color.red);
-        }*/
+        }
 
 
     }
@@ -82,17 +82,27 @@ public class Tester : MonoBehaviour
         }
     }
 
+    Vector3 newPos = Vector3.zero;
+    public void NewPos(object pos) {
+        Vector3 pos2 = (Vector3)pos;
+        if ((newPos.x != pos2.x || newPos.y != pos2.y) && Vector3.Distance(bodies[0].transform.position,newPos)<=2f)
+        {
+            newPos = pos2;
+            net.AddNetFitness(1f + net.GetNetFitness());
+        }
+    }
+
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
     private void UpdateNet() {
         /*float boardVelocity = bodies[0].velocity.x; //get current velocity of the board
         //both poles angles in radians
         float pole1AngleRadian = Mathf.Deg2Rad * bodies[1].transform.eulerAngles.z;
-        //float pole2AngleRadian = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
+        float pole2AngleRadian = Mathf.Deg2Rad * bodies[2].transform.eulerAngles.z;
 
         //both poles angular velocities 
         float pole1AngularVelocity = bodies[1].angularVelocity;
-        //float pole2AngularVelocity = bodies[2].angularVelocity;
+        float pole2AngularVelocity = bodies[2].angularVelocity;
 
         float boardLocation = bodies[0].transform.localPosition.x;
 
@@ -132,23 +142,26 @@ public class Tester : MonoBehaviour
         //if(start == false)
             UpdateOverTime();
         //start = true;
-        
+
 
         /*float angle = -100f;
-        float angleAdd = (22.22f) / 2f;
-        float distance = 10f;
+        float angleAdd = (22.22f) / 2f;*/
+
+        /*float angle = -40.5f;
+        float angleAdd = 9f;
+        float distance = 7.5f;
         float outDistance = 0.35f;
         int ignoreFoodLayer = ~(1 << 8);
-
-        Vector3[] direction = new Vector3[18];
-        Vector3[] relativePosition = new Vector3[18];
-        RaycastHit2D[] rayHit = new RaycastHit2D[18];
+        int numerOfSensors = 10;
+        Vector3[] direction = new Vector3[numerOfSensors];
+        Vector3[] relativePosition = new Vector3[numerOfSensors];
+        RaycastHit2D[] rayHit = new RaycastHit2D[numerOfSensors];
 
         float redness = 1f-(damage / 100f);
         Color lineColor = new Color(1f, redness, redness);
         
 
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < numerOfSensors; i++) {
             direction[i] = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
             relativePosition[i] = bodies[0].transform.position + (outDistance * direction[i]);
             rayHit[i] = Physics2D.Raycast(relativePosition[i], direction[i], distance, ignoreFoodLayer);
@@ -168,7 +181,77 @@ public class Tester : MonoBehaviour
             angle += angleAdd;
         }
 
-        damage -= Time.deltaTime * 30;*/
+        damage -= Time.deltaTime * 25f;*/
+
+        Vector2 dir = bodies[0].transform.up;
+        Vector2 deltaVector = newPos - bodies[0].transform.position;
+        deltaVector = deltaVector.normalized;
+        float rad2 = Mathf.Atan2(deltaVector.y, deltaVector.x);
+
+        rad2 *= Mathf.Rad2Deg;
+        rad2 = 90f - rad2;
+
+        if (rad2 < 0f)
+        {
+            rad2 += 360f;
+        }
+        rad2 = 360 - rad2;
+
+        rad2 -= bodies[0].transform.eulerAngles.z;
+        if (rad2 < 0)
+            rad2 = 360 + rad2;
+
+
+        if (rad2 >= 180f)
+        {
+            rad2 = 360 - rad2;
+            rad2 *= -1f;
+        }
+
+        rad2 *= Mathf.Deg2Rad;
+        float angle = -90;
+        float angleAdd = 36f;
+        float distance = 7.5f;
+        float outDistance = 0.35f;
+        int ignoreFoodLayer = ~(1 << 8);
+        int numerOfSensors = 6;
+
+        Vector3[] direction = new Vector3[numerOfSensors];
+        Vector3[] relativePosition = new Vector3[numerOfSensors];
+        RaycastHit2D[] rayHit = new RaycastHit2D[numerOfSensors];
+
+        float redness = 1f - (damage / 100f);
+        Color lineColor = new Color(1f, redness, redness);
+
+
+        for (int i = 0; i < numerOfSensors; i++)
+        {
+            direction[i] = Quaternion.AngleAxis(angle, Vector3.forward) * bodies[0].transform.up;
+            relativePosition[i] = bodies[0].transform.position + (outDistance * direction[i]);
+            rayHit[i] = Physics2D.Raycast(relativePosition[i], direction[i], distance, ignoreFoodLayer);
+            lines[i].SetPosition(0, relativePosition[i]);
+            sightHit[i] = -1f;
+
+            if (rayHit[i].collider != null && rayHit[i].collider.isTrigger == false)
+            {
+                sightHit[i] = Vector2.Distance(rayHit[i].point, bodies[0].transform.position) / distance;
+                lines[i].SetPosition(1, rayHit[i].point);
+            }
+            else
+            {
+                lines[i].SetPosition(1, relativePosition[i]);
+            }
+
+            lines[i].SetColors(lineColor, lineColor);
+
+            angle += angleAdd;
+        }
+
+        float[] inputValues = {rad2, sightHit[0], sightHit[1], sightHit[2], sightHit[3], sightHit[4], sightHit[5]}; 
+        float[] output = net.FireNet(inputValues);
+
+        bodies[0].velocity = 10f * dir * output[0];
+        bodies[0].angularVelocity = 250f * output[1];
     }
 
     public void UpdateOverTime() {
@@ -192,13 +275,12 @@ public class Tester : MonoBehaviour
 
         float[] inputValues = 
             {
+
+
                 sightHit[0], sightHit[1], sightHit[2],
                 sightHit[3], sightHit[4], sightHit[5],
                 sightHit[6], sightHit[7], sightHit[8],
-                sightHit[9], sightHit[10], sightHit[11],
-                sightHit[12], sightHit[13], sightHit[14],
-                sightHit[15], sightHit[16], sightHit[17],
-                (damage / 100f), bodies[0].transform.eulerAngles.z * Mathf.Deg2Rad
+                sightHit[9], damage/100f
             };
         float[] output = net.FireNet(inputValues);
 
@@ -206,35 +288,10 @@ public class Tester : MonoBehaviour
         if (output[1] >= 0)
             bodies[0].velocity = dir * output[1] * 5f;
         else
-            bodies[0].velocity /= 2f;
+            bodies[0].velocity = Vector2.zero;*/
 
-        Invoke("UpdateOverTime",0.08f);*/
-
-        float deg = bodies[0].transform.eulerAngles.z;
-        if (deg > 180f)
-            deg = (deg - 180f) * -1f;
-        deg = deg * Mathf.Deg2Rad;
-        float isIn = -1f;
-        if (Mathf.Abs(bodies[0].transform.position.y) < 0.25f)
-        {
-            isIn = 1f;
-        }
-
-        float[] inputValues = 
-            {
-                bodies[0].transform.position.y,
-                isIn,
-                deg
-            };
-        float[] output = net.FireNet(inputValues);
-
-        //bodies[0].velocity = new Vector2(output[0]*5f,output[1]*5f);
-
-        Vector2 dir = bodies[0].transform.right;
-        bodies[0].velocity = dir * output[1] * 5f;
-        bodies[0].angularVelocity = output[0] * 250f;
+        //Invoke("UpdateOverTime",0.08f);
     }
-    
     //--Add your own neural net fail code here--//
     //restrictions on the test to fail bad neural networks faster
     private bool FailCheck() {
@@ -335,27 +392,22 @@ public class Tester : MonoBehaviour
             pole1Factor = 0f;
         }
 
-        net.AddNetFitness(Mathf.Pow((Time.deltaTime*pole1Factor),1.1f*/
+        net.AddNetFitness(Mathf.Pow((Time.deltaTime * pole1Factor), 1.1f);*/
 
         /*if (bodies[0].angularVelocity == 0)
             fit = fit * 2f;*/
         /*if (bodies[0].velocity.magnitude < 0.5f)
             fit = fit / 2f;*/
 
-        /*if (Mathf.Abs(output[0]) > 0.05f)
-            this.net.AddNetFitness(-1f);
-        if (output[1] < 0f )
-            this.net.AddNetFitness(-1f);*/
-        float y = Mathf.Abs(bodies[0].transform.position.y);
-        if (y<= 1f)
-            net.AddNetFitness(Time.deltaTime*(1f+(1f-y)));
+
+        //this.net.AddNetFitness(Time.deltaTime);
     }
 
 
     //--Add your own neural net fail code here--//
     //Final fitness calculations
     private void CalculateFitnessOnFinish() {
-        
+
         /*float fit = net.GetNetFitness();
         float angle = bodies[0].transform.eulerAngles.z;
         if (angle > 180)
@@ -417,13 +469,11 @@ public class Tester : MonoBehaviour
     public void OtherActivity(int type) {
         mutex.WaitOne();
 
-        if (type == 0)
-        {
-            OnFinished();
-        }
         /*if (type == 0) {
-            net.AddNetFitness(1f);
-            damage = 100f;
+            // net.AddNetFitness(1f);
+            damage += 25f;
+            if (damage > 100)
+                damage = 100f;
         }
 
         if (type == 1) {

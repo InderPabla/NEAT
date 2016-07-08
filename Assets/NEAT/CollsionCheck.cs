@@ -21,12 +21,8 @@ public class CollsionCheck : MonoBehaviour {
             transform.parent.SendMessage("OtherActivity", (object)2);
         }*/
 
-        if (coll.collider.name.Contains("Car"))
-        {
-            transform.parent.SendMessage("OtherActivity", (object)0);
-        }
 
-        //transform.parent.SendMessage("OnFinished");
+        transform.parent.SendMessage("OnFinished");
 
     }
 
@@ -42,5 +38,7 @@ public class CollsionCheck : MonoBehaviour {
         //transform.parent.SendMessage("OtherActivity", (object)3);
         //transform.parent.SendMessage("OtherActivity", (object)0);
     }
+
+    
 
 }
