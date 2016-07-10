@@ -15,7 +15,7 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 - 2 ouputs which control rotaitonal velocity
 - Fitness is based on number of tracks passed through in succession
 - Racer does not need a directional angle to the next track. 
-- Racer must figure forward purely from its sensors. 
+- Racer must figure optimal strategy purely from its sensors. 
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/12.gif)
 
 ## Creature learns to to maximize distance travelled without dieing. 
