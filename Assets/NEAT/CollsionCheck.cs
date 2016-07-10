@@ -21,8 +21,8 @@ public class CollsionCheck : MonoBehaviour {
             transform.parent.SendMessage("OtherActivity", (object)2);
         }*/
 
-
-        transform.parent.SendMessage("OnFinished");
+        if (coll.collider.name.Contains("Ground"))
+            transform.parent.SendMessage("OtherActivity", (object)0);
 
     }
 

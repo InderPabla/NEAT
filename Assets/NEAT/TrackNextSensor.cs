@@ -15,6 +15,7 @@ public class TrackNextSensor : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if(other.name.Contains("Body"))
         other.transform.parent.SendMessage("NewPos",(object)nextSensor.position);
     }
 }

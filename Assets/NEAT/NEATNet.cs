@@ -728,8 +728,7 @@ public class NEATNet {
             }
         }
     }
-
-    /// <summary>
+    
     /// 
     /// </summary>
     /// <param name="net"></param>
@@ -877,8 +876,8 @@ public class NEATNet {
         NEATGene gene = new NEATGene(copyGene);
 
 
-        int randomNrandomNumber = Random.Range(0, 5);
-        if (gene.GetGeneState() == false && 5 == 0) {
+        int randomNumber = Random.Range(0, 5);
+        if (gene.GetGeneState() == false && randomNumber == 0) {
             gene.SetGeneState(true);
         }
 

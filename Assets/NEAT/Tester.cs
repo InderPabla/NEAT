@@ -41,14 +41,16 @@ public class Tester : MonoBehaviour
             lines[i].SetColors(Color.red,Color.red);
         }
 
-
+        TakePoint();
     }
     float avgAngle = 0;
     void TakePoint() {
         //points.Add(bodies[0].transform.position);
         //points.Add(bodies[0].velocity);
 
-        Invoke("TakePoint", 0.025f);
+        speedAvg += bodies[0].velocity.magnitude;
+        speedCounter++;
+        Invoke("TakePoint", 0.5f);
     }
     bool start = false;
     void FixedUpdate() {
@@ -83,12 +85,19 @@ public class Tester : MonoBehaviour
     }
 
     Vector3 newPos = Vector3.zero;
+    float distanceToNewPos = 0f;
+    float speedAvg = 0f;
+    float speedCounter = 0f;
     public void NewPos(object pos) {
         Vector3 pos2 = (Vector3)pos;
+        
+
         if ((newPos.x != pos2.x || newPos.y != pos2.y) && Vector3.Distance(bodies[0].transform.position,newPos)<=2f)
         {
+            distanceToNewPos = Vector3.Distance(bodies[0].transform.position, pos2);
             newPos = pos2;
-            net.AddNetFitness(1f + net.GetNetFitness());
+
+                net.AddNetFitness(net.GetNetFitness() + 1f);
         }
     }
 
@@ -183,35 +192,10 @@ public class Tester : MonoBehaviour
 
         damage -= Time.deltaTime * 25f;*/
 
-        Vector2 dir = bodies[0].transform.up;
-        Vector2 deltaVector = newPos - bodies[0].transform.position;
-        deltaVector = deltaVector.normalized;
-        float rad2 = Mathf.Atan2(deltaVector.y, deltaVector.x);
-
-        rad2 *= Mathf.Rad2Deg;
-        rad2 = 90f - rad2;
-
-        if (rad2 < 0f)
-        {
-            rad2 += 360f;
-        }
-        rad2 = 360 - rad2;
-
-        rad2 -= bodies[0].transform.eulerAngles.z;
-        if (rad2 < 0)
-            rad2 = 360 + rad2;
-
-
-        if (rad2 >= 180f)
-        {
-            rad2 = 360 - rad2;
-            rad2 *= -1f;
-        }
-
-        rad2 *= Mathf.Deg2Rad;
+        
         float angle = -90;
         float angleAdd = 36f;
-        float distance = 7.5f;
+        float distance = 5f;
         float outDistance = 0.35f;
         int ignoreFoodLayer = ~(1 << 8);
         int numerOfSensors = 6;
@@ -247,11 +231,7 @@ public class Tester : MonoBehaviour
             angle += angleAdd;
         }
 
-        float[] inputValues = {rad2, sightHit[0], sightHit[1], sightHit[2], sightHit[3], sightHit[4], sightHit[5]}; 
-        float[] output = net.FireNet(inputValues);
-
-        bodies[0].velocity = 10f * dir * output[0];
-        bodies[0].angularVelocity = 250f * output[1];
+        
     }
 
     public void UpdateOverTime() {
@@ -290,7 +270,43 @@ public class Tester : MonoBehaviour
         else
             bodies[0].velocity = Vector2.zero;*/
 
-        //Invoke("UpdateOverTime",0.08f);
+        Vector2 dir = bodies[0].transform.up;
+        Vector2 deltaVector = newPos - bodies[0].transform.position;
+        deltaVector = deltaVector.normalized;
+        float rad2 = Mathf.Atan2(deltaVector.y, deltaVector.x);
+
+        rad2 *= Mathf.Rad2Deg;
+        rad2 = 90f - rad2;
+
+        if (rad2 < 0f)
+        {
+            rad2 += 360f;
+        }
+        rad2 = 360 - rad2;
+
+        rad2 -= bodies[0].transform.eulerAngles.z;
+        if (rad2 < 0)
+            rad2 = 360 + rad2;
+
+
+        if (rad2 >= 180f)
+        {
+            rad2 = 360 - rad2;
+            rad2 *= -1f;
+        }
+
+        rad2 *= Mathf.Deg2Rad;
+        float d = Vector3.Distance(bodies[0].transform.position, newPos); 
+        float[] inputValues = {sightHit[0], sightHit[1], sightHit[2], sightHit[3], sightHit[4], sightHit[5]};
+        float[] output = net.FireNet(inputValues);
+
+        bodies[0].velocity = 10f * dir * output[0];
+        bodies[0].angularVelocity = 250f * output[1];
+
+        //bodies[1].velocity = 5f * bodies[0].transform.up * output[0];
+        //bodies[2].velocity = 5f * bodies[0].transform.up * output[1];
+
+        //Invoke("UpdateOverTime",0.01f);
     }
     //--Add your own neural net fail code here--//
     //restrictions on the test to fail bad neural networks faster
@@ -464,6 +480,15 @@ public class Tester : MonoBehaviour
             totalDistanceFit /= 50f;
         }*/
 
+        float dis = Vector3.Distance(bodies[0].transform.position, newPos);
+        float disFit = distanceToNewPos - dis;
+
+        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());
+
+
+        //net.AddNetFitness((disFit/ distanceToNewPos));
+
+
     }
 
     public void OtherActivity(int type) {
@@ -480,8 +505,13 @@ public class Tester : MonoBehaviour
             net.SetNetFitness(net.GetNetFitness()*0.5f);
             OnFinished();
         }*/
+        if (type == 0)
+        {
+            //net.SetNetFitness(net.GetNetFitness() * 0.5f);
+            OnFinished();
+        }
 
-        mutex.Release();
+            mutex.Release();
     }
 
     public NEATNet GetNet() {
