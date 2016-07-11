@@ -53,7 +53,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
     private float timeScale = 0; //Current time scale
     private float currentIncrement = 0; //Current increment rate for progress bar
-    private float[,] colors = new float[100, 3]; //Species color indexing (up to 100 species)
+    private float[,] colors = new float[10, 3]; //Species color indexing (up to 100 species)
 
     private bool viewMode = false; //If user is in view mode
     private bool computing = false; //If a generation is currently computing
@@ -336,7 +336,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                 allID.RemoveAt(randomIndex);
 
                 //create gameobject given location, network address, color and id value
-                Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
+                //Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
+                Color color = Color.red;
                 CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
 
                 //update withd and height location
@@ -376,7 +377,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         testCounter++; //increment counter 
         if (testCounter == populationSize) { //if all tests are finished
             DeleteWorld(); //delete enviroment
-            Invoke("TestFinished",1f); //wait 1 second to make sure all gameobjects that need to be deleted are deleted
+            Invoke("TestFinished",2f); //wait 1 second to make sure all gameobjects that need to be deleted are deleted
         }
 
         finished.Release(); //release lock

@@ -542,12 +542,14 @@ public class NEATNet {
 
         //NEATGene oldGene = geneList[randomGeneIndex]; //get old gene
 
-        NEATGene oldGene = null;
-        while (true) {
-            int randomGeneIndex = Random.Range(0, geneList.Count);
-            oldGene = geneList[randomGeneIndex];
-            if (oldGene.GetGeneState() == true) {
-                break;
+        NEATGene oldGene = null; //find a random old gene
+        bool found = false; //used to check if old gene is found
+
+        while (!found) { //run till found
+            int randomGeneIndex = Random.Range(0, geneList.Count); //pick random gene
+            oldGene = geneList[randomGeneIndex]; //get gene at random index
+            if (oldGene.GetGeneState() == true) { //if gene is active
+                found = true; //found
             }
         }
 
@@ -560,13 +562,14 @@ public class NEATNet {
         nodeList.Add(newNode); //add new node to the node list
         secondID = newNode.GetNodeID(); //get new node's ID
 
-        inno = consultor.CheckGeneExistance(firstID, secondID); 
-        NEATGene newGene1 = new NEATGene(inno, firstID, secondID, 1f, true);
+        inno = consultor.CheckGeneExistance(firstID, secondID); //get new innovation number for new gene
+        NEATGene newGene1 = new NEATGene(inno, firstID, secondID, 1f, true); //create new gene
 
-        inno = consultor.CheckGeneExistance(secondID, thirdID);
-        NEATGene newGene2 = new NEATGene(inno, secondID, thirdID, oldWeight, true);
+        inno = consultor.CheckGeneExistance(secondID, thirdID); //get new innovation number for new gene
+        NEATGene newGene2 = new NEATGene(inno, secondID, thirdID, oldWeight, true);  //create new gene
 
-        InsertNewGene(newGene1);
+        //add genes to gene list
+        InsertNewGene(newGene1); 
         InsertNewGene(newGene2);
     }
 
@@ -600,37 +603,42 @@ public class NEATNet {
     }
 
     /// <summary>
-    /// 
+    /// Run through all genes and randomly apply various muations with a chance of 1% 
     /// </summary>
-    private void MutateWeight(){
-        int numberOfGenes = geneList.Count;
-        float weight;
+    private void MutateWeight() {
+        int numberOfGenes = geneList.Count; //number of genes
 
-        for (int i = 0; i < numberOfGenes; i++){
-            NEATGene gene = geneList[i];
+        for (int i = 0; i < numberOfGenes; i++) { //run through all genes
+            NEATGene gene = geneList[i]; // get gene at index i
+            float weight = 0; 
 
-            int randomNumber = Random.Range(1, 101);
+            int randomNumber = Random.Range(1, 101); //random number between 1 and 100
 
-            if (randomNumber <= 1) {
-                weight = gene.GetWeight();
+            if (randomNumber <= 1) { //if 1
+                //flip sign of weight
+                weight = gene.GetWeight(); 
                 weight *= -1f;
                 gene.SetWeight(weight);
             }
-            else if (randomNumber <= 2) {
+            else if (randomNumber <= 2) { //if 2
+                //pick random weight between -1 and 1
                 weight = Random.Range(-1f,1f);
                 gene.SetWeight(weight);
             }
-            else if (randomNumber <= 3) {
+            else if (randomNumber <= 3) { //if 3
+                //randomly increase by 0% to 100%
                 float factor = Random.Range(0f,1f) + 1f;
                 weight = gene.GetWeight() * factor;
                 gene.SetWeight(weight);
             }
-            else if (randomNumber <= 4) {
+            else if (randomNumber <= 4) { //if 4
+                //randomly decrease by 0% to 100%
                 float factor = Random.Range(0f, 1f);
                 weight = gene.GetWeight() * factor;
                 gene.SetWeight(weight);
             }
-            else if (randomNumber <= 5) {
+            else if (randomNumber <= 5) { //if 5
+                //flip activation state for gene
                 //gene.SetGeneState(!gene.GetGeneState());
             }
         }
@@ -638,24 +646,24 @@ public class NEATNet {
     }
 
     /// <summary>
-    /// 
+    /// Check if a connection exists in this gene list
     /// </summary>
-    /// <param name="inID"></param>
-    /// <param name="outID"></param>
-    /// <returns></returns>
+    /// <param name="inID">In node in gene</param>
+    /// <param name="outID">Out node in gene</param>
+    /// <returns>True or false if connection exists in gene list</returns>
     private bool ConnectionExists(int inID, int outID) {
-        int numberOfGenes = geneList.Count;
+        int numberOfGenes = geneList.Count; //number of genes
 
-        for (int i = 0; i < numberOfGenes; i++) {
-            int nodeInID = geneList[i].GetInID();
-            int nodeOutID = geneList[i].GetOutID();
+        for (int i = 0; i < numberOfGenes; i++) { //run through gene list
+            int nodeInID = geneList[i].GetInID(); //get in node
+            int nodeOutID = geneList[i].GetOutID(); //get out node
 
-            if (nodeInID == inID && nodeOutID == outID) {
-                return true;
+            if (nodeInID == inID && nodeOutID == outID) { //check if nodes match given parameters
+                return true; //return true
             }
         }
 
-        return false;
+        return false; //return false if no match
     }
 
     /// <summary>

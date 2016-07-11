@@ -88,7 +88,21 @@ public class Tester : MonoBehaviour
     float distanceToNewPos = 0f;
     float speedAvg = 0f;
     float speedCounter = 0f;
-    public void NewPos(object pos) {
+    int posNum = 1;
+    public void NewPos(object newTransform)
+    {
+        Transform newTransformTemp = (Transform)newTransform;
+        int tempPosNum = int.Parse(newTransformTemp.name);
+        
+
+        if (tempPosNum - 1 == posNum) {
+            posNum = tempPosNum;
+            net.AddNetFitness(net.GetNetFitness() + 1f);
+        }
+
+    }
+
+    /*public void NewPos(object pos) {
         Vector3 pos2 = (Vector3)pos;
         
 
@@ -99,7 +113,7 @@ public class Tester : MonoBehaviour
 
                 net.AddNetFitness(net.GetNetFitness() + 1f);
         }
-    }
+    }*/
 
     //--Add your own neural net update code here--//
     //Updates nerual net with new inputs from the agent
@@ -300,8 +314,8 @@ public class Tester : MonoBehaviour
         float[] inputValues = {sightHit[0], sightHit[1], sightHit[2], sightHit[3], sightHit[4], sightHit[5]};
         float[] output = net.FireNet(inputValues);
 
-        bodies[0].velocity = 10f * dir * output[0];
-        bodies[0].angularVelocity = 250f * output[1];
+        bodies[0].velocity = 5f * dir * output[0];
+        bodies[0].angularVelocity = 150f * output[1];
 
         //bodies[1].velocity = 5f * bodies[0].transform.up * output[0];
         //bodies[2].velocity = 5f * bodies[0].transform.up * output[1];
@@ -480,13 +494,10 @@ public class Tester : MonoBehaviour
             totalDistanceFit /= 50f;
         }*/
 
-        float dis = Vector3.Distance(bodies[0].transform.position, newPos);
+
+        /*float dis = Vector3.Distance(bodies[0].transform.position, newPos);
         float disFit = distanceToNewPos - dis;
-
-        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());
-
-
-        //net.AddNetFitness((disFit/ distanceToNewPos));
+        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());*/
 
 
     }
