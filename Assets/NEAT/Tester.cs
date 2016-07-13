@@ -25,7 +25,7 @@ public class Tester : MonoBehaviour
     private GameObject[] lineObjects = new GameObject[18];
     private LineRenderer[] lines = new LineRenderer[18];
     private float[] sightHit = new float[18];
-
+    Vector2 posCheck = Vector2.zero;
     void Start()
     {
         mutex = new Semaphore(1, 1);
@@ -47,10 +47,17 @@ public class Tester : MonoBehaviour
     void TakePoint() {
         //points.Add(bodies[0].transform.position);
         //points.Add(bodies[0].velocity);
-
-        speedAvg += bodies[0].velocity.magnitude;
-        speedCounter++;
-        Invoke("TakePoint", 0.5f);
+        if (posCheck == Vector2.zero)
+        {
+            posCheck = (Vector2)bodies[0].transform.position + new Vector2(0.00001f,0.0001f);
+        }
+        else if (Vector2.Distance(posCheck, (Vector2)bodies[0].transform.position) <= 2) {
+            OnFinished();
+        }
+        else {
+            posCheck = bodies[0].transform.position;
+        }
+        Invoke("TakePoint", 2f);
     }
     bool start = false;
     void FixedUpdate() {
@@ -86,20 +93,30 @@ public class Tester : MonoBehaviour
 
     Vector3 newPos = Vector3.zero;
     float distanceToNewPos = 0f;
-    float speedAvg = 0f;
-    float speedCounter = 0f;
     int posNum = 1;
     public void NewPos(object newTransform)
     {
         Transform newTransformTemp = (Transform)newTransform;
         int tempPosNum = int.Parse(newTransformTemp.name);
-        
 
-        if (tempPosNum - 1 == posNum) {
+        int checkPos = tempPosNum;
+        if (checkPos == 1)
+            checkPos = 18;
+        else
+            checkPos = checkPos - 1;
+
+        if (checkPos == posNum) {
             posNum = tempPosNum;
+            Vector3 pos = newTransformTemp.position;
+            pos.z = 0f;
+            distanceToNewPos = Vector3.Distance(bodies[0].transform.position, pos);
+            newPos = pos;
+
             net.AddNetFitness(net.GetNetFitness() + 1f);
         }
-
+        else if (!(tempPosNum == posNum)) {
+            OnFinished();
+        }
     }
 
     /*public void NewPos(object pos) {
@@ -209,9 +226,9 @@ public class Tester : MonoBehaviour
         
         float angle = -90;
         float angleAdd = 36f;
-        float distance = 5f;
+        float distance = 4f;
         float outDistance = 0.35f;
-        int ignoreFoodLayer = ~(1 << 8);
+        int ignoreFoodLayer = ~((1 << 8) | (1 << 9));
         int numerOfSensors = 6;
 
         Vector3[] direction = new Vector3[numerOfSensors];
@@ -230,7 +247,7 @@ public class Tester : MonoBehaviour
             lines[i].SetPosition(0, relativePosition[i]);
             sightHit[i] = -1f;
 
-            if (rayHit[i].collider != null && rayHit[i].collider.isTrigger == false)
+            if (rayHit[i].collider != null /*&& rayHit[i].collider.isTrigger == false*/)
             {
                 sightHit[i] = Vector2.Distance(rayHit[i].point, bodies[0].transform.position) / distance;
                 lines[i].SetPosition(1, rayHit[i].point);
@@ -245,7 +262,8 @@ public class Tester : MonoBehaviour
             angle += angleAdd;
         }
 
-        
+        //bodies[0].velocity = (bodies[0].velocity)/(1f+Time.deltaTime);
+        //bodies[0].angularVelocity = (bodies[0].angularVelocity) / (1f + Time.deltaTime); ;
     }
 
     public void UpdateOverTime() {
@@ -311,14 +329,18 @@ public class Tester : MonoBehaviour
 
         rad2 *= Mathf.Deg2Rad;
         float d = Vector3.Distance(bodies[0].transform.position, newPos); 
-        float[] inputValues = {sightHit[0], sightHit[1], sightHit[2], sightHit[3], sightHit[4], sightHit[5]};
+        float[] inputValues = {
+            sightHit[0], sightHit[1], sightHit[2],
+                sightHit[3], sightHit[4], sightHit[5]/*, bodies[0].velocity.magnitude, bodies[0].angularVelocity, bodies[0].transform.eulerAngles.z*Mathf.Deg2Rad*/
+
+        };
         float[] output = net.FireNet(inputValues);
 
-        bodies[0].velocity = 5f * dir * output[0];
-        bodies[0].angularVelocity = 150f * output[1];
+        if(output[0]>0)
+            bodies[0].velocity = 15f * dir * output[0];
+        bodies[0].angularVelocity = 250f * output[1];
 
-        //bodies[1].velocity = 5f * bodies[0].transform.up * output[0];
-        //bodies[2].velocity = 5f * bodies[0].transform.up * output[1];
+        
 
         //Invoke("UpdateOverTime",0.01f);
     }
@@ -495,9 +517,9 @@ public class Tester : MonoBehaviour
         }*/
 
 
-        /*float dis = Vector3.Distance(bodies[0].transform.position, newPos);
+        float dis = Vector3.Distance(bodies[0].transform.position, newPos);
         float disFit = distanceToNewPos - dis;
-        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());*/
+        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());
 
 
     }
