@@ -57,7 +57,7 @@ public class Tester : MonoBehaviour
         else {
             posCheck = bodies[0].transform.position;
         }
-        Invoke("TakePoint", 2f);
+        Invoke("TakePoint", 1f);
     }
     bool start = false;
     void FixedUpdate() {
@@ -101,7 +101,7 @@ public class Tester : MonoBehaviour
 
         int checkPos = tempPosNum;
         if (checkPos == 1)
-            checkPos = 18;
+            checkPos = 19;
         else
             checkPos = checkPos - 1;
 
@@ -112,7 +112,7 @@ public class Tester : MonoBehaviour
             distanceToNewPos = Vector3.Distance(bodies[0].transform.position, pos);
             newPos = pos;
 
-            net.AddNetFitness(net.GetNetFitness() + 1f);
+            net.AddNetFitness((net.GetNetFitness()*2f) +1f);
         }
         else if (!(tempPosNum == posNum)) {
             OnFinished();
@@ -225,11 +225,11 @@ public class Tester : MonoBehaviour
 
         
         float angle = -90;
-        float angleAdd = 36f;
-        float distance = 4f;
+        float angleAdd = 18f;
+        float distance = 3f;
         float outDistance = 0.35f;
         int ignoreFoodLayer = ~((1 << 8) | (1 << 9));
-        int numerOfSensors = 6;
+        int numerOfSensors = 11;
 
         Vector3[] direction = new Vector3[numerOfSensors];
         Vector3[] relativePosition = new Vector3[numerOfSensors];
@@ -328,16 +328,19 @@ public class Tester : MonoBehaviour
         }
 
         rad2 *= Mathf.Deg2Rad;
-        float d = Vector3.Distance(bodies[0].transform.position, newPos); 
+        float d = Vector3.Distance(bodies[0].transform.position, newPos);
         float[] inputValues = {
             sightHit[0], sightHit[1], sightHit[2],
-                sightHit[3], sightHit[4], sightHit[5]/*, bodies[0].velocity.magnitude, bodies[0].angularVelocity, bodies[0].transform.eulerAngles.z*Mathf.Deg2Rad*/
-
+                sightHit[3], sightHit[4], sightHit[5],
+                sightHit[6], sightHit[7], sightHit[8],
+                sightHit[9], sightHit[10]
+                
         };
         float[] output = net.FireNet(inputValues);
 
         if(output[0]>0)
             bodies[0].velocity = 15f * dir * output[0];
+       
         bodies[0].angularVelocity = 250f * output[1];
 
         
@@ -519,7 +522,7 @@ public class Tester : MonoBehaviour
 
         float dis = Vector3.Distance(bodies[0].transform.position, newPos);
         float disFit = distanceToNewPos - dis;
-        net.AddNetFitness((disFit / distanceToNewPos)*net.GetNetFitness());
+        net.AddNetFitness((disFit / distanceToNewPos)*(net.GetNetFitness()));
 
 
     }

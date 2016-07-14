@@ -884,16 +884,16 @@ public class NEATNet {
         NEATGene gene = new NEATGene(copyGene);
 
 
-        /*int randomNumber = Random.Range(0, 11);
+        int randomNumber = Random.Range(0, 5);
         if (state == 2) {
-            randomNumber = Random.Range(0, 26);
+            randomNumber = Random.Range(0, 11);
             if (randomNumber == 0) {
                 gene.SetGeneState(true);
             }
         }
         else if (gene.GetGeneState() == false && randomNumber == 0) {
             gene.SetGeneState(true);
-        }*/
+        }
 
         /*if (state == 1) {
             int randomNumber = Random.Range(0, 26);
