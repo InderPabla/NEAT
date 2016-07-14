@@ -4,7 +4,7 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 #Video Demo Of Food Seeker:
 [![ScreenShot](https://github.com/InderPabla/NEAT/blob/master/Images/10.PNG)](http://youtu.be/6p-cZO-py0w)
 
-#Video Demo Of Food Seeker:
+#Video Demo Of Racer AI:
 [![ScreenShot](https://github.com/InderPabla/NEAT/blob/master/Images/13.PNG)](http://youtu.be/272amdscyiw)
 
 ## AI Racer
