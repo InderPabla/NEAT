@@ -36,8 +36,11 @@ public class DatabaseOperation  {
         int geneTotal = net.GetGeneCount();
         int genomeTotal = consultor.GetGeneCount();
 
+        float fitness = net.GetNetFitness();
+
         page +=
             "&creature_name=" + name +
+            "&creature_fitness=" + fitness +
             "&node_total=" + nodeTotal +
             "&node_inputs=" + nodeInputs +
             "&node_outputs=" + nodeOutputs +
@@ -45,7 +48,7 @@ public class DatabaseOperation  {
             "&genome_total=" + genomeTotal +
             "&genome=" + genome +
             "&consultor_genome=" + consultorGenome;
-
+        Debug.Log(page);
         web = new WWW(page);
         yield return web;
     }

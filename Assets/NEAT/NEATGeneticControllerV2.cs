@@ -442,6 +442,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             distribution = SortFitness(distribution); //sort distribution
 
             bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]); //set best net from the best index
+            bestNet.SetNetFitness(species[bestIndex[0]][bestIndex[1]].GetNetFitness());
             lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold()); //plot highest fitness on graph
             netDrawer.SendMessage("DrawNet",bestNet); //Draw best network
             
