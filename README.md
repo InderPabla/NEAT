@@ -64,4 +64,6 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 - Visual display of the neural network
 ![Alt text](https://github.com/InderPabla/NEAT/blob/master/Images/9.PNG "Panel System")
 
-
+# Database Configuration
+- 10 columns consisting of ID, name, fitness, total node count, input node count, output node count, network gene count, consultor genome gene count, string compilation of network genome and  string compilation of consultor genome
+![Alt text](https://github.com/InderPabla/NEAT/blob/master/Images/14.PNG "Database")
