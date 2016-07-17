@@ -667,97 +667,104 @@ public class NEATNet {
     }
 
     /// <summary>
-    /// 
+    /// Set all node values to 0
     /// </summary>
     public void ClearNodeValues() {
-        int numberOfNodes = nodeList.Count;
+        int numberOfNodes = nodeList.Count; //number of nodes
 
-        for (int i = 0; i < numberOfNodes; i++) {
-            nodeList[i].SetValue(0f);
+        for (int i = 0; i < numberOfNodes; i++) { //run through all nodes
+            nodeList[i].SetValue(0f); //set values to 0
         }
     }
 
     /// <summary>
-    /// 
+    /// Insert new gene into its proper location the gene list.
+    /// All genes are orders in asending order based on their innovation number.
     /// </summary>
-    /// <param name="gene"></param>
+    /// <param name="gene">Gene to inset into the gene list</param>
     private void InsertNewGene(NEATGene gene) {
-        int inno = gene.GetInnovation();
-        int insertIndex = FindInnovationInsertIndex(inno);
+        int inno = gene.GetInnovation(); //get innovation number
+        int insertIndex = FindInnovationInsertIndex(inno); //get insert index
 
-        if (insertIndex == geneList.Count) {
-            geneList.Add(gene);
+        if (insertIndex == geneList.Count) { //if insert index is equal to the size of the genome
+            geneList.Add(gene); //add gene 
         }
-        else {
-            geneList.Insert(insertIndex, gene);
+        else { //otherwise
+            geneList.Insert(insertIndex, gene); //add gene to the given insert index location
         }
     }
 
     /// <summary>
-    /// 
+    /// Find the correct location to insert a given innovation number.
+    /// Using bianry search to find insert location.
     /// </summary>
-    /// <param name="inno"></param>
-    /// <returns></returns>
+    /// <param name="inno">Innovation to insert</param>
+    /// <returns>Location to insert the innovation number</returns>
     private int FindInnovationInsertIndex(int inno) {
-        int numberOfGenes = geneList.Count;
-        int startIndex = 0;
-        int endIndex = numberOfGenes - 1;
+        int numberOfGenes = geneList.Count; //number of genes
+        int startIndex = 0; //start index
+        int endIndex = numberOfGenes - 1; //end index
 
-        if (numberOfGenes == 0) {
-            return 0;
+        if (numberOfGenes == 0) { //if there are no genes
+            return 0; //first location to insert
         }
-        else if (numberOfGenes == 1) {
-            if (inno > geneList[0].GetInnovation()) {
-                return 1;
+        else if (numberOfGenes == 1) { //if there is only 1 gene
+            if (inno > geneList[0].GetInnovation()) { //if innovation is greater than the girst gene's innovation
+                return 1; //insert into second location
             }
             else {
-                return 0;
+                return 0; //insert into first location 
             }
         }
 
-        while (true) {
-            int middleIndex = (endIndex + startIndex)/2;
-            int middleInno = geneList[middleIndex].GetInnovation();
-            if(endIndex-startIndex == 1) {
-                int endInno = geneList[endIndex].GetInnovation();
-                int startInno = geneList[startIndex].GetInnovation();
-                if (inno < startInno)
-                    return startIndex;
-                else if (inno > endInno)
-                    return endIndex + 1;
-                else
-                    return endIndex;
+        while (true) { //run till found
+            int middleIndex = (endIndex + startIndex)/2; //find middle index (middle of start and end)
+            int middleInno = geneList[middleIndex].GetInnovation(); //get middle index's innovation number
+
+            if(endIndex-startIndex == 1) { //if there is only 1 index between start and end index (base case on recursion)
+                int endInno = geneList[endIndex].GetInnovation(); //get end inde's innovation
+                int startInno = geneList[startIndex].GetInnovation(); //get start index's innovation
+
+                if (inno < startInno) { //innovation is less than start innovation
+                    return startIndex; //return start index
+                }
+                else if (inno > endInno) { //innovation is greater than end innovation
+                    return endIndex + 1; //return end index + 1
+                }
+                else { 
+                    return endIndex; //otherwise right in end index
+                }
             }
-            else if (inno > middleInno) {
-                startIndex = middleIndex;
+            else if (inno > middleInno) { //innovation is greater than middle innovation
+                startIndex = middleIndex; //new start index will be the middle
             }
-            else {
-                endIndex = middleIndex;
+            else { //innovation is less than middle innovation
+                endIndex = middleIndex; //new end index is middle index
             }
         }
-    }
-    
-    /// 
-    /// </summary>
-    /// <param name="net"></param>
-    /// <returns></returns>
-    internal static NEATNet CreateMutateCopy(NEATNet net) {
-        NEATNet copy = null;
-
-        copy = new NEATNet(net);
-        copy.Mutate();
-
-        return copy;
     }
 
     /// <summary>
-    /// 
+    /// Create a mutated deep copy of a given neural network
     /// </summary>
-    /// <param name="parent1"></param>
-    /// <param name="parent2"></param>
-    /// <returns></returns>
+    /// <param name="net">Neural network copy to mutate</param>
+    /// <returns>Mutated deep copy of the given neural network</returns>
+    internal static NEATNet CreateMutateCopy(NEATNet net) {
+        NEATNet copy = new NEATNet(net); //create deep copy of net
+        copy.Mutate(); //mutate copy
+
+        return copy; //return mutated deep copy
+    }
+
+    /// <summary>
+    /// Corssover between two parents neural networks to create a child neural network.
+    /// Crossover method is as described by the NEAT algorithm.
+    /// </summary>
+    /// <param name="parent1">Neural network parent</param>
+    /// <param name="parent2">Neural network parent</param>
+    /// <returns>Child neural network</returns>
     internal static NEATNet Corssover (NEATNet parent1, NEATNet parent2) {
-        NEATNet child = null;
+        NEATNet child = null; //child to create
 
         Hashtable geneHash = new Hashtable();
 
@@ -777,8 +784,7 @@ public class NEATNet {
         if (parent1.GetNodeCount() > parent2.GetNodeCount()) {
             childNodeList = parent1.nodeList;
         }
-        else
-        {
+        else {
             childNodeList = parent2.nodeList;
         }
 
