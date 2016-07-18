@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 
 /// <summary>
-/// Handels mutation, crossover, specification, feedforward activation and creation of neural network genome. 
+/// Handels mutation, crossover, specification, feedforward activation and creation of neural network's genotype. 
 /// </summary>
 public class NEATNet {
 
@@ -573,35 +573,6 @@ public class NEATNet {
         InsertNewGene(newGene2);
     }
 
-    //-----UNUSED
-    /// <summary>
-    /// 
-    /// </summary>
-    private void DeleteConnection() {
-        int randomGeneIndex = Random.Range(0, geneList.Count);
-        geneList.RemoveAt(randomGeneIndex);
-    }
-
-    //-----UNUSED
-    /// <summary>
-    /// 
-    /// </summary>
-    private void DeleteNode() {
-        int randomNodeIndex = Random.Range(numberOfInputs+numberOfOutputs, nodeList.Count);
-        
-        for (int i = 0; i < geneList.Count; i++) {
-            NEATGene gene = geneList[i];
-            int inID = gene.GetInID();
-            int outID = gene.GetOutID();
-
-            if (inID == randomNodeIndex || outID == randomNodeIndex) {
-                geneList.RemoveAt(i);
-            }
-        }
-
-        nodeList.RemoveAt(randomNodeIndex);
-    }
-
     /// <summary>
     /// Run through all genes and randomly apply various muations with a chance of 1% 
     /// </summary>
@@ -766,148 +737,163 @@ public class NEATNet {
     internal static NEATNet Corssover (NEATNet parent1, NEATNet parent2) {
         NEATNet child = null; //child to create
 
-        Hashtable geneHash = new Hashtable();
+        Hashtable geneHash = new Hashtable(); //hash table to be used to compared genes from the two parents
 
-        List<NEATGene> childGeneList = new List<NEATGene>();
-        List<NEATNode> childNodeList = null;
+        List<NEATGene> childGeneList = new List<NEATGene>(); //new gene child gene list to be created
+        List<NEATNode> childNodeList = null; //new child node list to be created
 
-        List<NEATGene> geneList1 = parent1.geneList;
-        List<NEATGene> geneList2 = parent2.geneList;
+        List<NEATGene> geneList1 = parent1.geneList; //get gene list of the parent 1
+        List<NEATGene> geneList2 = parent2.geneList; //get gene list of parent 2
 
-        NEATConsultor consultor = parent1.GetConsultor();
+        NEATConsultor consultor = parent1.GetConsultor(); //get consultor (consultor is the same for all neural network as it's just a pointer location)
 
-        int numberOfGenes1 = geneList1.Count;
-        int numberOfGenes2 = geneList2.Count;
-        int numberOfInputs = parent1.GetNumberOfInputNodes();
-        int numberOfOutputs = parent1.GetNumberOfOutputNodes();
+        int numberOfGenes1 = geneList1.Count; //get number of genes in parent 1
+        int numberOfGenes2 = geneList2.Count; //get number of genes in parent 2
+        int numberOfInputs = parent1.GetNumberOfInputNodes(); //number of inputs (same for both parents)
+        int numberOfOutputs = parent1.GetNumberOfOutputNodes(); //number of outputs (same for both parents)
 
-        if (parent1.GetNodeCount() > parent2.GetNodeCount()) {
-            childNodeList = parent1.nodeList;
+        if (parent1.GetNodeCount() > parent2.GetNodeCount()) { //if parents 1 has more nodes than parent 2
+            childNodeList = parent1.nodeList; //copy parent 1's node list
         }
-        else {
-            childNodeList = parent2.nodeList;
-        }
-
-        for (int i = 0; i < numberOfGenes1; i++) {
-            geneHash.Add(geneList1[i].GetInnovation(),new NEATGene[] { geneList1[i], null});
+        else { //otherwise parent 2 has euqal and more nodes than parent 1
+            childNodeList = parent2.nodeList; //copy parent 2's node list
         }
 
-        for (int i = 0; i < numberOfGenes2; i++) {
-            int innovationNumber = geneList2[i].GetInnovation();
-            if (geneHash.ContainsKey(innovationNumber) == true) {
-                NEATGene[] geneValue = (NEATGene[])geneHash[innovationNumber];
-                geneValue[1] = geneList2[i];
-                geneHash.Remove(innovationNumber);
-                geneHash.Add(innovationNumber, geneValue);
+        for (int i = 0; i < numberOfGenes1; i++) { //run through all genes in parent 1
+            geneHash.Add(geneList1[i].GetInnovation(),new NEATGene[] { geneList1[i], null}); //add into the hash with innovation number as the key and gene array of size 2 as value
+        }
+
+        for (int i = 0; i < numberOfGenes2; i++) { //run through all genes in parent 2
+            int innovationNumber = geneList2[i].GetInnovation(); //get innovation number 
+
+            if (geneHash.ContainsKey(innovationNumber) == true) { //if there is a key in the hash with the given innovation number
+                NEATGene[] geneValue = (NEATGene[])geneHash[innovationNumber]; //get gene array value with the innovation key
+                geneValue[1] = geneList2[i]; //since this array already contains value in first location, we can add the new gene in the second location
+                geneHash.Remove(innovationNumber); //remove old value with the key
+                geneHash.Add(innovationNumber, geneValue); //add new value with the key
             }
-            else {
-                geneHash.Add(innovationNumber, new NEATGene[] { null , geneList2[i] });
+            else { //there exists no key with the given innovation number
+                geneHash.Add(innovationNumber, new NEATGene[] { null , geneList2[i] }); //add into  the hash with innovation number as the key and gene array of size 2 as value
             }
         }
 
-        NEATGene gene;
-        int randomIndex;
-        ICollection keysCol = geneHash.Keys;
-        int[] keys = new int[keysCol.Count];
-        keysCol.CopyTo(keys,0);
-        keys = keys.OrderBy(i => i).ToArray();
+        ICollection keysCol = geneHash.Keys; //get all keys in the hash
+
+        NEATGene gene = null; //
+
+        int[] keys = new int[keysCol.Count]; //int array with size of nuumber of keys in the hash
+
+        keysCol.CopyTo(keys,0); //copy Icollentions keys list to keys array
+        keys = keys.OrderBy(i => i).ToArray(); //order keys in asending order
         
-        for (int i = 0; i < keys.Length; i++) {
-            NEATGene[] geneValue = (NEATGene[])geneHash[keys[i]];
-            int state = -1;
-            if (geneValue[0] != null && geneValue[1] != null)  {
-                randomIndex = Random.Range(0, 2);
+        for (int i = 0; i < keys.Length; i++) { //run through all keys
+            NEATGene[] geneValue = (NEATGene[])geneHash[keys[i]]; //get value at each index
 
-                if (geneValue[0].GetGeneState() == true && geneValue[1].GetGeneState() == true) {
-                    state = 0;
+            //compare value is used to compare gene activation states in each parent 
+            int compareValue = -1;
+            //0 = both genes are true, 1 = both are false, 2 = one is false other is true
+            //3 = gene is dominant in one of the parents and is true, 4 = gene is dominant in one of the parents and is false
+
+            if (geneValue[0] != null && geneValue[1] != null)  { //gene eixts in both parents
+                int randomIndex = Random.Range(0, 2);
+
+                if (geneValue[0].GetGeneState() == true && geneValue[1].GetGeneState() == true) { //gene is true in both
+                    compareValue = 0; //set compared value to 0
                 }
-                else if (geneValue[0].GetGeneState() == false && geneValue[1].GetGeneState() == false) {
-                    state = 1;
+                else if (geneValue[0].GetGeneState() == false && geneValue[1].GetGeneState() == false) { //gene is false in both
+                    compareValue = 1; //set compared value to 1
                 }
-                else {
-                    state = 2;
+                else { //gene is true in one and false in the other
+                    compareValue = 2; //set compared value to 2
                 }
-                gene = CrossoverCopyGene(geneValue[randomIndex],state);
-                childGeneList.Add(gene);
+
+                gene = CrossoverCopyGene(geneValue[randomIndex], compareValue); //randomly pick a gene from eaither parent and create deep copy 
+                childGeneList.Add(gene); //add gene to the child gene list
             }
-            else if (parent1.GetNetFitness() > parent2.GetNetFitness()) {
-                if (geneValue[0] != null) {
-                    if (geneValue[0].GetGeneState() == true) {
-                        state = 3;
+            else if (parent1.GetNetFitness() > parent2.GetNetFitness()) { //parent 1's fitness is greater than parent 2
+                if (geneValue[0] != null) { //gene value at first index from parent 1 exists
+                    if (geneValue[0].GetGeneState() == true) { //gene is active
+                        compareValue = 3; //set compared value to 3
                     }
-                    else {
-                        state = 4;
+                    else { //gene is not active
+                        compareValue = 4; //set compared value to 4
                     }
-                    gene = CrossoverCopyGene(geneValue[0],state);
-                    childGeneList.Add(gene);
-                }
-            }
-            else if (parent1.GetNetFitness() < parent2.GetNetFitness()) {
-                if (geneValue[1] != null) {
-                    if (geneValue[1].GetGeneState() == true) {
-                        state = 3;
-                    }
-                    else {
-                        state = 4;
-                    }
-                    gene = CrossoverCopyGene(geneValue[1],state);
-                    childGeneList.Add(gene);
+
+                    gene = CrossoverCopyGene(geneValue[0], compareValue); //deep copy parent 1's gene
+                    childGeneList.Add(gene); //add gene to the child gene list
                 }
             }
-            else if (geneValue[0] != null) {
-                if (geneValue[0].GetGeneState() == true){
-                    state = 3;
+            else if (parent1.GetNetFitness() < parent2.GetNetFitness()) { //parent 2's fitness is greater than parent 1
+                if (geneValue[1] != null) { //gene value at second index from parent 2 exists
+                    if (geneValue[1].GetGeneState() == true) { //gene is active
+                        compareValue = 3; //set compared value to 3
+                    }
+                    else { //gene is not active
+                        compareValue = 4; //set compared value to 4
+                    }
+
+                    gene = CrossoverCopyGene(geneValue[1], compareValue); //deep copy parent 2's gene 
+                    childGeneList.Add(gene); //add gene to the child gene list
                 }
-                else {
-                    state = 4;
-                }
-                gene = CrossoverCopyGene(geneValue[0], state);
-                childGeneList.Add(gene);
             }
-            else if (geneValue[1] != null) {
-                if (geneValue[1].GetGeneState() == true) {
-                    state = 3;
+            else if (geneValue[0] != null) { //both parents have equal fitness and gene value at first index from parent 1 exists
+                if (geneValue[0].GetGeneState() == true){ //gene is active
+                    compareValue = 3; //set compared value to 3
                 }
-                else {
-                    state = 4;
+                else { //gene is not active
+                    compareValue = 4; //set compared value to 4
                 }
-                gene = CrossoverCopyGene(geneValue[1],state);
-                childGeneList.Add(gene);
+
+                gene = CrossoverCopyGene(geneValue[0], compareValue); //deep copy parent 1's gene 
+                childGeneList.Add(gene); //add gene to the child gene list
+            }
+            else if (geneValue[1] != null) { //both parents have equal fitness and gene value at second index from parent 2 exists
+                if (geneValue[1].GetGeneState() == true) { //gene is active
+                    compareValue = 3; //set compared value to 3
+                }
+                else { //gene is not active
+                    compareValue = 4; //set compared value to 4
+                }
+
+                gene = CrossoverCopyGene(geneValue[1], compareValue); //deep copy parent 2's gene 
+                childGeneList.Add(gene); //add gene to the child gene list
             }
         }
 
-        child = new NEATNet(consultor, numberOfInputs, numberOfOutputs, childNodeList, childGeneList);
-        return child;
+        child = new NEATNet(consultor, numberOfInputs, numberOfOutputs, childNodeList, childGeneList); //create new child neural network 
+        return child; //return newly created neural network
     }
 
     /// <summary>
-    /// 
+    /// Created a deep copy of a given gene. 
+    /// This gene can be muated with a small chance based on the compare value. 
+    /// Deactivated genes have a small chance of being activated based on the compare value. 
     /// </summary>
-    /// <param name="copyGene"></param>
-    /// <param name="state"></param>
-    /// <returns></returns>
-    private static NEATGene CrossoverCopyGene(NEATGene copyGene, int state) {
-        NEATGene gene = new NEATGene(copyGene);
+    /// <param name="copyGene">Gene to deep copy</param>
+    /// <param name="compareValue">Value to use when activating a gene</param>
+    /// <returns>Deep copied gene</returns>
+    private static NEATGene CrossoverCopyGene(NEATGene copyGene, int compareValue) {
+        NEATGene gene = new NEATGene(copyGene); //deep copy gene 
 
+        int randomNumber = Random.Range(0, 5); //0-4
 
-        int randomNumber = Random.Range(0, 5);
-        if (state == 2) {
-            randomNumber = Random.Range(0, 11);
-            if (randomNumber == 0) {
-                gene.SetGeneState(true);
+        if (compareValue == 2) { //if gene is false in both parents
+            randomNumber = Random.Range(0, 11); //0-10
+            if (randomNumber == 0) { //9% chance of activating this gene
+                gene.SetGeneState(true); //activate
             }
         }
-        else if (gene.GetGeneState() == false && randomNumber == 0) {
-            gene.SetGeneState(true);
+        else if (gene.GetGeneState() == false && randomNumber == 0) { //gene is false and 20% chance of activating this gene
+            gene.SetGeneState(true); //activate
         }
 
-        /*if (state == 1) {
+        /*if (compareValue == 1) {
             int randomNumber = Random.Range(0, 26);
             if (randomNumber == 0) {
                 gene.SetGeneState(false);
             }
         }
-        else if (state == 2) {
+        else if (compareValue == 2) {
             int randomNumber = Random.Range(0, 26);
             if (randomNumber == 0) {
                 gene.SetGeneState(true);
@@ -920,113 +906,120 @@ public class NEATNet {
             }
         }*/
 
-        return gene;
+        return gene; //return new gene
     }
 
     /// <summary>
-    /// 
+    /// Check whether two neural networks belong to the same species based on defined coefficient values in the consultor
     /// </summary>
-    /// <param name="net1"></param>
-    /// <param name="net2"></param>
-    /// <returns></returns>
+    /// <param name="net1">Neural network to compare</param>
+    /// <param name="net2">Neural network to compare</param>
+    /// <returns>True of false whether they belong to the same species</returns>
     internal static bool SameSpeciesV2(NEATNet net1, NEATNet net2) {
-        Hashtable geneHash = new Hashtable();
-        NEATConsultor consultor = net1.consultor;
-        NEATGene[] geneValue;
+        Hashtable geneHash = new Hashtable(); //hash table to be used to compared genes from the two networks
+        NEATConsultor consultor = net1.consultor; //get consultor (consultor is the same for all neural network as it's just a pointer location)
+        NEATGene[] geneValue; //will be used to check whether a gene exists in both networks
 
-        List<NEATGene> geneList1 = net1.geneList;
-        List<NEATGene> geneList2 = net2.geneList;
+        List<NEATGene> geneList1 = net1.geneList; //get first network
+        List<NEATGene> geneList2 = net2.geneList; //get second network
 
-        ICollection keysCol;
-        int[] keys;
+        ICollection keysCol; //will be used to get keys from gene hash
+        int[] keys; //will be used to get keys arrray from ICollections
 
-        int numberOfGenes1 = geneList1.Count;
-        int numberOfGenes2 = geneList2.Count;
-        int largerGenomeSize = numberOfGenes1 > numberOfGenes2 ? numberOfGenes1 : numberOfGenes2;
-        int excessGenes = 0;
-        int disjointGenes = 0;
-        int equalGenes = 0;
+        int numberOfGenes1 = geneList1.Count; //get number of genes in network 1
+        int numberOfGenes2 = geneList2.Count; //get number of genes in network 2
+        int largerGenomeSize = numberOfGenes1 > numberOfGenes2 ? numberOfGenes1 : numberOfGenes2; //get one that is larger between the 2 network
+        int excessGenes = 0; //number of excess genes (genes that do match and are outside the innovation number of the other network)
+        int disjointGenes = 0; //number of disjoint gene (genes that do not match in the two networks)
+        int equalGenes = 0; //number of genes both neural network have
 
-        float disjointCoefficient = consultor.GetDisjointCoefficient();
-        float excessCoefficient = consultor.GetExcessCoefficient();
-        float averageWeightDifferenceCoefficient = consultor.GetAverageWeightDifferenceCoefficient();
-        float deltaThreshold = consultor.GetDeltaThreshold();
-        float similarity = 0;
-        float averageWeightDifference = 0;
+        float disjointCoefficient = consultor.GetDisjointCoefficient(); //get disjoint coefficient from consultor
+        float excessCoefficient = consultor.GetExcessCoefficient(); //get excess coefficient from consultor
+        float averageWeightDifferenceCoefficient = consultor.GetAverageWeightDifferenceCoefficient(); //get average weight difference coefficient
+        float deltaThreshold = consultor.GetDeltaThreshold(); //get threshold 
+        float similarity = 0; //similarity of the two networks 
+        float averageWeightDifference = 0; //average weight difference of the two network's equal genes
 
-        bool foundAllExcess = false;
-        bool isFirstGeneExcess = false;
+        bool foundAllExcess = false; //if all excess genes are found
+        bool isFirstGeneExcess = false; //if net 1 contains the excess genes
 
-        for (int i = 0; i < geneList1.Count; i++) {
-            int innovation = geneList1[i].GetInnovation();
-            geneValue = new NEATGene[] {geneList1[i], null};
-            geneHash.Add(innovation, geneValue);
+        for (int i = 0; i < geneList1.Count; i++) { //run through net 1's genes
+            int innovation = geneList1[i].GetInnovation(); //get innovation number of gene
+
+            geneValue = new NEATGene[] {geneList1[i], null}; //add into the hash with innovation number as the key and gene array of size 2 as value 
+            geneHash.Add(innovation, geneValue);  //add into the hash with innovation number as the key and gene array of size 2 as value
         }
 
-        for (int i = 0; i < geneList2.Count; i++) {
-            int innovation = geneList2[i].GetInnovation();
+        for (int i = 0; i < geneList2.Count; i++) { //run through net 2's genes
+            int innovation = geneList2[i].GetInnovation(); //get innovation number of gene
 
-            if (!geneHash.ContainsKey(innovation)) {
-                geneValue = new NEATGene[] {null, geneList2[i]};
-                geneHash.Add(innovation, geneValue);
+            if (!geneHash.ContainsKey(innovation)) { //if innovation key does not exist
+                geneValue = new NEATGene[] {null, geneList2[i]}; //create array of size 2 with new gene in the second position
+                geneHash.Add(innovation, geneValue); //add into  the hash with innovation number as the key and gene array of size 2 as value
             }
-            else {
-                geneValue = (NEATGene[]) geneHash[innovation];
-                geneValue[1] = geneList2[i];
-            }
-        }
-
-        keysCol = geneHash.Keys;
-        keys = new int[keysCol.Count];
-        keysCol.CopyTo(keys, 0);
-        keys = keys.OrderBy(i => i).ToArray();
-
-        for (int i = keys.Length-1; i >= 0; i--) {
-            geneValue = (NEATGene[])geneHash[keys[i]];
-            if (foundAllExcess == false) {
-                if (i == keys.Length - 1 && geneValue[1] == null) {
-                    isFirstGeneExcess = true;
-                }
-
-                if (isFirstGeneExcess == true && geneValue[1] == null) {
-                    excessGenes++;
-                }
-                else if (isFirstGeneExcess == false && geneValue[0] == null) {
-                    excessGenes++;
-                }
-                else {
-                    foundAllExcess = true;
-                }
-
-            }
-
-            if(foundAllExcess == true){ 
-                if (geneValue[0] != null && geneValue[1] != null) {
-                    equalGenes++;
-                    averageWeightDifference += Mathf.Abs(geneValue[0].GetWeight() - geneValue[1].GetWeight());
-                }
-                else {
-                    disjointGenes++;
-                }
+            else { //key exists
+                geneValue = (NEATGene[]) geneHash[innovation]; //get value
+                geneValue[1] = geneList2[i]; //add into second position net 2's gene
             }
         }
 
-        averageWeightDifference = averageWeightDifference / (float)equalGenes;
-        similarity = (averageWeightDifference * averageWeightDifferenceCoefficient) +
-                     (((float)disjointGenes * disjointCoefficient) / (float)largerGenomeSize) +
-                     (((float)excessGenes * excessCoefficient) / (float)largerGenomeSize);
+        keysCol = geneHash.Keys; //get all keys from gene hash
+        keys = new int[keysCol.Count]; //create array with size of number of keys
+        keysCol.CopyTo(keys, 0); //copy all keys from ICollections to array
+        keys = keys.OrderBy(i => i).ToArray(); //order keys in ascending order
 
-        return similarity<=deltaThreshold;
+        for (int i = keys.Length-1; i >= 0; i--) { //run through all keys backwards (to get all excess gene's first)
+            geneValue = (NEATGene[])geneHash[keys[i]]; //get value with key
+
+            if (foundAllExcess == false) { //if all excess genes have not been found
+                if (i == keys.Length - 1 && geneValue[1] == null) { //this is the first itteration and second gene location is null
+                    isFirstGeneExcess = true; //excess genes exit in net 1
+                }
+
+                if (isFirstGeneExcess == true && geneValue[1] == null) { //excess gene exist in net 1 and there is no gene in second location of the value
+                    excessGenes++; //this is an excess gene and increment excess gene
+                }
+                else if (isFirstGeneExcess == false && geneValue[0] == null) { //excess gene exist in net 12 and there is no gene in first location of the value
+                    excessGenes++; //this is an excess gene and increment excess gene
+                }
+                else { //no excess genes
+                    foundAllExcess = true; //all excess genes are found
+                }
+
+            }
+
+            if(foundAllExcess == true){ //if all excess genes are found
+                if (geneValue[0] != null && geneValue[1] != null) { //both gene location are not null
+                    equalGenes++; //increment equal genes
+                    averageWeightDifference += Mathf.Abs(geneValue[0].GetWeight() - geneValue[1].GetWeight()); //add absolute difference between 2 weight
+                }
+                else { //this is disjoint gene
+                    disjointGenes++; //increment disjoint
+                }
+            }
+        }
+
+        averageWeightDifference = averageWeightDifference / (float)equalGenes; //get average weight difference of equal genes
+
+        //similarity formula -> Sim = (AVG_DIFF * AVG_COFF) + (((DISJ*DISJ_COFF) + (EXSS*EXSS_COFF)) /GENOME_SIZE)
+        similarity = (averageWeightDifference * averageWeightDifferenceCoefficient) + //calculate weight difference disparity
+                     (((float)disjointGenes * disjointCoefficient) / (float)largerGenomeSize) +  //calculate disjoint disparity
+                     (((float)excessGenes * excessCoefficient) / (float)largerGenomeSize); //calculate excess disparity
+
+        //if similairty is <= to threshold then return true, otherwise false
+        return similarity<=deltaThreshold; //return boolean compare value
     }
 
     /// <summary>
-    /// 
+    /// ---ONLY USED FOR DEBUGGING---
+    /// Prints all neural network details.
     /// </summary>
     public void PrintDetails() {
-        int numberOfNodes = nodeList.Count;
-        int numberOfGenes = geneList.Count;
+        int numberOfNodes = nodeList.Count; //get number of nodes
+        int numberOfGenes = geneList.Count; //get number of genes
 
-        Debug.Log("-----------------");
+        //Print various node details to Unity Log
+        Debug.Log("-----------------"); 
 
         for (int i = 0; i < numberOfNodes; i++) {
             NEATNode node = nodeList[i];
