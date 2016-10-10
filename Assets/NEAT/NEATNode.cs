@@ -1,7 +1,7 @@
 ﻿using System;
 
 /// <summary>
-/// 
+/// Acts like the individual neuron of a network.
 /// </summary>
 public class NEATNode {
 
@@ -23,7 +23,15 @@ public class NEATNode {
     public NEATNode(NEATNode copy) {
         this.ID = copy.ID;
         this.type = copy.type;
-        this.value = copy.value;
+
+        if (this.type == INPUT_BIAS_NODE) {
+            this.value = 1f;
+        }
+        else {
+            this.value = 0f;
+        }
+
+        //this.value = copy.value; << MAJOR BUG FIXED!
     }
 
     /// <summary>
@@ -80,7 +88,7 @@ public class NEATNode {
     /// 
     /// </summary>
     public void Activation() {
-        value =  (float)Math.Tanh(value);
+        value =  (float)Math.Tanh(value); 
         //value= 1.0f / (1.0f + (float)Math.Exp(-value));
     }
 }

@@ -45,8 +45,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
     private List<List<NEATNet>> species = new List<List<NEATNet>>(); //List of list of species (There can be multiple species in a population)
    
-    private const string ACTIVATE = "Activate"; //Activate fucntion name in Tester class
-
+    private const string ACTION_ACTIVATE = "Activate"; //Activate fucntion name in Tester class
+    private const string ACTION_SUBSCRIBE = "SubscriveToEvent";
     private int numberOfGenerationsToRun = 0; //Number of generation to run, chosen from the panel
     private int generationNumber = 0; //Current generation number
     private int testCounter; //Counter for population testing, goes from 0 to population size
@@ -206,6 +206,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     /// Save best neural network to database
     /// </summary>
     public void ActionSaveCurrent() {
+        Debug.Log("Saving");
+        //bestNet.SetNetFitness(0f);
         StartCoroutine(operations.SaveNet(bestNet, networkName)); //start coroutine to save network
     }
 
@@ -314,8 +316,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         List<int[]> allID = new List<int[]>(); //2D id
 
         //width and height used for placing gameobjects
-        float height = 25f; 
-        float width = -25f;
+        float height = 16f; 
+        float width = -16f;
         int numberOfSpecies = species.Count; //save species count
 
         //create id's based on number of species in the species list
@@ -337,16 +339,17 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
                 //create gameobject given location, network address, color and id value
                 //Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                Color color = Color.red;
-                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
+                Color color = Color.red; 
 
                 //update withd and height location
-                if (width % 25 == 0 && width > 0) {
-                    width = -25f;
-                    height += -5f;
+                if (width % 16 == 0 && width > 0) {
+                    width = -16f;
+                    height += -2f;
                 }
                 else
-                    width += 10f;
+                    width += 2f;
+
+                CreateIndividual(new Vector3(width, height, 0), species[randomId[0]][randomId[1]], color, randomId);
             }
         }
     }
@@ -361,9 +364,10 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     private void CreateIndividual(Vector3 position, NEATNet net, Color color, int[] id) {
         GameObject tester = (GameObject)Instantiate(testPrefab, position, testPrefab.transform.rotation); //Instantiate gameobject with prebaf
         tester.name = id[0] + "_" + id[1]; //set tester name to match id
-        tester.SendMessage(ACTIVATE, net); //activate tester with net
+        tester.SendMessage(ACTION_ACTIVATE, net); //activate tester with net
         tester.transform.GetChild(0).GetComponent<Renderer>().material.color = color; //gave tester a color
-        tester.GetComponent<Tester>().TestFinished += OnFinished; //subscribe to a delegate to know when a tester is finished its simulation
+        tester.SendMessage(ACTION_SUBSCRIBE, this);
+        //tester.GetComponent<Tester>().TestFinished += OnFinished; //subscribe to a delegate to know when a tester is finished its simulation
     }
 
     /// <summary>
@@ -371,13 +375,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     /// </summary>
     /// <param name="source">NOT USED</param>
     /// <param name="ev">NOT USED</param>
-    private void OnFinished(object source, EventArgs ev) {
+    public void OnFinished(object source, EventArgs ev) {
         finished.WaitOne(); //mutex lock since test counter is a shared resource
 
         testCounter++; //increment counter 
         if (testCounter == populationSize) { //if all tests are finished
             DeleteWorld(); //delete enviroment
-            Invoke("TestFinished",2f); //wait 1 second to make sure all gameobjects that need to be deleted are deleted
+            TestFinished();
+            //Invoke("TestFinished",2f); //wait 1 second to make sure all gameobjects that need to be deleted are deleted
         }
 
         finished.Release(); //release lock
@@ -473,14 +478,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                             float powerNeeded = Mathf.Log(bestNetworks.Count - 1, 100);
                             float logIndex = Mathf.Abs(((bestNetworks.Count - 1) - Mathf.Pow(random, powerNeeded)));
 
-                            NEATNet organisum1 = bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)];  //pick randomly from best networks                     
-                            NEATNet organisum2 = bestNetworks[(int)logIndex]; //use logarithmicly chosen random index from best network 
+                            NEATNet organism1 = bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)];  //pick randomly from best networks                     
+                            NEATNet organism2 = bestNetworks[(int)logIndex]; //use logarithmicly chosen random index from best network 
 
                             net = NEATNet.Corssover(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)], bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //crossover both networks to create an offspring 
                             net.Mutate(); //mutate offspring
                         }
                         else { //pick % elite to keep safe
-                            net = new NEATNet(bestNetworks[UnityEngine.Random.Range(0, bestNetworks.Count)]); //pick randomly and keep elite the same
+                            net = new NEATNet(bestNetworks[bestNetworks.Count-1/*UnityEngine.Random.Range(0, bestNetworks.Count)*/]); //pick randomly and keep elite the same
                         }
 
                         //reset copied stats

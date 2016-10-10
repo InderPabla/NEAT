@@ -6,7 +6,7 @@
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
 	<RootNamespace></RootNamespace>
-	<ProjectGuid>{AEDD9433-65E1-687D-E4D4-8852EDFFADF5}</ProjectGuid>
+	<ProjectGuid>{354DB3CF-D610-CAD2-FDBC-EDADA400DB74}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<AssemblyName>Assembly-CSharp</AssemblyName>
@@ -45,10 +45,12 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\NEAT\CollsionCheck.cs" />
+     <Compile Include="Assets\AgentProblems\ObsticalAvoider\ObsticalAvoider.cs" />
+     <Compile Include="Assets\AgentProblems\RacerAI\CollsionCheck.cs" />
+     <Compile Include="Assets\AgentProblems\RacerAI\RacerAI.cs" />
+     <Compile Include="Assets\AgentProblems\RacerAI\TrackNextSensor.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
-     <Compile Include="Assets\NEAT\Food.cs" />
-     <Compile Include="Assets\NEAT\Leg1.cs" />
+     <Compile Include="Assets\NEAT\IAgentTester.cs" />
      <Compile Include="Assets\NEAT\LineGraphDrawer.cs" />
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
@@ -57,19 +59,24 @@
      <Compile Include="Assets\NEAT\NEATNetDraw.cs" />
      <Compile Include="Assets\NEAT\NEATNode.cs" />
      <Compile Include="Assets\NEAT\NEATPacket.cs" />
-     <Compile Include="Assets\NEAT\Tester.cs" />
-     <Compile Include="Assets\NEAT\TrackNextSensor.cs" />
      <Compile Include="Assets\ProgressBar\Script\ProgressBarBehaviour.cs" />
      <Compile Include="Assets\ProgressBar\Script\ProgressRadialBehaviour.cs" />
      <Compile Include="Assets\ProgressBar\Script\Utils.cs" />
+     <Compile Include="Assets\Testing\BehaviourTest.cs" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
+ </Reference>
  <Reference Include="LitJson">
- <HintPath>C:/Users/Pabla/Documents/Unity Projects/NEAT/Assets/NEAT/LitJson.dll</HintPath>
+ <HintPath>C:/Users/Pabla/Documents/Unity Projects/NEAT_V2/Assets/General/LitJson.dll</HintPath>
  </Reference>
  <Reference Include="Mono.Cecil">
  <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Mono.Cecil.dll</HintPath>

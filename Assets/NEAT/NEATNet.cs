@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine;
 using System.Linq;
+using System.Text;
 
 /// <summary>
 /// Handels mutation, crossover, specification, feedforward activation and creation of neural network's genotype. 
@@ -22,6 +23,7 @@ public class NEATNet {
     private float netFitness; //fitness of this neural network
 
     /// <summary>
+    /// This is a deep copy constructor. 
     /// Creating neural network structure from deep copying another network
     /// </summary>
     /// <param name="copy">Neural network to deep copy</param>
@@ -95,7 +97,7 @@ public class NEATNet {
         this.timeLived = 0f; //reset time lived
 
         InitilizeNodes(); //initialize initial nodes
-        InitilizeGenes(); //initialize initial gene sequence
+        InitilizeGenes(); //initialize initial gene sequence 
     }
 
     /// <summary>
@@ -153,7 +155,7 @@ public class NEATNet {
         for (int i = 0; i < numberOfInputs; i++){ //run through number of inputs
             for (int j = numberOfInputs; j < numberOfInputs+numberOfOutputs; j++){ //run through number of outputs
                 int inno = consultor.CheckGeneExistance(i,j);  //check if gene exists in consultor
-                NEATGene gene = new NEATGene(inno, i, j, 1f, true); // create gene with default weight of 1.0 and and is active 
+                NEATGene gene = new NEATGene(inno, i, j, Random.Range(-1f,1f), true); // create gene with default weight of 1.0 and and is active 
 
                 InsertNewGene(gene); //insert gene to correct location in gene list
             }
@@ -377,7 +379,7 @@ public class NEATNet {
     /// Compile and return only output node values in an array
     /// </summary>
     /// <returns>Only ouput node values in an array</returns>
-    private float[] GetOutputValues(){
+    public float[] GetOutputValues(){
         float[] values = new float[numberOfOutputs]; //create an array with size of number of output nodes
 
         for (int i = 0; i < numberOfOutputs; i++) { //run through number of outputs
@@ -439,6 +441,11 @@ public class NEATNet {
         int numberOfGenes = geneList.Count; //get number of genes
 
         SetInputValues(inputs); //set input values to the input nodes
+
+        //set all output node values to 0
+        for (int i = 0; i < numberOfOutputs; i++){ //run through number of outputs  
+            //nodeList[i + numberOfInputs].SetValue(0f); 
+        }
 
         //feed forward reccurent net 
         float[] tempValues = GetAllNodeValues(); //create a temporary storage of previous node values (used as a phenotype)

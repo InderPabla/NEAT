@@ -37,7 +37,8 @@ public class DatabaseOperation  {
         int geneTotal = net.GetGeneCount(); //neural network gene count to save
         int genomeTotal = consultor.GetGeneCount(); //consultor genome gene count to save
 
-        float fitness = net.GetNetFitness(); //net fitness to save
+        float fitness = Mathf.Clamp(net.GetNetFitness(),-100000f,100000f); //net fitness to save, clamp it between -100000 and 100000
+        
 
         page +=
             "&creature_name=" + name +

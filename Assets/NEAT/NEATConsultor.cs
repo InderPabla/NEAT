@@ -179,7 +179,7 @@ public class NEATConsultor  {
     /// </summary>
     /// <returns></returns>
     public string GetGenomeString() {
-        string genome = "";
+        string genome = ""; //
         int numberOfGenes = geneList.Count;
 
         for (int i = 0; i < numberOfGenes; i++) {
