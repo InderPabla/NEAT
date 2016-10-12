@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 
+//14 2      1 4 4 4
 public class ObsticalAvoider : MonoBehaviour, IAgentTester{
 
     public GameObject linePrefab;
@@ -106,8 +107,11 @@ public class ObsticalAvoider : MonoBehaviour, IAgentTester{
 
         float[] output = net.FireNet(inputValues);
 
-        if(output[0]>0)
+        if (output[0] > 0)
             rBody.velocity = 7 * transform.up * output[0];
+        else {
+            rBody.velocity = rBody.velocity.magnitude * transform.up;
+        }
         rBody.angularVelocity = 200f * output[1];
 
         float turn = (1f-Mathf.Abs(output[1])/100f);
@@ -147,8 +151,7 @@ public class ObsticalAvoider : MonoBehaviour, IAgentTester{
         }*/
         float fitness = net.GetNetFitness();
         float timeLivedPoint = 1f + (net.GetTimeLived() / net.GetTestTime());
-        float damagePoint = 1f + (damage / 100f);
-
+        float damagePoint = 1f/* + (damage / 100f)*/;
         net.SetNetFitness(fitness*timeLivedPoint*damagePoint);
     }
 

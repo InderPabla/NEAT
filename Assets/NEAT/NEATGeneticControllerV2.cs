@@ -53,11 +53,13 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
     private float timeScale = 0; //Current time scale
     private float currentIncrement = 0; //Current increment rate for progress bar
-    private float[,] colors = new float[10, 3]; //Species color indexing (up to 100 species)
+    private float[,] colors = new float[100, 3]; //Species color indexing (up to 100 species)
 
     private bool viewMode = false; //If user is in view mode
     private bool computing = false; //If a generation is currently computing
     private bool load = false; //load from database or create random neural network
+
+    public TextMesh generationNumberText; //>>> Used for video only (TAKE OUT LATER)!!! <<<
 
     /// <summary>
     /// Setting up initial systems
@@ -107,7 +109,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                 colors[i, 2] = UnityEngine.Random.Range(0f, 1f);
  
                 for (int j = 0; j < i; j++) { //run through all other found colors to make sure this new found color is atleast a certain threshold away  
-                    if (!(Mathf.Abs(((colors[i, 0] + colors[i, 1] + colors[i, 2]) - (colors[j, 0] + colors[j, 1] + colors[j, 2]))) >= 0.005f)) { //if new color is not a certain threshold away then not found
+                    if (!(Mathf.Abs(((colors[i, 0] + colors[i, 1] + colors[i, 2]) - (colors[j, 0] + colors[j, 1] + colors[j, 2]))) >= 0.0001f)) { //if new color is not a certain threshold away then not found
                         found = false;
                     }
                 }
@@ -311,6 +313,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     /// Generate tester gameobjects given the species list
     /// </summary>
     private void GeneratePopulation() {
+        generationNumberText.text = "Generation Number: " + (generationNumber+1);
         ResetWorld(); //reset world
 
         List<int[]> allID = new List<int[]>(); //2D id
@@ -338,8 +341,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                 allID.RemoveAt(randomIndex);
 
                 //create gameobject given location, network address, color and id value
-                //Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
-                Color color = Color.red; 
+                Color color = new Color(colors[randomId[0], 0], colors[randomId[0], 1], colors[randomId[0], 2]);
+                //Color color = Color.red; 
 
                 //update withd and height location
                 if (width % 16 == 0 && width > 0) {
@@ -365,9 +368,24 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         GameObject tester = (GameObject)Instantiate(testPrefab, position, testPrefab.transform.rotation); //Instantiate gameobject with prebaf
         tester.name = id[0] + "_" + id[1]; //set tester name to match id
         tester.SendMessage(ACTION_ACTIVATE, net); //activate tester with net
-        tester.transform.GetChild(0).GetComponent<Renderer>().material.color = color; //gave tester a color
         tester.SendMessage(ACTION_SUBSCRIBE, this);
+
+        //Commented out because the Tester object can have any class name
         //tester.GetComponent<Tester>().TestFinished += OnFinished; //subscribe to a delegate to know when a tester is finished its simulation
+        Renderer renderer = tester.GetComponent<Renderer>();
+        if (renderer!=null) {
+            renderer.material.color = color; //gave tester a color
+        }
+
+        //color all children inside this object
+        for (int i = 0; i < tester.transform.childCount; i++) {
+            renderer = tester.transform.GetChild(i).GetComponent<Renderer>();
+            if (renderer != null) {
+                renderer.material.color = color; //gave tester's children a color
+            }
+        }
+        
+        
     }
 
     /// <summary>
@@ -396,7 +414,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
         if (numberOfGenerationsToRun > 0) { //if computing
             generationNumber++; // increment generation number
-
             List<List<NEATNet>> bestSpecies = new List<List<NEATNet>>(); //50% best networks from each species list
 
             float[,] distribution = new float[species.Count,2]; //population distribution for species in the next generation
