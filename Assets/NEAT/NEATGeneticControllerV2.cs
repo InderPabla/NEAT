@@ -352,7 +352,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                 else
                     width += 2f;
 
-                CreateIndividual(new Vector3(width, height, 0), species[randomId[0]][randomId[1]], color, randomId);
+                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
             }
         }
     }

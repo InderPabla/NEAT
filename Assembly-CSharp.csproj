@@ -45,6 +45,11 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\AgentProblems\Bipedal\Bipedal.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\Bipedal2.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\Bipedal3.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\Bipedal4.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\TouchDetector.cs" />
      <Compile Include="Assets\AgentProblems\ObsticalAvoider\ObsticalAvoider.cs" />
      <Compile Include="Assets\AgentProblems\PoleBalance\PoleBalancer.cs" />
      <Compile Include="Assets\AgentProblems\RacerAI\CollsionCheck.cs" />
@@ -64,6 +69,7 @@
      <Compile Include="Assets\ProgressBar\Script\ProgressRadialBehaviour.cs" />
      <Compile Include="Assets\ProgressBar\Script\Utils.cs" />
      <Compile Include="Assets\Testing\BehaviourTest.cs" />
+     <Compile Include="Assets\Testing\BipedalAngleTest.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
