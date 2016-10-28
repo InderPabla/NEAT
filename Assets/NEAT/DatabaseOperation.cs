@@ -10,8 +10,8 @@ using LitJson;
 public class DatabaseOperation  {
 
 
-    private string insertPage = "http://localhost:8000/NEAT/insert_genotype.php?server=localhost&username=root&password=123&database=neat"; //insert php script
-    private string retrievePage = "http://localhost:8000/NEAT/retrieve_genotype.php?server=localhost&username=root&password=123&database=neat"; //retrieve php script
+    private string insertPage = "http://localhost:8000/NEAT/insert_genotype.php?server=localhost&username=root&password=&database=neat"; //insert php script
+    private string retrievePage = "http://localhost:8000/NEAT/retrieve_genotype.php?server=localhost&username=root&password=&database=neat"; //retrieve php script
 
     public NEATPacket[] retrieveNet; //packets of retrieved nets
     public WWW web; //used to connect to server side 
@@ -37,7 +37,7 @@ public class DatabaseOperation  {
         int geneTotal = net.GetGeneCount(); //neural network gene count to save
         int genomeTotal = consultor.GetGeneCount(); //consultor genome gene count to save
 
-        float fitness = Mathf.Clamp(net.GetNetFitness(),-100000f,100000f); //net fitness to save, clamp it between -100000 and 100000
+		float fitness = Mathf.Clamp(net.GetNetFitness(),-100000000f,100000000f); //net fitness to save, clamp it between -100000000 and 100000000
         
 
         page +=
@@ -50,7 +50,7 @@ public class DatabaseOperation  {
             "&genome_total=" + genomeTotal +
             "&genome=" + genome +
             "&consultor_genome=" + consultorGenome; //create insert page url
-
+		Debug.Log (page);
         web = new WWW(page); //run page
         yield return web; //return page when finished execution (retruns success echo if inserted corrected)
     }

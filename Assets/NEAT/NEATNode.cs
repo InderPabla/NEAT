@@ -12,18 +12,19 @@ public class NEATNode {
     public const int OUTPUT_NODE = 3;
 
     private int ID;
-    private int type;
+    private int type; 
 
     private float value;
 
     /// <summary>
-    /// 
+    /// Deep copy a given copy node
     /// </summary>
-    /// <param name="copy"></param>
+    /// <param name="copy">The node to copy</param>
     public NEATNode(NEATNode copy) {
-        this.ID = copy.ID;
+        this.ID = copy.ID; 
         this.type = copy.type;
 
+		// if this is the bias node set it to 1, else reset value to 0
         if (this.type == INPUT_BIAS_NODE) {
             this.value = 1f;
         }
@@ -31,14 +32,14 @@ public class NEATNode {
             this.value = 0f;
         }
 
-        //this.value = copy.value; << MAJOR BUG FIXED!
+        //this.value = copy.value; << BUG FIXED!
     }
 
     /// <summary>
-    /// 
+    /// Create a node with an id and type
     /// </summary>
-    /// <param name="ID"></param>
-    /// <param name="type"></param>
+    /// <param name="ID">ID of this node</param>
+    /// <param name="type">Type of this node</param>
     public NEATNode(int ID, int type) {
         this.ID = ID;
         this.type = type;      
@@ -52,40 +53,40 @@ public class NEATNode {
     }
 
     /// <summary>
-    /// 
+    /// Get the ID of this node.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Node ID</returns>
     public int GetNodeID() {
         return ID;
     }
 
     /// <summary>
-    /// 
+    /// Get the type of this node
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Node type</returns>
     public int GetNodeType(){
         return type;
     }
 
     /// <summary>
-    /// 
+    /// Get node value
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Node value</returns>
     public float GetValue() {
         return value;
     }
 
     /// <summary>
-    /// 
+    /// Set value of the node if it's not a biased node
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">Value to set</param>
     public void SetValue(float value) {
         if(type != INPUT_BIAS_NODE)
             this.value = value;
     }
 
     /// <summary>
-    /// 
+    /// Run the value through hyperbolic tangent approx
     /// </summary>
     public void Activation() {
         value =  (float)Math.Tanh(value); 

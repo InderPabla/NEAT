@@ -2,41 +2,34 @@
 using System.Collections.Generic;
 
 /// <summary>
-/// 
+/// Draws the network
 /// </summary>
 public class NEATNetDraw : MonoBehaviour {
     public GameObject linePrefab;
     public GameObject nodePrefab;
 
     private List<GameObject> lineList;
-
     private List<GameObject> nodeList;
     private Vector3[] locations;
     private Vector3 topLeft;
 
     /// <summary>
-    /// 
+    /// Initilize line and node list, followed by getting the position where this object is placed.
     /// </summary>
     void Start () {
         lineList = new List<GameObject>();
         nodeList = new List<GameObject>();
-        topLeft = transform.position;
+        topLeft = transform.position; // a reference point to index on
     }
-	
-	/// <summary>
-    /// 
-    /// </summary>
-	void Update () {
-	    
-	}
 
     /// <summary>
-    /// 
+    /// Draw neural network
     /// </summary>
     /// <param name="net"></param>
     public void DrawNet(NEATNet net) {
-        Clear();
+        Clear(); // clear previous network
 
+		// get network information from MEATNet
         int numberOfInputs = net.GetNumberOfInputNodes();
         int numberOfOutputs = net.GetNumberOfOutputNodes();
         int numberOfNodes = net.GetNodeCount();
@@ -45,6 +38,7 @@ public class NEATNetDraw : MonoBehaviour {
         locations = new Vector3[net.GetNodeCount()];
         int locationIndex = 0;
 
+		//Create input node objects 
         float staryY = topLeft.y;
         for (int i = 0; i < numberOfInputs; i++) {
             Vector3 loc = new Vector3(topLeft.x, staryY, 0);
@@ -58,7 +52,7 @@ public class NEATNetDraw : MonoBehaviour {
             locationIndex++;
         }
 
-        //staryY = (topLeft.y - (numberOfInputs / 2f)) + (numberOfOutputs / 2f);
+        //create output node objects	
         staryY = (topLeft.y);
         for (int i = numberOfInputs; i < hiddenStartIndex; i++) {
             Vector3 loc = new Vector3(topLeft.x + 7f, staryY, 0);
@@ -72,6 +66,7 @@ public class NEATNetDraw : MonoBehaviour {
             locationIndex++;
         }
 
+		//create hidden nodes in a circle formation 
         float xn = 0;
         float yn = 0;
         float angle = 0;
@@ -79,7 +74,7 @@ public class NEATNetDraw : MonoBehaviour {
             xn = Mathf.Sin(Mathf.Deg2Rad * angle) * 2;
             yn = Mathf.Cos(Mathf.Deg2Rad * angle) * 2;
 
-            Vector3 loc = new Vector3(xn + /*3.5f*/5f + topLeft.x, ((yn + topLeft.y) - (numberOfInputs / 2f))-7f, 0);
+            Vector3 loc = new Vector3(xn + 5f + topLeft.x, ((yn + topLeft.y) - (numberOfInputs / 2f))-7f, 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
             node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.red;
@@ -90,11 +85,12 @@ public class NEATNetDraw : MonoBehaviour {
             locationIndex++;
         }
 
-        float[][] geneConnections = net.GetGeneDrawConnections();
+        float[][] geneConnections = net.GetGeneDrawConnections(); //get gene connection list
         int colSize = geneConnections.GetLength(0);
         
+		//create line connection objects
         for (int i = 0; i < colSize; i++) {
-            if (geneConnections[i][2] != 0f){
+            //if (geneConnections[i][2] != 0f){
                 GameObject lineObj = (GameObject)Instantiate(linePrefab);
                 lineObj.transform.parent = transform;
                 lineList.Add(lineObj);
@@ -125,13 +121,13 @@ public class NEATNetDraw : MonoBehaviour {
 
                 lineRen.SetColors(color, color);
                 lineRen.SetWidth(size, size);
-            }
+            //}
         } 
     }
 
     /// <summary>
-    /// 
-    /// </summary>
+    /// Clear previous nodes and linez
+	/// </summary>
     public void Clear() {
         for(int i = 0; i < lineList.Count; i++) {
             Destroy(lineList[i]);

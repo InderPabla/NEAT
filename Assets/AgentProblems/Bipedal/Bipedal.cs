@@ -17,96 +17,115 @@ public class Bipedal : MonoBehaviour, IAgentTester
     private float damage = 100f;
     private bool finished = false;
 
-    public WheelJoint2D[] wheels = new WheelJoint2D[4];
+    public WheelJoint2D[] wheels1 = new WheelJoint2D[4];
     public Rigidbody2D body;
-    public TouchDetector[] detector = new TouchDetector[4];
-    // Use this for initialization
-    void Start()
-    {
-        
-    }
+    public TouchDetector[] detector1 = new TouchDetector[4];
+    public bool[] wheels1Broken = new bool[4];
+    float[] wheels1DegPrev = new float[4];
 
     public void UpdateNet()
     {
-        float[] angles = new float[4];
-        float bodyAngle = body.transform.eulerAngles.z;
-        if (bodyAngle > 180f)
-            bodyAngle = bodyAngle - 360f;
-        bodyAngle *= Mathf.Deg2Rad;
+        float bodyDeg = body.transform.eulerAngles.z;
+        if (bodyDeg < 0f)
+            bodyDeg = 360f + bodyDeg;
 
-        for (int i = 0; i < angles.Length; i++)
+        float bodyRad = bodyDeg;
+        if (bodyRad > 180f)
+            bodyRad = bodyRad - 360f;
+        bodyRad *= Mathf.Deg2Rad;
+
+        float[] wheels1Rad = new float[4];
+        float[] wheels1Deg = new float[4];
+        float[] wheels1DegPrev = new float[4];
+
+        for (int i = 0; i < wheels1Deg.Length; i++)
         {
+            wheels1Deg[i] = wheels1[i].transform.eulerAngles.z;
+            if (wheels1Deg[i] < 0f)
+                wheels1Deg[i] = 360f + wheels1Deg[i];
+
             if (i < 2)
-                angles[i] = wheels[i].transform.eulerAngles.z - body.transform.eulerAngles.z;
+            {
+                wheels1Deg[i] = wheels1Deg[i] - bodyDeg;
+            }
             else if (i == 2)
-                angles[i] = wheels[i].transform.eulerAngles.z - wheels[0].transform.eulerAngles.z;
+            {
+                wheels1Deg[i] = wheels1Deg[i] - wheels1Deg[0];
+            }
             else if (i == 3)
-                angles[i] = wheels[i].transform.eulerAngles.z - wheels[1].transform.eulerAngles.z;
-            //angles[i] = getJointRotation(wheels[i].GetComponent<ConfigurableJoint>()).eulerAngles.z;
-            if (angles[i] > 180f)
-                angles[i] = angles[i] - 360f;
-            angles[i] *= Mathf.Deg2Rad;
+            {
+                wheels1Deg[i] = wheels1Deg[i] - wheels1Deg[1];
+            }
+
+            if (wheels1Deg[i] < 0f)
+                wheels1Deg[i] = 360f + wheels1Deg[i];
+
+            wheels1Rad[i] = wheels1Deg[i];
+            if (wheels1Rad[i] > 180f)
+                wheels1Rad[i] = 180f - wheels1Rad[i];
+            wheels1Rad[i] = wheels1Rad[i] * Mathf.Deg2Rad;
+        }
+
+
+        float[] output = net.FireNet(new float[] { bodyRad,
+            wheels1Rad[0]/(Mathf.PI/6f), wheels1Rad[1]/(Mathf.PI/6f), wheels1Rad[2]/(Mathf.PI/6f), wheels1Rad[3]/(Mathf.PI/6f),
+            detector1[0].touch, detector1[1].touch, detector1[2].touch, detector1[3].touch});
+
+
+        for (int i = 0; i < wheels1Deg.Length; i++)
+        {
+            if (wheels1Broken[i] == false)
+            {
+                JointMotor2D jointMotor = wheels1[i].motor;
+                float speed = 0f;
+                float value = output[i];
+
+                if (value < 0 && wheels1Deg[i] > 50f && wheels1Deg[i] < 180f)
+                {
+                    speed =0 ;
+                    if (wheels1Deg[i] > 70f)
+                        wheels1Broken[i] = true;
+                }
+                else if (value > 0 && wheels1Deg[i] < 310f && wheels1Deg[i] > 180f)
+                {
+                    speed = 0;
+                    if (wheels1Deg[i] < 290f)
+                        wheels1Broken[i] = true;
+                }
+                else
+                {
+                    speed = value * 150f;
+                }
+
+                jointMotor.motorSpeed = speed;
+                wheels1[i].motor = jointMotor;
+            }
+            else
+            {
+                wheels1[i].useMotor = false;
+            }
+        }
+
+        if (detector1[0].touch == 1 || detector1[1].touch == 1)
+            damage -= 5f;
+
+
+        for (int i = 0; i < wheels1DegPrev.Length; i++)
+        {
+            float diff = Mathf.Abs(wheels1Deg[i] - wheels1DegPrev[i]);
+
+            diff = (diff/360f) * Time.deltaTime;
+
+            damage -= diff;
 
 
         }
 
-        float[] output = net.FireNet(new float[] {bodyAngle,angles[0],angles[1],angles[2],angles[3],detector[0].touch,detector[1].touch,detector[2].touch,detector[3].touch});
-
-        for (int i = 0; i < wheels.Length; i++)
+        for (int i = 0; i < wheels1DegPrev.Length; i++)
         {
-            JointMotor2D jointMotor = wheels[i].motor;
-            jointMotor.motorSpeed = output[i] * 100f;
-
-            float currentAngle = 0;
-            if (i < 2)
-                currentAngle = wheels[i].transform.eulerAngles.z - body.transform.eulerAngles.z;
-            else if (i == 2)
-            {
-                float beforeAngle = wheels[0].transform.eulerAngles.z - body.transform.eulerAngles.z;
-                if (beforeAngle < 0f)
-                    beforeAngle = 360f + beforeAngle;
-                currentAngle = wheels[i].transform.eulerAngles.z - beforeAngle;
-            }
-            else if (i == 3)
-            {
-                float beforeAngle = wheels[1].transform.eulerAngles.z - body.transform.eulerAngles.z;
-                if (beforeAngle < 0f)
-                    beforeAngle = 360f + beforeAngle;
-                currentAngle = wheels[i].transform.eulerAngles.z - beforeAngle; 
-            }
-
-            if (currentAngle < 0f)
-                currentAngle = 360f + currentAngle;
-           
-            if (i < 2 && output[i] < 0f && currentAngle > 30f && currentAngle < 180f)
-            {
-                jointMotor.motorSpeed = -output[i]*0f;
-            }
-            else if (i < 2 && output[i] > 0f && currentAngle < 330f && currentAngle > 180f)
-            {
-                jointMotor.motorSpeed = -output[i] * 0f;
-            }
-            else if (i>=2 && output[i] < 0f && currentAngle > 45f && currentAngle < 180f)
-            {
-                jointMotor.motorSpeed = -output[i] * 0f;
-            }
-            else if (i >= 2 && output[i] > 0f && currentAngle < 315f && currentAngle > 180f)
-            {
-                jointMotor.motorSpeed = -output[i] * 0f;
-            }
-
-            /*if (i == 2)
-                wheels[i].useMotor = false;
-            else*/
-                wheels[i].motor = jointMotor;
+            wheels1DegPrev[i] = wheels1Deg[i];
         }
 
-
-    }
-
-    public Quaternion getJointRotation(ConfigurableJoint joint)
-    {
-        return (Quaternion.FromToRotation(joint.axis, joint.connectedBody.transform.rotation.eulerAngles));
     }
 
     public bool FailCheck()
@@ -116,13 +135,27 @@ public class Bipedal : MonoBehaviour, IAgentTester
             return true;
         }
 
-        if (body.transform.eulerAngles.z > 80f && body.transform.eulerAngles.z < 280f)
+        if ((body.transform.eulerAngles.z > 50f && body.transform.eulerAngles.z < 310f)/* || body.transform.position.y > 1.9f*/)
         {
             float fit = net.GetNetFitness();
             fit /= 2.5f;
             net.SetNetFitness(fit);
             return true;
         }
+
+        for (int i = 0; i < wheels1Broken.Length; i++)
+        {
+            if (wheels1Broken[i] == true)
+            {
+                float fit = net.GetNetFitness();
+                fit /= 2.5f;
+                net.SetNetFitness(fit);
+                return true;
+            }
+
+        }
+
+
 
         return false;
     }
@@ -138,12 +171,12 @@ public class Bipedal : MonoBehaviour, IAgentTester
     {
         float fit = body.transform.position.x;
         if (fit < 0)
-            fit = UnityEngine.Random.Range(0f,0.001f);
-
+            fit = UnityEngine.Random.Range(0f, 0.001f);
+        fit = fit * fit;
         net.SetNetFitness(fit);
     }
 
-    
+
 
     //---
     void FixedUpdate()

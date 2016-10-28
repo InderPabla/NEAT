@@ -1,5 +1,5 @@
 ﻿
-// Gives basic functionality to Agent 
+// Gives basic functionality to test an Agent 
 public interface IAgentTester {
 
     void UpdateNet(); //Function where update will take place once per frame

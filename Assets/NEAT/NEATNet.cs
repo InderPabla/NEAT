@@ -617,7 +617,7 @@ public class NEATNet {
             }
             else if (randomNumber <= 5) { //if 5
                 //flip activation state for gene
-                //gene.SetGeneState(!gene.GetGeneState());
+                gene.SetGeneState(!gene.GetGeneState());
             }
         }
 

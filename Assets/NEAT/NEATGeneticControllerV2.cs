@@ -32,6 +32,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     public bool worldActivation = false; //Creating enviroment on each generation
 
     public string networkName = "Creature"; //Name of the network (used for saving to and retrieving from database
+	public bool spawnInGrid = false;
 
     private GameObject enviroment; //Instantiated enviroment prefab
     
@@ -77,14 +78,11 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             testCounter = 0; 
             finished = new Semaphore(1, 1); //initialize a binary semaphore and set it to unlocked
 
-            //{0.5f, 1f, 1f, 4f}, {1f, 3f, 2f, 3f}, {0.1f, 2f, 2f, 4f}  works for seeker (non mover) worst to best
-            //{1f, 2f, 2f, 2f} works for collision avoidance
-
             operations = new DatabaseOperation(); //initialize database oepration 
 
             GenerateSpeciesColor(); //Create random color for each species
 
-            lineGraph.GetComponent<LineGraphDrawer>().CalibrateGraph(200f,50f,0.5f, 0.04f,0.15f,0.15f); //Calibrate line graph
+            lineGraph.GetComponent<DataDrawer>().CalibrateGraph(200f,50f,0.5f, 0.04f,0.15f,0.15f); //Calibrate line graph
         }
     }
 
@@ -129,10 +127,10 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             currentIncrement = 100f / gens; //increment of progress bar per generation
             numberOfGenerationsToRun = gens; //number of generation to run
             GeneratePopulation(); //Generate population with neural networks
-            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Running " + gens + " generations"); //information for the user on action performed
+            lineGraph.GetComponent<DataDrawer>().DisplayActionInformation("Action: Running " + gens + " generations"); //information for the user on action performed
         }
         else { //Currently simulation is running
-            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Simulation currently running");  //information for the user on action performed
+			lineGraph.GetComponent<DataDrawer>().DisplayActionInformation("Action: Simulation currently running");  //information for the user on action performed
         }   
     }
 
@@ -170,7 +168,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         if (load == false) { //if loading from database is fasle
             consultor = new NEATConsultor(numberOfInputPerceptrons, numberOfOutputPerceptrons, deltaThreshold, disjointCoefficient, excessCoefficient, averageWeightDifferenceCoefficient);  //create a consultor with perceptron and coefficients
             GenerateInitialNets(); //generate standard NEAT nets
-            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: New neural networks created"); //information for the user on action performed
+            lineGraph.GetComponent<DataDrawer>().DisplayActionInformation("Action: New neural networks created"); //information for the user on action performed
         }
         else { //loading from database is true
             consultor = new NEATConsultor(operations.retrieveNet[operations.retrieveNet.Length-1], deltaThreshold, disjointCoefficient, excessCoefficient, averageWeightDifferenceCoefficient); //create a consultor with NEAT packet retrieved from database and coefficients
@@ -190,7 +188,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                 newSpecies.Add(netCopy); //add copy to new species 
             }
             species.Add(newSpecies); //add new species to species list
-            lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Neural networks copied from sample"); //information for the user on action performed
+            lineGraph.GetComponent<DataDrawer>().DisplayActionInformation("Action: Neural networks copied from sample"); //information for the user on action performed
         }
     }
 
@@ -201,7 +199,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     public void ActionSetTimeScale(float timeScale) {
         this.timeScale = timeScale; //set time scale to parameter (when checking time scale this local copy will be used rather than the global copy)
         Time.timeScale = timeScale; //set time scale to parameter
-        lineGraph.GetComponent<LineGraphDrawer>().DisplayActionInformation("Action: Time changed to "+ timeScale); //information for the user on action performed
+        lineGraph.GetComponent<DataDrawer>().DisplayActionInformation("Action: Time changed to "+ timeScale); //information for the user on action performed
     }
 
     /// <summary>
@@ -209,7 +207,6 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
     /// </summary>
     public void ActionSaveCurrent() {
         Debug.Log("Saving");
-        //bestNet.SetNetFitness(0f);
         StartCoroutine(operations.SaveNet(bestNet, networkName)); //start coroutine to save network
     }
 
@@ -349,10 +346,14 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                     width = -16f;
                     height += -2f;
                 }
-                else
+                else {
                     width += 2f;
+				}
 
-                CreateIndividual(new Vector3(0, 0, 0), species[randomId[0]][randomId[1]], color, randomId);
+				if(spawnInGrid == true)
+                	CreateIndividual(new Vector3(width, height, 0f), species[randomId[0]][randomId[1]], color, randomId);
+				else
+					CreateIndividual(Vector3.zero, species[randomId[0]][randomId[1]], color, randomId);
             }
         }
     }
@@ -465,7 +466,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
             bestNet = new NEATNet(species[bestIndex[0]][bestIndex[1]]); //set best net from the best index
             bestNet.SetNetFitness(species[bestIndex[0]][bestIndex[1]].GetNetFitness());
-            lineGraph.GetComponent<LineGraphDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold()); //plot highest fitness on graph
+            lineGraph.GetComponent<DataDrawer>().PlotData(highestFitness, "Generation Number: " + generationNumber + ", Highest Fitness: " + highestFitness + ", Delta: " + consultor.GetDeltaThreshold()); //plot highest fitness on graph
             netDrawer.SendMessage("DrawNet",bestNet); //Draw best network
             
             for (int i = 0; i < distribution.GetLength(0); i++) { //run through all species (which have been sorted)

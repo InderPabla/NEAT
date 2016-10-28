@@ -76,30 +76,34 @@ public class NEATConsultor  {
     }
 
     /// <summary>
-    /// 
+    /// Initilize genome where every input is connected to every output
     /// </summary>
     private void InitilizeGenome() {
-        geneList = new List<NEATGene>();
+        geneList = new List<NEATGene>(); // new gene list
 
+		//connect every input to every output
         for (int i = 0; i < numberOfInputs; i++) {
             for (int j = numberOfInputs; j < numberOfInputs + numberOfOutputs; j++) {
                 AddNewGene(innovationNumber, i, j);
                 innovationNumber++;
             }
         }
+
+		//innovation number at the initilization should be inputs*outputs - 1
     }
 
     /// <summary>
-    /// 
+    /// Check if a given gene already exists within the gene list.
     /// </summary>
-    /// <param name="inNodeID"></param>
-    /// <param name="outNodeID"></param>
-    /// <returns></returns>
+    /// <param name="inNodeID">Input node to check</param>
+    /// <param name="outNodeID">Output node the check</param>
+    /// <returns>Innovation number for this gene</returns>
     public int CheckGeneExistance(int inNodeID, int outNodeID) {
         NEATGene gene = null;
         int oldInnovationNumber = innovationNumber;
         int numberOfGenes = geneList.Count;
 
+		//Check if this gene exists in the current consultor gene list
         for (int i = 0; i < numberOfGenes; i++) {
             gene = geneList[i];
             int inID = gene.GetInID();
@@ -109,75 +113,75 @@ public class NEATConsultor  {
             }
         }
 
-        AddNewGene(innovationNumber, inNodeID, outNodeID);
-        innovationNumber++;
+        AddNewGene(innovationNumber, inNodeID, outNodeID); //create a new gene
+        innovationNumber++; //increment innovation number
 
-        return oldInnovationNumber;
+        return oldInnovationNumber; //return old innovation number
     }
 
     /// <summary>
-    /// 
+    /// Create a new gene and add it to the gene list.
     /// </summary>
-    /// <param name="inno"></param>
-    /// <param name="inNodeID"></param>
-    /// <param name="outNodeID"></param>
+    /// <param name="inno">New innovation number</param>
+    /// <param name="inNodeID">New input node</param>
+    /// <param name="outNodeID">New output node</param>
     public void AddNewGene(int inno, int inNodeID, int outNodeID) {
         NEATGene gene = new NEATGene(inno, inNodeID, outNodeID, 1f, true);
         geneList.Add(gene);
     }
 
     /// <summary>
-    /// 
+    /// Set delta threshold value. Used generally to dynamically change delta value at run time.
     /// </summary>
-    /// <param name="deltaThreshold"></param>
+    /// <param name="deltaThreshold">New delta threshold to be set</param>
     public void SetDeltaThreshold(float deltaThreshold) {
         this.deltaThreshold = deltaThreshold;
     }
 
     /// <summary>
-    /// 
+    /// Get the disjoint coefficient
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Disjoint coefficient</returns>
     public float GetDisjointCoefficient() {
         return disjointCoefficient;
     }
 
     /// <summary>
-    /// 
+    /// Get the excess coefficient
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Excess coefficient</returns>
     public float GetExcessCoefficient() {
         return excessCoefficient;
     }
 
     /// <summary>
-    /// 
+    /// Get the average weight difference coefficient
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Average weight difference coefficient</returns>
     public float GetAverageWeightDifferenceCoefficient() {
         return averageWeightDifferenceCoefficient;
     }
 
     /// <summary>
-    /// 
+    /// Get the delta threhold value
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Delta threshold</returns>
     public float GetDeltaThreshold() {
         return deltaThreshold;
     }
 
     /// <summary>
-    /// 
+    /// Get the number of genes in the genome
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Numbers of genes in genome</returns>
     public int GetGeneCount() {
         return geneList.Count;
     }
 
     /// <summary>
-    /// 
+    /// Concat all the gene strings in the consultor genome list 
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Genome converted to string</returns>
     public string GetGenomeString() {
         string genome = ""; //
         int numberOfGenes = geneList.Count;

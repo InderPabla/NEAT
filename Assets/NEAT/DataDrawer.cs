@@ -1,35 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class LineGraphDrawer : MonoBehaviour {
-
-    public GameObject linePrefab;
-    public TextMesh displayGenerationalText;
-    public TextMesh displayActionText;
-
-    List<GameObject> lines;
-
-    private float maxY, maxX, seperationX, seperationY, axisLineWidth, plotLineWidth;
+/// <summary>
+/// Draws line data, displays action information, and generational fitness information
+/// </summary>
+public class DataDrawer : MonoBehaviour {
+	
+    public GameObject linePrefab; //line prebaf for displaying line in graph
+    public TextMesh displayGenerationalText; //displaying fitness information onto a text mesh
+    public TextMesh displayActionText; //displaying action information onto a text mesh
+	
+	private List<GameObject> lines; //list of line gameobjects to create
+	private float maxY, maxX, seperationX, seperationY, axisLineWidth, plotLineWidth; //line data 
     private Vector2 oldLocation;
     private Vector2 centerLocation;
-    LineRenderer linePlot;
-    List<Vector2> linePlotList = new List<Vector2>();
-    int vertextCount = 2;
+	private LineRenderer linePlot;
+	private List<Vector2> linePlotList = new List<Vector2>();
+	private int vertextCount = 2;
 
-    List<string> generationalInformationList = new List<string>();
-    List<string> actionInformationList = new List<string>();
-    int INFORMATION_LIST_SIZE = 10;
+	// Generational and action information stored in list
+	private List<string> generationalInformationList = new List<string>();
+	private List<string> actionInformationList = new List<string>();
+	private const int INFORMATION_LIST_SIZE = 10;
     
-
     void Start () {
         lines = new List<GameObject>();
         centerLocation = transform.position;
     }
-	
-	void Update () {
-	
-	}
 
+	/// <summary>
+	/// Calibrates the graph.
+	/// </summary>
+	/// <param name="maxY">Maximum height of y fitness</param>
+	/// <param name="maxX">Maximum width of x generationvalue</param>
+	/// <param name="seperationX">Low sepration = Many generations displayed, High Seperation = Less generations displayed</param>
+	/// <param name="seperationY"></param>
+	/// <param name="axisLineWidth">Axis line width.</param>
+	/// <param name="plotLineWidth">Plot line width.</param>
     public void CalibrateGraph(float maxY, float maxX, float seperationX, float seperationY, float axisLineWidth, float plotLineWidth) {
         for (int i = 0; i < lines.Count; i++) {
             Destroy(lines[i]);

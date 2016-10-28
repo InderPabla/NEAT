@@ -55,9 +55,9 @@
      <Compile Include="Assets\AgentProblems\RacerAI\CollsionCheck.cs" />
      <Compile Include="Assets\AgentProblems\RacerAI\RacerAI.cs" />
      <Compile Include="Assets\AgentProblems\RacerAI\TrackNextSensor.cs" />
+     <Compile Include="Assets\NEAT\DataDrawer.cs" />
      <Compile Include="Assets\NEAT\DatabaseOperation.cs" />
      <Compile Include="Assets\NEAT\IAgentTester.cs" />
-     <Compile Include="Assets\NEAT\LineGraphDrawer.cs" />
      <Compile Include="Assets\NEAT\NEATConsultor.cs" />
      <Compile Include="Assets\NEAT\NEATGene.cs" />
      <Compile Include="Assets\NEAT\NEATGeneticControllerV2.cs" />
