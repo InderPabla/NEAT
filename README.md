@@ -32,10 +32,10 @@ I wrote NEAT for C# and tested it in Unity3D enviroment.
 ![](https://github.com/InderPabla/NEAT/blob/master/Images/1.gif)
 
 ## Quadrupedal creature
-- 12 inputs consisting of, 8 joint angles and 4 touch sensors
-- 8 outputs which give motor control to the joints 
-- Fitness is calculated based on (distance travelled * average speed)
-![](https://github.com/InderPabla/NEAT/blob/master/Images/4.gif)
+- 9 inputs consisting of joint angles with respect to joint movement limit
+- 4 outputs joint turn speed
+- Fitness is calculated based on distance travelled and maximum joint movement 
+![](https://github.com/InderPabla/NEAT/blob/master/Images/14.gif)
 
 ## Food Seekers
 ### Single sensor - food seeker 
