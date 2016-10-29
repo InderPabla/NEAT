@@ -19,10 +19,11 @@ public class Bipedal : MonoBehaviour, IAgentTester
 
     public WheelJoint2D[] wheels1 = new WheelJoint2D[4];
     public Rigidbody2D body;
-    public TouchDetector[] detector1 = new TouchDetector[4];
+    public TouchDetector[] detector1 = new TouchDetector[5];
     public bool[] wheels1Broken = new bool[4];
     float[] wheels1DegPrev = new float[4];
 
+    //10 (9+1 bias) inputs, 4 outputs 
     public void UpdateNet()
     {
         float bodyDeg = body.transform.eulerAngles.z;
@@ -36,7 +37,7 @@ public class Bipedal : MonoBehaviour, IAgentTester
 
         float[] wheels1Rad = new float[4];
         float[] wheels1Deg = new float[4];
-        float[] wheels1DegPrev = new float[4];
+        //float[] wheels1DegPrev = new float[4];  TRY IT OUT NOW!!!
 
         for (int i = 0; i < wheels1Deg.Length; i++)
         {
@@ -94,7 +95,7 @@ public class Bipedal : MonoBehaviour, IAgentTester
                 }
                 else
                 {
-                    speed = value * 150f;
+                    speed = value * 200f;
                 }
 
                 jointMotor.motorSpeed = speed;
@@ -106,7 +107,7 @@ public class Bipedal : MonoBehaviour, IAgentTester
             }
         }
 
-        if (detector1[0].touch == 1 || detector1[1].touch == 1)
+        if (detector1[0].touch == 1 || detector1[1].touch == 1 || detector1[4].touch == 1)
             damage -= 5f;
 
 
@@ -114,7 +115,11 @@ public class Bipedal : MonoBehaviour, IAgentTester
         {
             float diff = Mathf.Abs(wheels1Deg[i] - wheels1DegPrev[i]);
 
-            diff = (diff/360f) * Time.deltaTime;
+            if (diff < 0.0001)
+                diff = 0.0001f;
+            diff = Mathf.Pow((1f / diff), 0.1f) *0.05f;
+            //diff = (diff/360f) *1f;
+
 
             damage -= diff;
 
@@ -155,7 +160,14 @@ public class Bipedal : MonoBehaviour, IAgentTester
 
         }
 
-
+        if (detector1[0].touch == 1 || detector1[1].touch == 1 || detector1[4].touch == 1)
+        {
+            //damage -= 5f;
+            float fit = net.GetNetFitness();
+            fit /= 2.5f;
+            net.SetNetFitness(fit);
+            return true;
+        }
 
         return false;
     }

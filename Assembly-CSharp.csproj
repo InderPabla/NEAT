@@ -50,6 +50,7 @@
      <Compile Include="Assets\AgentProblems\Bipedal\Bipedal3.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\Bipedal4.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\TouchDetector.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\Worm1.cs" />
      <Compile Include="Assets\AgentProblems\ObsticalAvoider\ObsticalAvoider.cs" />
      <Compile Include="Assets\AgentProblems\PoleBalance\PoleBalancer.cs" />
      <Compile Include="Assets\AgentProblems\RacerAI\CollsionCheck.cs" />
