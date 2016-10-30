@@ -49,6 +49,7 @@
      <Compile Include="Assets\AgentProblems\Bipedal\Bipedal2.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\Bipedal3.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\Bipedal4.cs" />
+     <Compile Include="Assets\AgentProblems\Bipedal\StarFish1.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\TouchDetector.cs" />
      <Compile Include="Assets\AgentProblems\Bipedal\Worm1.cs" />
      <Compile Include="Assets\AgentProblems\ObsticalAvoider\ObsticalAvoider.cs" />
@@ -71,11 +72,17 @@
      <Compile Include="Assets\ProgressBar\Script\Utils.cs" />
      <Compile Include="Assets\Testing\BehaviourTest.cs" />
      <Compile Include="Assets\Testing\BipedalAngleTest.cs" />
+ <Reference Include="UnityEngine.Advertisements">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Advertisements/UnityEngine.Advertisements.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Networking">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+ </Reference>
+ <Reference Include="UnityEngine.Analytics">
+ <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityAnalytics/UnityEngine.Analytics.dll</HintPath>
  </Reference>
  <Reference Include="LitJson">
  <HintPath>C:/Users/Pabla/Documents/Unity Projects/NEAT_V2/Assets/General/LitJson.dll</HintPath>

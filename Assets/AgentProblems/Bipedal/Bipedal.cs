@@ -27,6 +27,7 @@ public class Bipedal : MonoBehaviour, IAgentTester
     public void UpdateNet()
     {
         float bodyDeg = body.transform.eulerAngles.z;
+        
         if (bodyDeg < 0f)
             bodyDeg = 360f + bodyDeg;
 
@@ -37,14 +38,13 @@ public class Bipedal : MonoBehaviour, IAgentTester
 
         float[] wheels1Rad = new float[4];
         float[] wheels1Deg = new float[4];
-        //float[] wheels1DegPrev = new float[4];  TRY IT OUT NOW!!!
 
         for (int i = 0; i < wheels1Deg.Length; i++)
         {
             wheels1Deg[i] = wheels1[i].transform.eulerAngles.z;
             if (wheels1Deg[i] < 0f)
                 wheels1Deg[i] = 360f + wheels1Deg[i];
-
+            
             if (i < 2)
             {
                 wheels1Deg[i] = wheels1Deg[i] - bodyDeg;
@@ -181,10 +181,17 @@ public class Bipedal : MonoBehaviour, IAgentTester
     //Final fitness calculations
     public void CalculateFitnessOnFinish()
     {
-        float fit = body.transform.position.x;
+        float fit = (body.transform.position.x + 
+            wheels1[0].transform.position.x + 
+            wheels1[1].transform.position.x+
+            wheels1[2].transform.position.x+
+            wheels1[3].transform.position.x)/5f;
+
         if (fit < 0)
             fit = UnityEngine.Random.Range(0f, 0.001f);
         fit = fit * fit;
+
+
         net.SetNetFitness(fit);
     }
 

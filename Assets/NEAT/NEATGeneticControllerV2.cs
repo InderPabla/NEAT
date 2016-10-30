@@ -54,7 +54,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
 
     private float timeScale = 0; //Current time scale
     private float currentIncrement = 0; //Current increment rate for progress bar
-    private float[,] colors = new float[100, 3]; //Species color indexing (up to 100 species)
+    private float[,] colors; //Species color indexing (up to 100 species)
 
     private bool viewMode = false; //If user is in view mode
     private bool computing = false; //If a generation is currently computing
@@ -79,6 +79,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
             finished = new Semaphore(1, 1); //initialize a binary semaphore and set it to unlocked
 
             operations = new DatabaseOperation(); //initialize database oepration 
+            colors  = new float[populationSize, 3];
 
             GenerateSpeciesColor(); //Create random color for each species
 

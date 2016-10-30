@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 
 
-public class Worm1 : MonoBehaviour, IAgentTester
+public class StarFish1 : MonoBehaviour, IAgentTester
 {
 
     private NEATGeneticControllerV2 controller;
@@ -17,33 +17,34 @@ public class Worm1 : MonoBehaviour, IAgentTester
     private float damage = 100f;
     private bool finished = false;
 
-    public WheelJoint2D[] wheels1 = new WheelJoint2D[4];
+    public WheelJoint2D[] wheels1 = new WheelJoint2D[5];
+    public Rigidbody2D body;
+    public TouchDetector bodyTouch;
     public TouchDetector[] detector1 = new TouchDetector[5];
-    public Rigidbody2D front;
+    private float[] initialDeg = new float[5];
 
+    //12 (11+1 bias) inputs, 5 outputs 
     public void UpdateNet()
     {
-        float frontDeg = front.transform.eulerAngles.z;
-        if (frontDeg < 0f)
-            frontDeg = 360f + frontDeg;
+        float bodyDeg = body.transform.eulerAngles.z;
 
-        float frontRad = frontDeg;
-        if (frontRad > 180f)
-            frontRad = frontRad - 360f;
-        frontRad *= Mathf.Deg2Rad;
+        if (bodyDeg < 0f)
+            bodyDeg = 360f + bodyDeg;
 
-        float[] wheels1Rad = new float[4];
-        float[] wheels1Deg = new float[4];
+        float bodyRad = bodyDeg;
+        if (bodyRad > 180f)
+            bodyRad = bodyRad - 360f;
+        bodyRad *= Mathf.Deg2Rad;
+
+        float[] wheels1Rad = new float[5];
+        float[] wheels1Deg = new float[5];
 
         for (int i = 0; i < wheels1Deg.Length; i++)
         {
-            wheels1Deg[i] = wheels1[i].transform.eulerAngles.z;
+            wheels1Deg[i] = wheels1[i].transform.eulerAngles.z - initialDeg[i];
             if (wheels1Deg[i] < 0f)
                 wheels1Deg[i] = 360f + wheels1Deg[i];
 
-
-            if (wheels1Deg[i] < 0f)
-                wheels1Deg[i] = 360f + wheels1Deg[i];
 
             wheels1Rad[i] = wheels1Deg[i];
             if (wheels1Rad[i] > 180f)
@@ -52,36 +53,34 @@ public class Worm1 : MonoBehaviour, IAgentTester
         }
 
 
-        float[] output = net.FireNet(new float[] {frontDeg,
-            wheels1Rad[0]/(Mathf.PI/6f), wheels1Rad[1]/(Mathf.PI/6f), wheels1Rad[2]/(Mathf.PI/6f), wheels1Rad[3]/(Mathf.PI/6f),
-            detector1[0].touch, detector1[1].touch, detector1[2].touch, detector1[3].touch, detector1[4].touch});
+        float[] output = net.FireNet(new float[] { bodyRad,
+            wheels1Rad[0], wheels1Rad[1], wheels1Rad[2], wheels1Rad[3],wheels1Rad[4],
+            detector1[0].touch, detector1[1].touch, detector1[2].touch, detector1[3].touch,detector1[4].touch});
 
 
         for (int i = 0; i < wheels1Deg.Length; i++)
         {
-
+           
             JointMotor2D jointMotor = wheels1[i].motor;
             float speed = 0f;
             float value = output[i];
 
-            if (value < 0 && wheels1Deg[i] > 50f && wheels1Deg[i] < 180f)
+            if (value < 0 && wheels1Deg[i] > 10f && wheels1Deg[i] < 180f)
             {
                 speed = 0;
             }
-            else if (value > 0 && wheels1Deg[i] < 310f && wheels1Deg[i] > 180f)
+            else if (value > 0 && wheels1Deg[i] < 10f && wheels1Deg[i] > 180f)
             {
                 speed = 0;
             }
             else
             {
-                speed = value * 200f;
+                speed = value * 150f;
             }
 
             jointMotor.motorSpeed = speed;
             wheels1[i].motor = jointMotor;
         }
-
-
     }
 
     public bool FailCheck()
@@ -91,6 +90,8 @@ public class Worm1 : MonoBehaviour, IAgentTester
             return true;
         }
 
+        /*if (bodyTouch.touch == 1)
+            return true;*/
         return false;
     }
 
@@ -103,7 +104,7 @@ public class Worm1 : MonoBehaviour, IAgentTester
     //Final fitness calculations
     public void CalculateFitnessOnFinish()
     {
-        float fit = wheels1[0].transform.position.x;
+        float fit = body.transform.position.x;
         if (fit < 0)
             fit = UnityEngine.Random.Range(0f, 0.001f);
         fit = fit * fit;
@@ -111,7 +112,7 @@ public class Worm1 : MonoBehaviour, IAgentTester
     }
 
 
-    
+
     //---
     void FixedUpdate()
     {
@@ -160,5 +161,17 @@ public class Worm1 : MonoBehaviour, IAgentTester
     {
         this.controller = controller;
         TestFinished += controller.OnFinished; //subscrive to an event notification
+    }
+
+    void Start()
+    {
+        for (int i = 0; i < initialDeg.Length; i++)
+        {
+            initialDeg[i] = wheels1[i].transform.eulerAngles.z;
+            if (initialDeg[i] < 0)
+            {
+                initialDeg[i] = 360f + initialDeg[i];
+            }
+        }
     }
 }

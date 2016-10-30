@@ -882,36 +882,37 @@ public class NEATNet {
     private static NEATGene CrossoverCopyGene(NEATGene copyGene, int compareValue) {
         NEATGene gene = new NEATGene(copyGene); //deep copy gene 
 
-        int randomNumber = Random.Range(0, 5); //0-4
+        /*int randomNumber = Random.Range(0, 20); //0-19
 
         if (compareValue == 2) { //if gene is false in both parents
-            randomNumber = Random.Range(0, 11); //0-10
-            if (randomNumber == 0) { //9% chance of activating this gene
+            randomNumber = Random.Range(0, 10); //0-9
+            if (randomNumber == 0) { //10% chance of activating this gene
                 gene.SetGeneState(true); //activate
             }
         }
         else if (gene.GetGeneState() == false && randomNumber == 0) { //gene is false and 20% chance of activating this gene
             gene.SetGeneState(true); //activate
-        }
+        }*/
 
-        /*if (compareValue == 1) {
-            int randomNumber = Random.Range(0, 26);
+        int factor = 2;
+        if (compareValue == 1) {
+            int randomNumber = Random.Range(0, 25* factor);
             if (randomNumber == 0) {
                 gene.SetGeneState(false);
             }
         }
         else if (compareValue == 2) {
-            int randomNumber = Random.Range(0, 26);
+            int randomNumber = Random.Range(0, 10 * factor);
             if (randomNumber == 0) {
                 gene.SetGeneState(true);
             }
         }
         else {
-            int randomNumber = Random.Range(0, 11);
+            int randomNumber = Random.Range(0, 25 * factor);
             if (randomNumber == 0) {
                 gene.SetGeneState(!gene.GetGeneState());
             }
-        }*/
+        }
 
         return gene; //return new gene
     }

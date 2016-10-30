@@ -12,7 +12,7 @@ public class NEATNetDraw : MonoBehaviour {
     private List<GameObject> nodeList;
     private Vector3[] locations;
     private Vector3 topLeft;
-
+    private float factor = 0.5f;
     /// <summary>
     /// Initilize line and node list, followed by getting the position where this object is placed.
     /// </summary>
@@ -46,7 +46,7 @@ public class NEATNetDraw : MonoBehaviour {
             node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.green;
             nodeList.Add(node);
-            staryY--;
+            staryY= staryY- (factor);
 
             locations[locationIndex] = loc;
             locationIndex++;
@@ -60,7 +60,7 @@ public class NEATNetDraw : MonoBehaviour {
             node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.white;
             nodeList.Add(node);
-            staryY--;
+            staryY = staryY - (factor);
 
             locations[locationIndex] = loc;
             locationIndex++;
@@ -71,10 +71,10 @@ public class NEATNetDraw : MonoBehaviour {
         float yn = 0;
         float angle = 0;
         for (int i = hiddenStartIndex; i < numberOfNodes; i++) {
-            xn = Mathf.Sin(Mathf.Deg2Rad * angle) * 2;
-            yn = Mathf.Cos(Mathf.Deg2Rad * angle) * 2;
+            xn = Mathf.Sin(Mathf.Deg2Rad * angle) * (2*factor);
+            yn = Mathf.Cos(Mathf.Deg2Rad * angle) * (2 * factor);
 
-            Vector3 loc = new Vector3(xn + 5f + topLeft.x, ((yn + topLeft.y) - (numberOfInputs / 2f))-7f, 0);
+            Vector3 loc = new Vector3(xn + (5f* factor) + topLeft.x, ((yn + topLeft.y) - (numberOfInputs / 2f))-(7f*factor), 0);
             GameObject node = (GameObject)Instantiate(nodePrefab, loc, nodePrefab.transform.rotation);
             node.transform.parent = transform;
             node.GetComponent<Renderer>().material.color = Color.red;
@@ -90,7 +90,7 @@ public class NEATNetDraw : MonoBehaviour {
         
 		//create line connection objects
         for (int i = 0; i < colSize; i++) {
-            //if (geneConnections[i][2] != 0f){
+            if (geneConnections[i][2] != 0f){
                 GameObject lineObj = (GameObject)Instantiate(linePrefab);
                 lineObj.transform.parent = transform;
                 lineList.Add(lineObj);
@@ -99,7 +99,7 @@ public class NEATNetDraw : MonoBehaviour {
                 if ((int)geneConnections[i][0] != (int)geneConnections[i][1])
                     lineRen.SetPosition(1, locations[(int)geneConnections[i][1]]);
                 else
-                    lineRen.SetPosition(1, locations[(int)geneConnections[i][1]] + new Vector3(1f, 0, 0));
+                    lineRen.SetPosition(1, locations[(int)geneConnections[i][1]] + new Vector3(1f, 0, 0)) ;
                 lineRen.material = new Material(Shader.Find("Particles/Additive"));
                 float size = 0.1f;
                 float weight = geneConnections[i][2];
@@ -111,7 +111,7 @@ public class NEATNetDraw : MonoBehaviour {
                 else if (weight < 0)
                     color = Color.red;
                 else
-                    color = Color.white;
+                    color = Color.cyan;
 
                 size = size * factor;
                 if (size < 0.05f)
@@ -121,7 +121,7 @@ public class NEATNetDraw : MonoBehaviour {
 
                 lineRen.SetColors(color, color);
                 lineRen.SetWidth(size, size);
-            //}
+            }
         } 
     }
 
