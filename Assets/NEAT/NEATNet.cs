@@ -4,10 +4,132 @@ using UnityEngine;
 using System.Linq;
 using System.Text;
 
+
+public class Neuron
+{
+    public int id;
+    public float value;
+    public List<NEATGene> incomming = new List<NEATGene>();
+    public NEATGene[] incommingArray;
+
+    public Neuron(int id, float value)
+    {
+        this.id = id;
+        this.value = value;
+    }
+}
+
 /// <summary>
 /// Handels mutation, crossover, specification, feedforward activation and creation of neural network's genotype. 
 /// </summary>
 public class NEATNet {
+    
+    // ADDING GENE NETWORK TO NEURAL NETWORK CONVERSION USED IN LSES VERSON 2
+    //------------------------------------------------
+    private List<Neuron> network;
+    private Neuron[] networkArray;
+    private int usedHiddenNeuronIndex;
+
+    public void GenerateNeuralNetworkFromGenome()
+    {
+        network = new List<Neuron>();
+
+        usedHiddenNeuronIndex = int.MinValue;
+        for (int i = 0; i < geneList.Count; i++)
+        {
+            int inNode = geneList[i].GetInID();
+            int outNode = geneList[i].GetOutID();
+
+            if (usedHiddenNeuronIndex < inNode)
+                usedHiddenNeuronIndex = inNode;
+
+            if (usedHiddenNeuronIndex < outNode)
+                usedHiddenNeuronIndex = outNode;
+        }
+
+        usedHiddenNeuronIndex = usedHiddenNeuronIndex + 1; //incremented as per LSES algorithm 
+
+
+        for (int i = 0; i < usedHiddenNeuronIndex; i++)
+        {
+            Neuron neuron = new Neuron(i, 0f);
+            network.Add(neuron);
+        }
+
+        network.Sort((x, y) => x.id.CompareTo(y.id));
+        geneList.Sort((x, y) => x.GetOutID().CompareTo(y.GetOutID()));
+
+
+        for (int i = 0; i < geneList.Count; i++)
+        {
+            NEATGene gene = geneList[i];
+
+            if (gene.GetGeneState() == true)
+            {
+                network[gene.GetOutID()].incomming.Add(gene);
+            }
+        }
+
+        networkArray = network.ToArray();
+
+        for (int i = 0; i < networkArray.Length; i++)
+        {
+            networkArray[i].incomming.Sort((x, y) => x.GetInID().CompareTo(y.GetInID()));
+            networkArray[i].incommingArray = networkArray[i].incomming.ToArray();
+        }
+
+
+        geneList.Sort((x, y) => x.GetInnovation().CompareTo(y.GetInnovation())); //reset back to sorted interms of innovation number
+    }
+
+    public float[] FireNet(float[] inputs)
+    {
+        for (int i = 0; i < inputs.Length; i++)
+        {
+            networkArray[i].value = inputs[i];
+
+        }
+        float[] output = new float[numberOfOutputs];
+
+        float[] tempValues = new float[networkArray.Length];
+        for (int i = 0; i < tempValues.Length; i++)
+            tempValues[i] = networkArray[i].value;
+
+        networkArray[numberOfInputs - 1].value = 1f;
+
+        for (int i = 0; i < networkArray.Length; i++)
+        {
+            float value = 0;
+            Neuron neuron = networkArray[i];
+            NEATGene[] incommingArray = neuron.incommingArray;
+
+            if (incommingArray.Length > 0)
+            {
+                for (int j = 0; j < incommingArray.Length; j++)
+                {
+                    if (incommingArray[j].GetGeneState() == true)
+                    {
+                        value = value + (incommingArray[j].GetWeight() * tempValues[incommingArray[j].GetInID()]);
+                    }
+                }
+                neuron.value = (float)System.Math.Tanh(value);
+            }
+        }
+
+
+
+        for (int i = 0; i < output.Length; i++)
+        {
+            output[i] = networkArray[i + numberOfInputs].value;
+
+        }
+
+        return output;
+    }
+
+
+    //------------------------------------------------
+
 
     private NEATConsultor consultor; //Handles consultor genome sequence
 
@@ -437,7 +559,7 @@ public class NEATNet {
     /// </summary>
     /// <param name="inputs">Inputs to set as the input perceptron values</param>
     /// <returns>An array of output values after feed-forward</returns>
-    public float[] FireNet(float[] inputs){
+    public float[] FireNet_OLD(float[] inputs){
         int numberOfGenes = geneList.Count; //get number of genes
 
         SetInputValues(inputs); //set input values to the input nodes
@@ -492,6 +614,8 @@ public class NEATNet {
         }
 
         MutateWeight(); //mutate weight
+
+
     }
 
     /// <summary>
@@ -730,6 +854,7 @@ public class NEATNet {
     internal static NEATNet CreateMutateCopy(NEATNet net) {
         NEATNet copy = new NEATNet(net); //create deep copy of net
         copy.Mutate(); //mutate copy
+        copy.GenerateNeuralNetworkFromGenome(); //< NEW LSES ADDITION
 
         return copy; //return mutated deep copy
     }

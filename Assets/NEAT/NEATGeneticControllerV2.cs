@@ -274,6 +274,7 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
         for (int i = 0; i < populationSize; i++) { //run through population size
             NEATNet net = new NEATNet(consultor, new int[] { 0, i }, numberOfInputPerceptrons, numberOfOutputPerceptrons, testTime); //create net with consultor, perceptron information and test time
             net.Mutate(); //mutate once for diversity
+            net.GenerateNeuralNetworkFromGenome();  //< NEW LSES ADDITION
 
             if (species.Count == 0) { //if nothing exists yet
                 List<NEATNet> newSpecies = new List<NEATNet>(); //create a new species
@@ -506,6 +507,8 @@ public class NEATGeneticControllerV2 : MonoBehaviour {
                         else { //pick % elite to keep safe
                             net = new NEATNet(bestNetworks[bestNetworks.Count-1/*UnityEngine.Random.Range(0, bestNetworks.Count)*/]); //pick randomly and keep elite the same
                         }
+
+                        net.GenerateNeuralNetworkFromGenome();  //< NEW LSES ADDITION
 
                         //reset copied stats
                         net.SetNetFitness(0f);
