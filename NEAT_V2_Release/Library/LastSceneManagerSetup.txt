@@ -1,0 +1,4 @@
+sceneSetups:
+- path: Assets/Scenes/NEAT_Racer_AI.unity
+  isLoaded: 1
+  isActive: 1
